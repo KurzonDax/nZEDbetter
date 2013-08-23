@@ -29,7 +29,7 @@ con = mdb.connect(host=conf['DB_HOST'], user=conf['DB_USER'], passwd=conf['DB_PA
 cur = con.cursor()
 
 #get active groups
-cur.execute("SELECT name from groups where active = 1")
+cur.execute("SELECT name from groups where active = 1 ORDER BY last_updated ASC")
 datas = cur.fetchall()
 if len(datas) == 0:
 	sys.exit("No Active Groups")
