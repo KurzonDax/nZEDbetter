@@ -1556,29 +1556,32 @@ class Releases
         $where = (!empty($groupID)) ? " AND c.groupID=".$groupID : '';
         if ($echooutput)
             echo "\nProcessing collections...\n";
-        $collections = $db->queryDirect("SELECT c.ID AS ID, c.filesize AS filesize, c.totalFiles AS totalFiles, g.minsizetoformrelease AS groupsize, g.minfilestoformrelease AS groupfiles FROM `collections` AS c INNER JOIN groups as g ON c.groupID=g.ID WHERE c.filecheck=3".$where);
-        $totalColCount = $db->getNumRows($collections);
+        $collectionsresult=$db->queryDirect("SELECT c.ID AS colID, c.filesize AS colfilesize, c.totalFiles AS coltotalFiles, g.minsizetoformrelease AS groupsize, g.minfilestoformrelease AS groupfiles FROM collections AS c INNER JOIN groups as g ON c.groupID=g.ID WHERE c.filecheck=3");
+        $collectionstotal=$db->getNumRows($collectionsresult);
+        if($echooutput)
+            Echo "\nFound ".$collectionstotal." collections to check.\n";
 
-        if($totalColCount)
+        if ($collectionstotal>0)
         {
-            $colsProcessed = 0;
-            $colsDeleted = 0;
+            $colsDeleted=0;
+            $colsprocessed=0;
             $totalColsProcessTime = microtime(true);
-            $db->setAutoCommit(false);
-            while($colRow=$db->fetchAssoc($collections));
+            $db->setAutoCommit(FALSE);
+            while($collectionrow=$db->fetchAssoc($collectionsresult))
             {
-                $colsProcessed ++;
-                $consoletools->overWrite("Examining collection ".$consoletools->percentString($colsProcessed, $totalColCount)." ID=".$colRow['ID']);
+                $colsprocessed++;
+                if($echooutput)
+                    $consoletools->overWrite("Collections processed: ".$consoletools->percentString($colsprocessed,$collectionstotal)." ID = ".$collectionrow['colID']);
                 $tooLittleTooMuch = false;
-                if($colRow['groupsize'] != 0  && !is_null($colRow['groupsize']) && $colRow['filesize'] < $colRow['groupsize']) $tooLittleTooMuch = true;
-                elseif($this->siteMinFileSize != 0 && !is_null($this->siteMinFileSize) && $colRow['filesize'] < $this->siteMinFileSize) $tooLittleTooMuch = true;
-                elseif($colRow['groupfiles'] != 0 && !is_null($colRow['groupfiles']) && $colRow['totalFiles'] < $colRow['groupfiles']) $tooLittleTooMuch = true;
-                elseif($this->siteMinFileCount != 0 && !is_null($this->siteMinFileCount) && $colRow['totalFiles'] < $this->siteMinFileCount) $tooLittleTooMuch = true;
-                elseif($this->siteMaxFileSize !=0 && !is_null($this->siteMaxFileSize) && $colRow['filesize'] > $this->siteMaxFileSize) $tooLittleTooMuch = true;
+                if($collectionrow['groupsize'] != 0  && !is_null($collectionrow['groupsize']) && $collectionrow['colfilesize'] < $collectionrow['groupsize']) $tooLittleTooMuch = true;
+                elseif($this->siteMinFileSize != 0 && !is_null($this->siteMinFileSize) && $collectionrow['colfilesize'] < $this->siteMinFileSize) $tooLittleTooMuch = true;
+                elseif($collectionrow['groupfiles'] != 0 && !is_null($collectionrow['groupfiles']) && $collectionrow['coltotalFiles'] < $collectionrow['groupfiles']) $tooLittleTooMuch = true;
+                elseif($this->siteMinFileCount != 0 && !is_null($this->siteMinFileCount) && $collectionrow['coltotalFiles'] < $this->siteMinFileCount) $tooLittleTooMuch = true;
+                elseif($this->siteMaxFileSize !=0 && !is_null($this->siteMaxFileSize) && $collectionrow['colfilesize'] > $this->siteMaxFileSize) $tooLittleTooMuch = true;
                 // See if we got a hit
                 if($tooLittleTooMuch)
                 {
-                    $db->query("UPDATE collections SET filecheck=5 WHERE ID=".$colRow['ID']);
+                    $db->query("UPDATE collections SET filecheck=990 WHERE ID=".$collectionrow['colID']);
                     $colsDeleted ++;
                 }
             }
@@ -1588,7 +1591,7 @@ class Releases
             if ($echooutput)
             {
                 echo "\n\nTotal collections marked for deletion: ".$colsDeleted."\n";
-                echo "Total processing time: ".number_format($totalColsProcessTime,4)." Average per collection: ".number_format(($totalColsProcessTime/$totalColCount),4)."\n";
+                echo "Total processing time: ".number_format($totalColsProcessTime,4)."\nAverage per collection: ".number_format(($totalColsProcessTime/$colsprocessed),4)."\n";
             }
         }
         // Nothing more to see here... moving on
@@ -1930,7 +1933,7 @@ class Releases
 
 			$timing = $consoletools->convertTime(TIME() - $stage8);
 			if ($echooutput)
-				echo $iFoundcnt . " Releases updated in " . $timing . ".";
+				echo $iFoundcnt . " Releases updated in " . $timing . ".\n";
 		}
 	}
 
@@ -1975,63 +1978,78 @@ class Releases
 		$remcount = $passcount = $passcount = $dupecount = $relsizecount = $completioncount = $disabledcount = $disabledgenrecount = $miscothercount = 0;
 
 		$where = (!empty($groupID)) ? " AND collections.groupID = " . $groupID : "";
+        $furiousPurge = $db->queryOneRow("SELECT VALUE as furious FROM tmux WHERE setting='FURIOUS_PURGE'");
+        $fastAndFurious = $furiousPurge['furious'];
 
 		// Delete old releases and finished collections.
 		if ($echooutput)
 			echo $n."\033[1;33m[".date("H:i:s A")."] Stage 7a -> Delete finished collections.\033[0m".$n;
 		$stage7 = TIME();
-
+        if ($fastAndFurious == 'TRUE' && $echooutput)
+            echo "\n\033[00;33mFurious purging enabled.\n\n\033[00;37m";
 		// Completed releases and old collections that were missed somehow.
 		// $db->queryDirect(sprintf("DELETE collections, binaries, parts
 		//				  FROM collections INNER JOIN binaries ON collections.ID = binaries.collectionID INNER JOIN parts on binaries.ID = parts.binaryID
 		//				  WHERE collections.filecheck = 5 " . $where));
 		// $reccount = $db->getAffectedRows();
-        $colsDeleted = 0;
-        $binsDeleted = 0;
-        $partsDeleted = 0;
 
-        // Using thread ID to mark the collections to delete will allow us to multi-thread this function in the future if desired.
-        $threadID = $db->queryOneRow("SELECT connection_ID() as thread_ID");
-        if ($echooutput)
-            echo "Using thread ID ".$threadID['thread_ID']." to mark collections.\n";
-        $db->query("UPDATE collections SET filecheck=".$threadID['thread_ID']." WHERE filecheck = 5 ".$where." ORDER BY dateadded ASC LIMIT ".$maxcollections);
-        $completeCols = $db->queryDirect("SELECT ID FROM collections WHERE filecheck=".$threadID['thread_ID']);
-        $colsToDelete = $db->getNumRows($completeCols);
-        if($colsToDelete == 0 || $colsToDelete == false)
+        do
         {
-            echo "\n No collections to purge right now.  Exiting stage.\n";
-            return;
-        }
-        $db->setAutoCommit(false);
-        while ($currentCol=$db->fetchAssoc($completeCols))
-        {
-            $colsDeleted++;
+            $loopTime = microtime(true);
+            $colsDeleted = 0;
+            $binsDeleted = 0;
+            $partsDeleted = 0;
+            // Using thread ID to mark the collections to delete will allow us to multi-thread this function in the future if desired.
+            $threadID = $db->queryOneRow("SELECT connection_ID() as thread_ID");
             if ($echooutput)
-                $consoletools->overWrite("Processing collection ".$consoletools->percentString($colsDeleted,$maxcollections));
+                echo "Using thread ID ".$threadID['thread_ID']." to mark collections.\n";
+            $db->query("UPDATE collections SET filecheck=".$threadID['thread_ID']." WHERE filecheck = 5 ".$where." ORDER BY dateadded ASC LIMIT ".$maxcollections);
+            $completeCols = $db->queryDirect("SELECT ID FROM collections WHERE filecheck=".$threadID['thread_ID']);
+            $colsToDelete = $db->getNumRows($completeCols);
+            if($colsToDelete == 0 || $colsToDelete == false)
+            {
+                echo "\n No collections to purge right now.  Exiting stage.\n";
+                break;
+            }
 
-            $db->queryDirect("DELETE parts FROM parts WHERE collectionID=".$currentCol['ID']);
-            $partsDeleted += $db->getAffectedRows();
+            $db->setAutoCommit(false);
+            while ($currentCol=$db->fetchAssoc($completeCols))
+            {
+                $colsDeleted++;
+                if ($echooutput)
+                    $consoletools->overWrite("Processing collection ".$consoletools->percentString($colsDeleted,$colsToDelete));
 
-            $db->queryDirect("DELETE binaries FROM binaries WHERE collectionID=".$currentCol['ID']);
-            $binsDeleted += $db->getAffectedRows();
+                $db->queryDirect("DELETE parts FROM parts WHERE collectionID=".$currentCol['ID']);
+                $partsDeleted += $db->getAffectedRows();
 
-        }
-        $db->Commit();
-        $db->queryDirect("DELETE collections FROM collections WHERE filecheck=".$threadID['thread_ID']);
-        // $colsDeletedbyAffected = $db->getAffectedRows();
-        $db->Commit();
-        $db->setAutoCommit(true);
+                $db->queryDirect("DELETE binaries FROM binaries WHERE collectionID=".$currentCol['ID']);
+                $binsDeleted += $db->getAffectedRows();
 
-		if ($echooutput)
-        {
-				echo "\nTotal Objects Removed:\n";
+            }
+            $db->Commit();
+            $db->queryDirect("DELETE collections FROM collections WHERE filecheck=".$threadID['thread_ID']);
+            // $colsDeletedbyAffected = $db->getAffectedRows();
+            $db->Commit();
+            $db->setAutoCommit(true);
+            $loopTime = microtime(true) - $loopTime;
+            if ($colsDeleted>0)
+                $avgDeleteTime = $loopTime/$colsDeleted;
+            if ($echooutput)
+            {
+                echo "\n\033[00;36mTotal Objects Removed:\n";
                 echo "Collections:  ".number_format($colsDeleted)."\n";
                 // echo "Affected rows: ".number_format($colsDeletedbyAffected)."\n";
                 echo "Binaries:     ".number_format($binsDeleted)."\n";
                 echo "Parts:        ".number_format($partsDeleted)."\n\n";
-                echo "Stage completed in ".$consoletools->convertTime(TIME() - $stage7).".\n";
-                sleep(15);
-        }
+                echo "Processing completed in ".number_format($loopTime, 2)." seconds.\n";
+                echo "Average per collection: ".number_format($avgDeleteTime,4)." seconds\n\033[00;37m";
+                // Adding sleep here to give MySQL time to purge changes
+                sleep(5);
+            }
+        } while ($colsDeleted>0 && $fastAndFurious == 'TRUE');
+
+        If ($echooutput)
+            echo "\nStage completed in ".$consoletools->convertTime(TIME() - $stage7).".\n";
 	}
 
 	public function processReleasesStage7b($groupID, $echooutput=true)
@@ -2298,14 +2316,17 @@ class Releases
 			$loops++;
 
             // Putting in a countdown delay here so that it's possible to shut down the thread before it loops
-            $sleepCounter = 15;
-            while($sleepCounter > 0)
+            if ($nzbcount>0)
             {
+                $sleepCounter = 15;
+                while($sleepCounter > 0)
+                {
 
-                $consoletools->overWrite("Sleeping for ".$sleepCounter." more seconds...");
-                sleep(1);
-                $sleepCounter --;
+                    $consoletools->overWrite("Sleeping for ".$sleepCounter." more seconds...");
+                    sleep(1);
+                    $sleepCounter --;
 
+                }
             }
 		//this loops as long as there were releases created or 3 loops, otherwise, you could loop indefinately
         // Well... the above comment was not from me.  Now that I'm looking at this, I'm either reading the
@@ -2370,7 +2391,7 @@ class Releases
 
 		$cremain = $db->queryOneRow("select count(ID) from collections WHERE filecheck != 5" . $where);
 		if ($echooutput)
-			echo "Completed adding ".number_format($releasesAdded)." releases in ".$timeUpdate.". ".number_format(array_shift($cremain))." collections waiting to be created (still incomplete or in queue for creation).".$n;
+			echo "\nCompleted adding ".number_format($releasesAdded)." releases in ".$timeUpdate.".\n".number_format(array_shift($cremain))." collections waiting to be created\n (still incomplete or in queue for creation).".$n;
 		return $releasesAdded;
 	}
 
