@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/misc/update_scripts/nix_scripts/tmux/monitor.php" line="1203" />
+    <bookmark url="file://$PROJECT_DIR$/misc/update_scripts/nix_scripts/tmux/monitor.php" line="513" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="1d508ce3-27e7-4b8b-a445-803050b9458a" name="Default" comment="" />
+    <ignored path="nZEDb.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <file path="/Dummy.txt" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1377221102248" ignored="false" />
+    <file path="/namefixer.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376450528373" ignored="false" />
+    <file path="/category.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376157014428" ignored="false" />
+    <file path="/a.dummy" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376760271585" ignored="false" />
+    <file path="/music.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376209514673" ignored="false" />
+    <file path="/releases.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1377168985683" ignored="false" />
+    <file path="/a.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376312193941" ignored="false" />
+    <file path="/a.sql" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376312263351" ignored="false" />
+    <file path="/nzb.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1377135644438" ignored="false" />
+    <file path="/namecleaning.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1377135454984" ignored="false" />
+    <file path="/delete_huge_collections.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376431411865" ignored="false" />
+    <file path="/fixReleaseNames.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376451353352" ignored="false" />
+    <file path="/delete_releases.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376493347415" ignored="false" />
+    <file path="/binaries.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1377100627414" ignored="false" />
+    <file path="/partrepair_threaded.py" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376681004047" ignored="false" />
+    <file path="/consoletools.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376581258500" ignored="false" />
+    <file path="/Local_Header.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1377083517142" ignored="false" />
+    <file path="/merge_delete_dup_cols.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376675667051" ignored="false" />
+    <file path="/backfill.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376766657503" ignored="false" />
+    <file path="/test-cleansubject.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376757632127" ignored="false" />
+    <file path="/site-edit.tpl" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376786793986" ignored="false" />
+    <file path="/admin.css" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376786232540" ignored="false" />
+    <file path="/monitor.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376943837686" ignored="false" />
+    <file path="/test_update_collection.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376793725315" ignored="false" />
+    <file path="/function_tester.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1377179865399" ignored="false" />
+    <file path="/db.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376882564288" ignored="false" />
+    <file path="/start.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376935967137" ignored="false" />
+    <file path="/purge_thread.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376986527830" ignored="false" />
+    <file path="/tmux-edit.tpl" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376957000419" ignored="false" />
+    <file path="/groups.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1377112873456" ignored="false" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="DatabaseView">
+    <flatten value="false" />
+    <groupTables value="false" />
+    <sortChildren value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="nZEDb" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="tmux-edit.tpl" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/www/themes/alpha/templates/admin/tmux-edit.tpl">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="318" column="66" selection-start="18243" selection-end="18243" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="purge_thread.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/misc/update_scripts/purge_thread.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="60" column="60" selection-start="2212" selection-end="2212" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="releases.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/www/lib/releases.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="1589" column="26" selection-start="59825" selection-end="59825" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="function_tester.php" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/misc/update_scripts/function_tester.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="28" column="88" selection-start="981" selection-end="981" vertical-scroll-proportion="0.2523268">
+              <folding>
+                <element signature="e#6#161#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="db.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/www/lib/framework/db.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="113" column="20" selection-start="2418" selection-end="2418" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="binaries.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/www/lib/binaries.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="529" column="58" selection-start="22936" selection-end="22936" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="false" />
+    </FindUsagesManager>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitLogSettings">
+    <option name="myStructureFilterPaths" />
+    <option name="myDateState">
+      <MyDateState />
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="changedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/www/admin/site-edit.php" />
+        <option value="$PROJECT_DIR$/www/themes/alpha/styles/admin.css" />
+        <option value="$PROJECT_DIR$/www/themes/alpha/templates/admin/site-edit.tpl" />
+        <option value="$PROJECT_DIR$/misc/update_scripts/test_update_collection.php" />
+        <option value="$PROJECT_DIR$/www/lib/framework/db.php" />
+        <option value="$PROJECT_DIR$/misc/update_scripts/nix_scripts/tmux/start.php" />
+        <option value="$PROJECT_DIR$/www/themes/alpha/templates/admin/tmux-edit.tpl" />
+        <option value="$PROJECT_DIR$/misc/update_scripts/nix_scripts/tmux/monitor.php" />
+        <option value="$PROJECT_DIR$/misc/testing/Dev_testing/Local_Header.php" />
+        <option value="$PROJECT_DIR$/www/lib/groups.php" />
+        <option value="$PROJECT_DIR$/www/lib/binaries.php" />
+        <option value="$PROJECT_DIR$/www/lib/namecleaning.php" />
+        <option value="$PROJECT_DIR$/www/lib/nzb.php" />
+        <option value="$PROJECT_DIR$/misc/update_scripts/purge_thread.php" />
+        <option value="$PROJECT_DIR$/www/lib/releases.php" />
+        <option value="$PROJECT_DIR$/misc/update_scripts/function_tester.php" />
+      </list>
+    </option>
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1176" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>SQL</id>
+          </State>
+          <State>
+            <id>Spelling</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>SQL</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+      <flattenPackages />
+      <showMembers ProjectPane="true" />
+      <showModules />
+      <showLibraryContents ProjectPane="true" />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nZEDb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nZEDb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nZEDb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="289" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="289" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="293" />
+    <property name="options.lastSelected" value="project.propVCSSupport.Mappings" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="289" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="968" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="964" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="288" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="282" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
+    <property name="FullScreen" value="false" />
+    <property name="dynamic.classpath" value="false" />
+    <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
+      <TestRunner />
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpLocalRunConfigurationType" factoryName="PHP Console">
+      <method />
+    </configuration>
+    <configuration default="true" type="com.intellij.persistence.run.ConsoleRunConfigurationType" factoryName="Query Language Console">
+      <option name="VM_PARAMETERS" value="" />
+      <option name="USER_CFG_CLASS" />
+      <option name="CONTEXT_PROVIDER" />
+      <method />
+    </configuration>
+    <list size="0" />
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration" maxAnnotateRevisions="500" myUseAcceleration="nothing" myAutoUpdateAfterCommit="false" cleanupOnStartRun="false" SSL_PROTOCOLS="all">
+    <option name="USER" value="" />
+    <option name="PASSWORD" value="" />
+    <option name="mySSHConnectionTimeout" value="30000" />
+    <option name="mySSHReadTimeout" value="30000" />
+    <option name="LAST_MERGED_REVISION" />
+    <option name="MERGE_DRY_RUN" value="false" />
+    <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
+    <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
+    <option name="IGNORE_SPACES_IN_MERGE" value="false" />
+    <option name="CHECK_NESTED_FOR_QUICK_MERGE" value="false" />
+    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
+    <option name="FORCE_UPDATE" value="false" />
+    <option name="IGNORE_EXTERNALS" value="false" />
+    <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1d508ce3-27e7-4b8b-a445-803050b9458a" name="Default" comment="" />
+      <created>1376100625316</created>
+      <updated>1376100625316</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TodoView" selected-index="3">
+    <todo-panel id="selected-file">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="default-changelist">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
+    <editor active="false" />
+    <layout>
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32973504" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32908913" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.052294556" sideWeight="0.86973554" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.226254" sideWeight="0.49852797" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.226254" sideWeight="0.50147206" order="0" side_tool="true" content_ui="combo" />
+      <window_info id="DB Browser" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32875368" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="DB Execution Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32908913" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33398628" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="CHECK_NEW_TODO" value="true" />
+    <option name="myTodoPanelSettings">
+      <value>
+        <are-packages-shown value="false" />
+        <are-modules-shown value="false" />
+        <flatten-packages value="false" />
+        <is-autoscroll-to-source value="false" />
+      </value>
+    </option>
+    <option name="PERFORM_UPDATE_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_COMMIT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_EDIT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_CHECKOUT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_ADD_REMOVE_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_ROLLBACK_IN_BACKGROUND" value="false" />
+    <option name="CHECK_LOCALLY_CHANGED_CONFLICTS_IN_BACKGROUND" value="false" />
+    <option name="CHANGED_ON_SERVER_INTERVAL" value="60" />
+    <option name="SHOW_ONLY_CHANGED_IN_SELECTION_DIFF" value="true" />
+    <option name="CHECK_COMMIT_MESSAGE_SPELLING" value="true" />
+    <option name="DEFAULT_PATCH_EXTENSION" value="patch" />
+    <option name="SHORT_DIFF_HORIZONTALLY" value="true" />
+    <option name="SHORT_DIFF_EXTRA_LINES" value="2" />
+    <option name="SOFT_WRAPS_IN_SHORT_DIFF" value="true" />
+    <option name="INCLUDE_TEXT_INTO_PATCH" value="false" />
+    <option name="INCLUDE_TEXT_INTO_SHELF" value="false" />
+    <option name="SHOW_FILE_HISTORY_DETAILS" value="true" />
+    <option name="SHOW_VCS_ERROR_NOTIFICATIONS" value="true" />
+    <option name="SHOW_DIRTY_RECURSIVELY" value="false" />
+    <option name="LIMIT_HISTORY" value="true" />
+    <option name="MAXIMUM_HISTORY_ROWS" value="1000" />
+    <option name="UPDATE_FILTER_SCOPE_NAME" />
+    <option name="USE_COMMIT_MESSAGE_MARGIN" value="false" />
+    <option name="COMMIT_MESSAGE_MARGIN_SIZE" value="72" />
+    <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
+    <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
+    <option name="LAST_COMMIT_MESSAGE" />
+    <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
+    <option name="FILE_HISTORY_DIALOG_COMMENTS_SPLITTER_PROPORTION" value="0.8" />
+    <option name="FILE_HISTORY_DIALOG_SPLITTER_PROPORTION" value="0.5" />
+    <option name="ACTIVE_VCS_NAME" />
+    <option name="UPDATE_GROUP_BY_PACKAGES" value="false" />
+    <option name="UPDATE_GROUP_BY_CHANGELIST" value="false" />
+    <option name="UPDATE_FILTER_BY_SCOPE" value="false" />
+    <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
+    <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <option name="time" value="3" />
+    </breakpoint-manager>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/www/lib/tmux.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.2631579" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/misc/update_scripts/update_releases.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="80" column="0" selection-start="3575" selection-end="3577" vertical-scroll-proportion="1.4035088" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/misc/update_scripts/nix_scripts/tmux/monitor.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="111" column="6" selection-start="7707" selection-end="7778" vertical-scroll-proportion="-29.807692">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/lib/nntp.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/lib/Net_NNTP/NNTP/Client.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="985" column="13" selection-start="30295" selection-end="30295" vertical-scroll-proportion="-12.423077" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/misc/testing/Dev_testing/Local_Header.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="34" column="78" selection-start="1172" selection-end="1172" vertical-scroll-proportion="0.5964912" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/lib/binaries.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="529" column="58" selection-start="22936" selection-end="22936" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/lib/groups.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="70" column="5" selection-start="1831" selection-end="1831" vertical-scroll-proportion="0.51987445" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/lib/namecleaning.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="23" selection-start="453" selection-end="453" vertical-scroll-proportion="0.28451884" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/lib/nzb.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="0" selection-start="627" selection-end="627" vertical-scroll-proportion="0.28451884" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/themes/alpha/templates/admin/tmux-edit.tpl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="318" column="66" selection-start="18243" selection-end="18243" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/misc/update_scripts/purge_thread.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="60" column="60" selection-start="2212" selection-end="2212" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/lib/predb.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="357" column="12" selection-start="14576" selection-end="14576" vertical-scroll-proportion="6.2991633" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/lib/releases.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1589" column="26" selection-start="59825" selection-end="59825" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/lib/framework/db.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="113" column="20" selection-start="2418" selection-end="2418" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/misc/update_scripts/function_tester.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="28" column="88" selection-start="981" selection-end="981" vertical-scroll-proportion="0.2523268">
+          <folding>
+            <element signature="e#6#161#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
+

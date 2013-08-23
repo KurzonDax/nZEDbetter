@@ -1,0 +1,973 @@
+
+# 181.1s user time, 580ms system time, 40.77M rss, 112.40M vsz
+# Current date: Fri Aug  9 11:38:37 2013
+# Hostname: Ubuntu1304-vm
+# Files: ./mysql-slow-0809-0657.log
+# Overall: 952.95k total, 211 unique, 4.54 QPS, 0.38x concurrency ________
+# Time range: 2013-08-06 21:16:54 to 2013-08-09 07:35:22
+# Attribute          total     min     max     avg     95%  stddev  median
+# ============     ======= ======= ======= ======= ======= ======= =======
+# Exec time         80135s    53us   7486s    84ms    40ms     11s   348us
+# Lock time          4033s       0    229s     4ms   194us   494ms    40us
+# Rows sent         79.49M       0  26.09k   87.46  107.34   63.10  107.34
+# Rows examine       6.35G       0 353.89M   6.99k   8.06k 741.24k  107.34
+# Rows affecte     152.63M       0   9.79M  167.95       0  24.75k       0
+# Bytes sent         4.29G      11   9.70M   4.72k   5.73k  19.32k   5.73k
+# Query size        77.08M       6  45.43k   84.82  400.73  262.38   17.65
+
+# Profile
+# Rank Query ID           Response time    Calls  R/Call    V/M   Item
+# ==== ================== ================ ====== ========= ===== ========
+#    1 0x53D21BCC693DB88B 19712.4405 24.6%     68  289.8888 42... DELETE collections binaries parts
+#    2 0xE49B1FACECBD9064 12970.8673 16.2%     12 1080.9056 41... UPDATE SELECT collections parts binaries
+#    3 0x702AF66FA222C5EC 11450.3391 14.3%     24  477.0975 22... UPDATE SELECT binaries parts collections
+#    4 0x4CA0E480027943D7 10436.8932 13.0%   3083    3.3853 10.06 SELECT releases releasefiles
+#    5 0x7FE042D1633C8E8C  4724.6558  5.9%     19  248.6661 13... UPDATE SELECT binaries parts collections
+#    6 0x9645A31B768A51C4  3928.5077  4.9%   1822    2.1562  1.79 SELECT releases category releases category predb collections binaries INFORMATION_SCHEMA.TABLES nzbs
+#    7 0x5BA918A498A610F7  3684.4974  4.6%  43701    0.0843  0.34 UPDATE nzbs
+#    8 0xD3F6FE20AE7DEC0C  2855.0404  3.6%    219   13.0367  0.75 INSERT parts
+#    9 0xA9F05D6ACBCD0D73  1968.5946  2.5%   1489    1.3221  0.83 SELECT releases predb
+#   10 0xF9FCB0DED9FD5393   995.2816  1.2%   1489    0.6684  6.13 SELECT predb releases
+#   11 0xA777D4DE5CAEE26A   847.9692  1.1%  12374    0.0685 26.72 UPDATE SELECT collections groups site
+#   12 0x96EB517EE35C4726   642.1590  0.8% 689397    0.0009  0.14 SELECT site
+#   13 0x65EF82D0C958BE34   508.2432  0.6%     41   12.3962  0.46 SELECT parts
+#   14 0xEB4FAC3E362512FE   462.6198  0.6%  12374    0.0374 25.91 UPDATE SELECT collections groups site
+#   15 0x401000E44F00ECBE   443.8999  0.6%     20   22.1950  5.04 SELECT groups
+#   16 0xE57D9072CD5CDA50   390.4445  0.5%   2195    0.1779 12... SELECT collections predb releases nzbs tmux site tmux groups site groups
+#   17 0x175D26BA628B5C23   386.5784  0.5%     29   13.3303 37.03 SELECT releases releasefiles
+#   19 0x57F0F69C7302BDB4   317.9527  0.4%     16   19.8720  0.04 UPDATE releases
+#   21 0x31149DACB128C473   263.1313  0.3%     23   11.4405  0.17 UPDATE releases
+#   22 0xF5EA609A0EDED044   249.7741  0.3%    316    0.7904  0.91 SELECT releases
+#   24 0x813031B8BBC3B329   229.5819  0.3%     15   15.3055  1.29 COMMIT
+#   26 0x84C56E0A6B41405A   167.6422  0.2%    316    0.5305  0.38 SELECT releases releasefiles
+#   32 0xB2C28C118C5EBBBC    60.2088  0.1%     19    3.1689 25.69 SELECT releases category
+# MISC 0xMISC              2437.8646  3.0% 183888    0.0133   0.0 <188 ITEMS>
+
+# Query 1: 0.00 QPS, 0.15x concurrency, ID 0x53D21BCC693DB88B at byte 235493226
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 422.66
+# Time range: 2013-08-07 19:16:20 to 2013-08-09 07:14:50
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0      68
+# Exec time     24  19712s     17s   1816s    290s    793s    350s    188s
+# Lock time      1     67s    63us     45s   986ms   144us      6s    93us
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   2 150.39M  96.66k   9.79M   2.21M   4.93M   1.88M   1.69M
+# Rows affecte  98 150.39M  96.66k   9.79M   2.21M   4.93M   1.88M   1.69M
+# Bytes sent     0     952      14      14      14      14       0      14
+# Query size     0  14.01k     211     211     211     211       0     211
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms
+# 100ms
+#    1s
+#  10s+  ################################################################
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'collections'\G
+#    SHOW CREATE TABLE `nzedb`.`collections`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'binaries'\G
+#    SHOW CREATE TABLE `nzedb`.`binaries`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'parts'\G
+#    SHOW CREATE TABLE `nzedb`.`parts`\G
+DELETE collections, binaries, parts
+						  FROM collections INNER JOIN binaries ON collections.ID = binaries.collectionID INNER JOIN parts on binaries.ID = parts.binaryID
+						  WHERE collections.filecheck = 5\G
+# Converted for EXPLAIN
+# EXPLAIN /*!50100 PARTITIONS*/
+select * from  collections INNER JOIN binaries ON collections.ID = binaries.collectionID INNER JOIN parts on binaries.ID = parts.binaryID
+						  WHERE collections.filecheck = 5\G
+
+# Query 2: 0.00 QPS, 0.10x concurrency, ID 0xE49B1FACECBD9064 at byte 299671705
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 4167.58
+# Time range: 2013-08-07 19:44:59 to 2013-08-09 06:19:05
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0      12
+# Exec time     16  12971s     30s   7486s   1081s   3110s   2122s     84s
+# Lock time      4    184s    91us     55s     15s     47s     20s      2s
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   3 195.30M   1.26M  61.58M  16.28M  36.45M  16.31M   8.43M
+# Rows affecte   0  88.52k       0  21.90k   7.38k  17.59k   7.15k   3.69k
+# Bytes sent     0     711      45      62   59.25   59.77    4.19   59.77
+# Query size     0   2.36k     201     201     201     201       0     201
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   1592 (10/83%), 0 (1/8%), 1048 (1/8%)
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms
+# 100ms
+#    1s
+#  10s+  ################################################################
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'collections'\G
+#    SHOW CREATE TABLE `nzedb`.`collections`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'parts'\G
+#    SHOW CREATE TABLE `nzedb`.`parts`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'binaries'\G
+#    SHOW CREATE TABLE `nzedb`.`binaries`\G
+UPDATE collections c SET filesize = (SELECT SUM(size) FROM parts p LEFT JOIN binaries b ON p.binaryID = b.ID WHERE b.collectionID = c.ID), c.filecheck = 3 WHERE
+						c.filecheck = 2 AND c.filesize = 0\G
+
+# Query 3: 0.00 QPS, 0.09x concurrency, ID 0x702AF66FA222C5EC at byte 310809847
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 2241.23
+# Time range: 2013-08-07 18:40:28 to 2013-08-09 04:41:22
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0      24
+# Exec time     14  11450s     23s   4495s    477s    653s   1034s    140s
+# Lock time     30   1217s   192us    164s     51s    113s     43s     42s
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine  28   1.81G   8.46M 353.89M  77.34M 136.10M  83.60M  56.00M
+# Rows affecte   1   1.70M       0 635.97k  72.35k 328.61k 150.78k  214.80
+# Bytes sent     0   1.34k      52      65   57.12   62.76    4.93   54.21
+# Query size     0   5.84k     249     249     249     249       0     249
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   1592 (22/91%), 0 (2/8%)
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms
+# 100ms
+#    1s
+#  10s+  ################################################################
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'binaries'\G
+#    SHOW CREATE TABLE `nzedb`.`binaries`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'parts'\G
+#    SHOW CREATE TABLE `nzedb`.`parts`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'collections'\G
+#    SHOW CREATE TABLE `nzedb`.`collections`\G
+UPDATE binaries b SET partcheck = 1 WHERE b.ID IN (SELECT p.binaryID FROM parts p, collections c WHERE p.binaryID = b.ID AND c.filecheck = 15 AND c.id = b.collectionID
+							GROUP BY p.binaryID HAVING count(p.ID) = b.totalParts) AND b.partcheck = 0\G
+# Converted for EXPLAIN
+# EXPLAIN /*!50100 PARTITIONS*/
+select  partcheck = 1 from binaries b where  b.ID IN (SELECT p.binaryID FROM parts p, collections c WHERE p.binaryID = b.ID AND c.filecheck = 15 AND c.id = b.collectionID
+							GROUP BY p.binaryID HAVING count(p.ID) = b.totalParts) AND b.partcheck = 0\G
+
+# Query 4: 0.03 QPS, 0.09x concurrency, ID 0x4CA0E480027943D7 at byte 145597998
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 10.06
+# Time range: 2013-08-07 18:32:28 to 2013-08-09 03:10:56
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0    3083
+# Exec time     13  10437s    16ms     52s      3s     15s      6s   992ms
+# Lock time      0      3s    81us   392ms   874us     2ms     7ms   247us
+# Rows sent      0     312       0     223    0.10       0    3.85       0
+# Rows examine   0  55.30M   1.13k  39.48k  18.37k  38.40k  11.75k  15.96k
+# Rows affecte   0       0       0       0       0       0       0       0
+# Bytes sent     0 565.05k     175  28.97k  187.68  174.84  527.10  174.84
+# Query size     1   1.53M     218   1.63k  521.80   1.61k  442.28  299.03
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms  ########
+# 100ms  ################################################################
+#    1s  ###########################################################
+#  10s+  ##############
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'releases'\G
+#    SHOW CREATE TABLE `nzedb`.`releases`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'releasefiles'\G
+#    SHOW CREATE TABLE `nzedb`.`releasefiles`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+select r.ID, r.guid, r.searchname from releases r left join releasefiles rf on rf.releaseID = r.ID where (rf.name REGEXP'(brazilian|chinese|croatian|danish|deutsch|dutch|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|latin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)[\\)]?( \\-)?[ \\-\\.]((19|20)\\d\\d|(480|720|1080)(i|p)|3d|5\\.1|dts|ac3|truehd|(bd|dvd|hd|sat|vhs|web)\\.?rip|(bd.)?(h|x).?2?64|divx|xvid|bluray|svcd|board|custom|\"|(d|h|p|s)d?v?tv|m?dvd(-|sc)?r|int(ernal)?|nzb|par2|\\b(((dc|ld|md|ml|dl|hr|se)[.])|(anime\\.)|(fs|ws)|dsr|pal|ntsc|iso|complete|cracked|ebook|extended|dirfix|festival|proper|game|limited|read.?nfo|real|rerip|repack|remastered|retail|samplefix|scan|screener|theatrical|uncut|unrated|incl|winall)\\b|doku|doc|dub|sub|\\(uncut\\))' or r.name REGEXP'(brazilian|chinese|croatian|danish|deutsch|dutch|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|latin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)[\\)]?( \\-)?[ \\-\\.]((19|20)\\d\\d|(480|720|1080)(i|p)|3d|5\\.1|dts|ac3|truehd|(bd|dvd|hd|sat|vhs|web)\\.?rip|(bd.)?(h|x).?2?64|divx|xvid|bluray|svcd|board|custom|\"|(d|h|p|s)d?v?tv|m?dvd(-|sc)?r|int(ernal)?|nzb|par2|\\b(((dc|ld|md|ml|dl|hr|se)[.])|(anime\\.)|(fs|ws)|dsr|pal|ntsc|iso|complete|cracked|ebook|extended|dirfix|festival|proper|game|limited|read.?nfo|real|rerip|repack|remastered|retail|samplefix|scan|screener|theatrical|uncut|unrated|incl|winall)\\b|doku|doc|dub|sub|\\(uncut\\))') and adddate > (now() - interval 2 hour) order by ID asc\G
+
+# Query 5: 0.00 QPS, 0.04x concurrency, ID 0x7FE042D1633C8E8C at byte 312282669
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 1351.85
+# Time range: 2013-08-07 18:41:41 to 2013-08-09 05:26:34
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0      19
+# Exec time      5   4725s     20s   2712s    249s    314s    580s     91s
+# Lock time     16    650s   149us     73s     34s     69s     23s     35s
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine  20   1.28G   9.47M 309.32M  69.12M 211.13M  72.22M  40.24M
+# Rows affecte   0     624       0     226   32.84  183.58   65.70       0
+# Bytes sent     0    1004      52      56   52.84   54.21    0.94   51.63
+# Query size     0   4.68k     252     252     252     252       0     252
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   1592 (17/89%), 0 (2/10%)
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms
+# 100ms
+#    1s
+#  10s+  ################################################################
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'binaries'\G
+#    SHOW CREATE TABLE `nzedb`.`binaries`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'parts'\G
+#    SHOW CREATE TABLE `nzedb`.`parts`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'collections'\G
+#    SHOW CREATE TABLE `nzedb`.`collections`\G
+UPDATE binaries b SET partcheck = 1 WHERE b.ID IN (SELECT p.binaryID FROM parts p, collections c WHERE p.binaryID = b.ID AND c.filecheck = 16 AND c.id = b.collectionID
+							GROUP BY p.binaryID HAVING count(p.ID) >= b.totalParts+1) AND b.partcheck = 0\G
+# Converted for EXPLAIN
+# EXPLAIN /*!50100 PARTITIONS*/
+select  partcheck = 1 from binaries b where  b.ID IN (SELECT p.binaryID FROM parts p, collections c WHERE p.binaryID = b.ID AND c.filecheck = 16 AND c.id = b.collectionID
+							GROUP BY p.binaryID HAVING count(p.ID) >= b.totalParts+1) AND b.partcheck = 0\G
+
+# Query 6: 0.01 QPS, 0.03x concurrency, ID 0x9645A31B768A51C4 at byte 296734239
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 1.79
+# Time range: 2013-08-07 16:32:43 to 2013-08-09 07:35:22
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0    1822
+# Exec time      4   3929s     3ms     30s      2s      5s      2s      2s
+# Lock time      0      8s   262us   566ms     4ms     7ms    30ms   657us
+# Rows sent      0   1.78k       1       1       1       1       0       1
+# Rows examine   0       0       0       0       0       0       0       0
+# Rows affecte   0       0       0       0       0       0       0       0
+# Bytes sent     0 791.14k     410     448  444.64  441.81    5.86  441.81
+# Query size     2   2.22M   1.25k   1.25k   1.25k   1.25k       0   1.25k
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms  #
+#  10ms  #
+# 100ms  ##########
+#    1s  ################################################################
+#  10s+  #
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'releases'\G
+#    SHOW CREATE TABLE `nzedb`.`releases`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'category'\G
+#    SHOW CREATE TABLE `nzedb`.`category`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'predb'\G
+#    SHOW CREATE TABLE `nzedb`.`predb`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'collections'\G
+#    SHOW CREATE TABLE `nzedb`.`collections`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'binaries'\G
+#    SHOW CREATE TABLE `nzedb`.`binaries`\G
+#    SHOW TABLE STATUS FROM `INFORMATION_SCHEMA` LIKE 'TABLES'\G
+#    SHOW CREATE TABLE `INFORMATION_SCHEMA`.`TABLES`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'nzbs'\G
+#    SHOW CREATE TABLE `nzedb`.`nzbs`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT
+	( SELECT COUNT( * ) FROM releases r left join category c on c.ID = r.categoryID where categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) and (r.haspreview = -1 and c.disablepreview = 0))) AS pc,
+	( SELECT COUNT( * ) FROM releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) and (r.haspreview = -1 and c.disablepreview = 0)) AS work,
+	( SELECT COUNT( * ) FROM predb where releaseID IS NOT NULL ) AS predb_matched,
+	( SELECT COUNT( * ) FROM collections WHERE collectionhash IS NOT NULL ) AS collections_table,
+	( SELECT COUNT( * ) FROM binaries WHERE collectionID IS NOT NULL ) AS binaries_table,
+	( SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES where table_name = 'predb' AND TABLE_SCHEMA = 'nzedb' ) AS predb,
+	( SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES where table_name = 'parts' AND TABLE_SCHEMA = 'nzedb' ) AS parts_table,
+	( SELECT COUNT( distinct( collectionhash )) FROM nzbs WHERE collectionhash IS NOT NULL ) AS distinctnzbs,
+	( SELECT COUNT( collectionhash ) FROM nzbs WHERE collectionhash IS NOT NULL ) AS totalnzbs,
+	( SELECT COUNT( collectionhash ) FROM ( SELECT collectionhash FROM nzbs GROUP BY collectionhash, totalparts HAVING COUNT(*) >= totalparts ) AS count) AS pendingnzbs\G
+
+# Query 7: 0.32 QPS, 0.03x concurrency, ID 0x5BA918A498A610F7 at byte 103672072
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.34
+# Time range: 2013-08-07 17:24:33 to 2013-08-09 07:35:01
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          4   43701
+# Exec time      4   3684s     1ms      9s    84ms   219ms   168ms    53ms
+# Lock time      2    112s    28us      5s     3ms   119us    43ms    57us
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine  11 760.44M       1  35.25k  17.82k  33.17k   9.73k  17.59k
+# Rows affecte   0  77.85k       0     355    1.82    6.98   11.47       0
+# Bytes sent     0   2.18M      52      58   52.30   51.63    0.17   51.63
+# Query size     5   4.29M     103     103     103     103       0     103
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms  #####
+#  10ms  ################################################################
+# 100ms  ######################
+#    1s  #
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'nzbs'\G
+#    SHOW CREATE TABLE `nzedb`.`nzbs`\G
+UPDATE `nzbs` SET `dateadded` = NOW() WHERE collectionhash = '0d2503cfce2beabbafa8e9293676500652d8b289'\G
+# Converted for EXPLAIN
+# EXPLAIN /*!50100 PARTITIONS*/
+select  `dateadded` = NOW() from `nzbs` where  collectionhash = '0d2503cfce2beabbafa8e9293676500652d8b289'\G
+
+# Query 8: 0.01 QPS, 0.07x concurrency, ID 0xD3F6FE20AE7DEC0C at byte 247320625
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.75
+# Time range: 2013-08-07 22:29:44 to 2013-08-08 09:17:41
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0     219
+# Exec time      3   2855s     10s     36s     13s     17s      3s     11s
+# Lock time      0    34ms    14us    12ms   153us   176us   893us    27us
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0       0       0       0       0       0       0       0
+# Rows affecte   0     219       1       1       1       1       0       1
+# Bytes sent     0   4.06k      19      19      19      19       0      19
+# Query size     0  35.64k     152     187  166.65  183.58   10.22  158.58
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms
+# 100ms
+#    1s
+#  10s+  ################################################################
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'parts'\G
+#    SHOW CREATE TABLE `nzedb`.`parts`\G
+INSERT IGNORE INTO parts (binaryID, number, messageID, partnumber, size) VALUES (2307238, '3049571575', 'GG0fgC1enH9nhFcdj16_6o43@JBinUp.local', '135', '398854')\G
+
+# Query 9: 0.01 QPS, 0.01x concurrency, ID 0xA9F05D6ACBCD0D73 at byte 204729885
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.83
+# Time range: 2013-08-07 17:31:44 to 2013-08-09 07:34:40
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0    1489
+# Exec time      2   1969s   454ms     16s      1s      3s      1s   992ms
+# Lock time      0   268ms    46us    40ms   179us   176us     1ms    93us
+# Rows sent      0      53       0      35    0.04       0    0.97       0
+# Rows examine  29   1.85G   1.25M   1.30M   1.27M   1.26M  22.33k   1.26M
+# Rows affecte   0       0       0       0       0       0       0       0
+# Bytes sent     0 164.68k     110   3.16k  113.25  107.34   84.54  107.34
+# Query size     0 189.03k     130     130     130     130       0     130
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms
+# 100ms  ################################################################
+#    1s  ###############################################################
+#  10s+  #
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'releases'\G
+#    SHOW CREATE TABLE `nzedb`.`releases`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'predb'\G
+#    SHOW CREATE TABLE `nzedb`.`predb`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT r.ID, p.nfo from releases r inner join predb p on r.ID = p.releaseID where p.nfo is not null and r.nfostatus != 1 limit 100\G
+
+# Query 10: 0.01 QPS, 0.01x concurrency, ID 0xF9FCB0DED9FD5393 at byte 296752718
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 6.13
+# Time range: 2013-08-07 17:31:31 to 2013-08-09 07:34:40
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0    1489
+# Exec time      1    995s   803us     80s   668ms      2s      2s   477ms
+# Lock time      0   510ms    54us    65ms   342us   348us     2ms   103us
+# Rows sent      0     182       0      70    0.12       0    2.23       0
+# Rows examine   0  56.59M      82  55.65k  38.92k  51.46k  14.53k  40.32k
+# Rows affecte   0       0       0       0       0       0       0       0
+# Bytes sent     0 248.87k     168   1.94k  171.15  166.51   56.51  166.51
+# Query size     0 222.48k     153     153     153     153       0     153
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us  #
+#   1ms  ##
+#  10ms  #
+# 100ms  ################################################################
+#    1s  ############
+#  10s+  #
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'predb'\G
+#    SHOW CREATE TABLE `nzedb`.`predb`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'releases'\G
+#    SHOW CREATE TABLE `nzedb`.`releases`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT p.ID, p.category, r.ID as releaseID from predb p inner join releases r on p.title = r.searchname where p.releaseID is null and p.source = 'womble'\G
+
+# Query 11: 0.09 QPS, 0.01x concurrency, ID 0xA777D4DE5CAEE26A at byte 225194374
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 26.72
+# Time range: 2013-08-07 17:31:01 to 2013-08-09 06:19:13
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          1   12374
+# Exec time      1    848s   367us     52s    69ms    36ms      1s     5ms
+# Lock time     17    697s    84us     52s    56ms   273us      1s   185us
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0 412.33k       1   1.96k   34.12  346.17  120.48    0.99
+# Rows affecte   0      13       0      11    0.00       0    0.10       0
+# Bytes sent     0 628.65k      52      79   52.02   51.63    0.69   51.63
+# Query size     6   5.13M     433     435  434.79  420.77       0  420.77
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   1592 (11640/94%), 0 (721/5%), 1105 (13/0%)
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us  #
+#   1ms  ################################################################
+#  10ms  ###############
+# 100ms  #
+#    1s  #
+#  10s+  #
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'collections'\G
+#    SHOW CREATE TABLE `nzedb`.`collections`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'groups'\G
+#    SHOW CREATE TABLE `nzedb`.`groups`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'site'\G
+#    SHOW CREATE TABLE `nzedb`.`site`\G
+UPDATE collections c LEFT JOIN (SELECT g.ID, coalesce(g.minsizetoformrelease, s.minsizetoformrelease) as minsizetoformrelease FROM groups g INNER JOIN
+									( SELECT value as minsizetoformrelease FROM site WHERE setting = 'minsizetoformrelease' ) s ) g ON g.ID = c.groupID SET c.filecheck = 5 WHERE g.minsizetoformrelease != 0
+									AND c.filecheck = 3 AND c.filesize < g.minsizetoformrelease and c.filesize > 0 AND groupID = 3\G
+# Converted for EXPLAIN
+# EXPLAIN /*!50100 PARTITIONS*/
+select  c.filecheck = 5 from collections c LEFT JOIN (SELECT g.ID, coalesce(g.minsizetoformrelease, s.minsizetoformrelease) as minsizetoformrelease FROM groups g INNER JOIN
+									( SELECT value as minsizetoformrelease FROM site WHERE setting = 'minsizetoformrelease' ) s ) g ON g.ID = c.groupID where  g.minsizetoformrelease != 0
+									AND c.filecheck = 3 AND c.filesize < g.minsizetoformrelease and c.filesize > 0 AND groupID = 3\G
+
+# Query 12: 4.62 QPS, 0.00x concurrency, ID 0x96EB517EE35C4726 at byte 130552658
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.14
+# Time range: 2013-08-07 13:42:48 to 2013-08-09 07:08:27
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count         72  689397
+# Exec time      0    642s   149us      5s   931us     2ms    11ms   332us
+# Lock time      2     86s    18us      5s   124us    60us     7ms    36us
+# Rows sent     90  72.32M     110     110     110     110       0     110
+# Rows examine   1  72.32M     110     110     110     110       0     110
+# Rows affecte   0       0       0       0       0       0       0       0
+# Bytes sent    88   3.82G   5.80k   5.80k   5.80k   5.73k       0   5.73k
+# Query size    15  11.83M      18      18      18      18       0      18
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us  ################################################################
+#   1ms  ########
+#  10ms  #
+# 100ms  #
+#    1s  #
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'site'\G
+#    SHOW CREATE TABLE `nzedb`.`site`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+select * from site\G
+
+# Query 13: 0.00 QPS, 0.01x concurrency, ID 0x65EF82D0C958BE34 at byte 255037973
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.46
+# Time range: 2013-08-08 04:00:20 to 22:37:46
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0      41
+# Exec time      0    508s     10s     20s     12s     17s      2s     11s
+# Lock time      0    13ms    37us    10ms   322us   131us     2ms    52us
+# Rows sent      0  33.69k      82   2.73k  841.39   1.33k  687.76  793.42
+# Rows examine   0 101.07k     246   8.19k   2.47k   3.88k   2.01k   2.38k
+# Rows affecte   0       0       0       0       0       0       0       0
+# Bytes sent     0   1.84M   5.86k 152.71k  45.92k  72.41k  36.73k  38.40k
+# Query size     0   3.99k      98     100   99.66   97.36       0   97.36
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms
+# 100ms
+#    1s
+#  10s+  ################################################################
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'parts'\G
+#    SHOW CREATE TABLE `nzedb`.`parts`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT DISTINCT(messageID), size, partnumber FROM parts WHERE binaryID = 1066334 ORDER BY partnumber\G
+
+# Query 14: 0.09 QPS, 0.00x concurrency, ID 0xEB4FAC3E362512FE at byte 225458579
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 25.91
+# Time range: 2013-08-07 17:31:01 to 2013-08-09 06:19:13
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          1   12374
+# Exec time      0    463s   341us     55s    37ms    40ms   984ms     5ms
+# Lock time      7    305s    80us     52s    25ms   260us   958ms   167us
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0 473.14k       1   4.30k   39.15  363.48  163.83    0.99
+# Rows affecte   0  15.53k       0   1.98k    1.29       0   33.52       0
+# Bytes sent     0 628.69k      52      79   52.03   51.63    0.46   51.63
+# Query size     6   5.01M     423     425  424.79  420.77       0  420.77
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   1592 (11647/94%), 0 (721/5%), 1105 (6/0%)
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us  ##
+#   1ms  ################################################################
+#  10ms  #################
+# 100ms  #
+#    1s  #
+#  10s+  #
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'collections'\G
+#    SHOW CREATE TABLE `nzedb`.`collections`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'groups'\G
+#    SHOW CREATE TABLE `nzedb`.`groups`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'site'\G
+#    SHOW CREATE TABLE `nzedb`.`site`\G
+UPDATE collections c LEFT JOIN (SELECT g.ID, coalesce(g.minfilestoformrelease, s.minfilestoformrelease) as minfilestoformrelease FROM groups g INNER JOIN
+									( SELECT value as minfilestoformrelease FROM site WHERE setting = 'minfilestoformrelease' ) s ) g ON g.ID = c.groupID SET c.filecheck = 5
+									WHERE g.minfilestoformrelease != 0 AND c.filecheck = 3 AND c.totalFiles < g.minfilestoformrelease AND groupID = 51\G
+# Converted for EXPLAIN
+# EXPLAIN /*!50100 PARTITIONS*/
+select  c.filecheck = 5 from collections c LEFT JOIN (SELECT g.ID, coalesce(g.minfilestoformrelease, s.minfilestoformrelease) as minfilestoformrelease FROM groups g INNER JOIN
+									( SELECT value as minfilestoformrelease FROM site WHERE setting = 'minfilestoformrelease' ) s ) g ON g.ID = c.groupID where  g.minfilestoformrelease != 0 AND c.filecheck = 3 AND c.totalFiles < g.minfilestoformrelease AND groupID = 51\G
+
+# Query 15: 0.00 QPS, 0.02x concurrency, ID 0x401000E44F00ECBE at byte 247322715
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 5.04
+# Time range: 2013-08-08 02:42:31 to 08:26:17
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0      20
+# Exec time      0    444s     10s     36s     22s     35s     11s     15s
+# Lock time      0   866us    21us   162us    43us    69us    28us    35us
+# Rows sent      0       6       0       1    0.30    0.99    0.45       0
+# Rows examine   0       6       0       1    0.30    0.99    0.45       0
+# Rows affecte   0       0       0       0       0       0       0       0
+# Bytes sent     0   1.62k      74     103   82.70  102.22   13.55   72.65
+# Query size     0     720      36      36      36      36       0      36
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms
+# 100ms
+#    1s
+#  10s+  ################################################################
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'groups'\G
+#    SHOW CREATE TABLE `nzedb`.`groups`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+select name from groups where ID = 1\G
+
+# Query 16: 0.02 QPS, 0.00x concurrency, ID 0xE57D9072CD5CDA50 at byte 299672482
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 127.67
+# Time range: 2013-08-07 16:32:36 to 2013-08-09 07:35:21
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0    2195
+# Exec time      0    390s     3ms    229s   178ms   189ms      5s    36ms
+# Lock time      6    264s   646us    229s   120ms    24ms      5s     2ms
+# Rows sent      0   2.14k       1       1       1       1       0       1
+# Rows examine   0       0       0       0       0       0       0       0
+# Rows affecte   0       0       0       0       0       0       0       0
+# Bytes sent     0   4.85M   2.10k   2.43k   2.26k   2.27k   55.47   2.27k
+# Query size    11   9.19M   4.29k   4.29k   4.29k   4.29k       0   4.29k
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms  #
+#  10ms  ################################################################
+# 100ms  ##########
+#    1s  #
+#  10s+  #
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'collections'\G
+#    SHOW CREATE TABLE `nzedb`.`collections`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'predb'\G
+#    SHOW CREATE TABLE `nzedb`.`predb`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'releases'\G
+#    SHOW CREATE TABLE `nzedb`.`releases`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'nzbs'\G
+#    SHOW CREATE TABLE `nzedb`.`nzbs`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'tmux'\G
+#    SHOW CREATE TABLE `nzedb`.`tmux`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'site'\G
+#    SHOW CREATE TABLE `nzedb`.`site`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'groups'\G
+#    SHOW CREATE TABLE `nzedb`.`groups`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT
+	( SELECT UNIX_TIMESTAMP(dateadded) FROM collections order by dateadded ASC limit 1 ) AS oldestcollection,
+	( SELECT UNIX_TIMESTAMP(adddate) FROM predb order by adddate DESC limit 1 ) AS newestpre,
+	( SELECT name FROM releases WHERE nzbstatus = 1 order by adddate DESC limit 1 ) AS newestaddname,
+	( SELECT UNIX_TIMESTAMP(adddate) FROM releases WHERE nzbstatus = 1 order by adddate DESC limit 1 ) AS newestadd,
+	( SELECT UNIX_TIMESTAMP(dateadded) FROM nzbs order by dateadded ASC limit 1 ) AS oldestnzb,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'MONITOR_DELAY' ) AS monitor,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'TMUX_SESSION' ) AS tmux_session,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'NICENESS' ) AS niceness,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'BINARIES' ) AS binaries_run,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'BACKFILL' ) AS backfill,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'IMPORT' ) AS import,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'NZBS' ) AS nzbs,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'POST' ) AS post,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'RELEASES' ) AS releases_run,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'RELEASES_THREADED' ) AS releases_threaded,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'FIX_NAMES' ) AS fix_names,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'SEQ_TIMER' ) AS seq_timer,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'BINS_TIMER' ) AS bins_timer,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'BACK_TIMER' ) AS back_timer,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'IMPORT_TIMER' ) AS import_timer,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'REL_TIMER' ) AS rel_timer,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'FIX_TIMER' ) AS fix_timer,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'POST_TIMER' ) AS post_timer,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'COLLECTIONS_KILL' ) AS collections_kill,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'POSTPROCESS_KILL' ) AS postprocess_kill,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'CRAP_TIMER' ) AS crap_timer,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'FIX_CRAP' ) AS fix_crap,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'TV_TIMER' ) AS tv_timer,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'UPDATE_TV' ) AS update_tv,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'POST_KILL_TIMER' ) AS post_kill_timer,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'MONITOR_PATH' ) AS monitor_path,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'MONITOR_PATH_A' ) AS monitor_path_a,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'MONITOR_PATH_B' ) AS monitor_path_b,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'SORTER' ) AS sorter,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'SORTER_TIMER' ) AS sorter_timer,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'PROGRESSIVE' ) AS progressive,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'DEHASH' ) AS dehash,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'DEHASH_TIMER' ) AS dehash_timer,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'BACKFILL_DAYS' ) AS backfilldays,
+	( SELECT VALUE FROM `site` WHERE SETTING = 'debuginfo' ) AS debug,
+	( SELECT VALUE FROM `site` WHERE SETTING = 'lookupbooks' ) AS processbooks,
+	( SELECT VALUE FROM `site` WHERE SETTING = 'lookupmusic' ) AS processmusic,
+	( SELECT VALUE FROM `site` WHERE SETTING = 'lookupgames' ) AS processgames,
+	( SELECT VALUE FROM `site` WHERE SETTING = 'tmpunrarpath' ) AS tmpunrar,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'POST_AMAZON' ) AS post_amazon,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'POST_TIMER_AMAZON' ) AS post_timer_amazon,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'POST_NON' ) AS post_non,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'POST_TIMER_NON' ) AS post_timer_non,
+	( SELECT COUNT( * ) FROM groups WHERE active = 1 ) AS active_groups,
+	( SELECT COUNT( * ) FROM groups WHERE first_record IS NOT NULL and backfill = 1 and first_record_postdate != '2000-00-00 00:00:00' and (now() - interval backfill_target day) < first_record_postdate ) AS backfill_groups_days,
+	( SELECT COUNT( * ) FROM groups WHERE first_record IS NOT NULL and backfill = 1 and first_record_postdate != '2000-00-00 00:00:00' and (now() - interval datediff(curdate(),(SELECT VALUE FROM `site` WHERE SETTING = 'safebackfilldate')) day) < first_record_postdate) AS backfill_groups_date,
+	( SELECT COUNT( * ) FROM groups WHERE name IS NOT NULL ) AS all_groups\G
+
+# Query 17: 0.00 QPS, 0.00x concurrency, ID 0x175D26BA628B5C23 at byte 308627670
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 37.03
+# Time range: 2013-08-07 18:31:22 to 2013-08-09 03:29:41
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0      29
+# Exec time      0    387s    12ms    100s     13s     40s     22s      4s
+# Lock time      0    11ms    74us     1ms   385us     1ms   397us   194us
+# Rows sent      0     190       0      81    6.55   18.53   15.28       0
+# Rows examine   0   2.01M   1.04k 122.08k  71.12k 117.95k  47.98k  79.83k
+# Rows affecte   0       0       0       0       0       0       0       0
+# Bytes sent     0  26.25k     175  11.72k     927   1.78k   2.06k  174.84
+# Query size     0  12.64k     162   1.58k  446.41   1.53k  414.75  246.02
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms  ##########################
+# 100ms  #####################
+#    1s  ################################################################
+#  10s+  ##########################################
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'releases'\G
+#    SHOW CREATE TABLE `nzedb`.`releases`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'releasefiles'\G
+#    SHOW CREATE TABLE `nzedb`.`releasefiles`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+select r.ID, r.guid, r.searchname from releases r left join releasefiles rf on rf.releaseID = r.ID where (rf.name REGEXP'(brazilian|chinese|croatian|danish|deutsch|dutch|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|latin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)[\\)]?( \\-)?[ \\-\\.]((19|20)\\d\\d|(480|720|1080)(i|p)|3d|5\\.1|dts|ac3|truehd|(bd|dvd|hd|sat|vhs|web)\\.?rip|(bd.)?(h|x).?2?64|divx|xvid|bluray|svcd|board|custom|\"|(d|h|p|s)d?v?tv|m?dvd(-|sc)?r|int(ernal)?|nzb|par2|\\b(((dc|ld|md|ml|dl|hr|se)[.])|(anime\\.)|(fs|ws)|dsr|pal|ntsc|iso|complete|cracked|ebook|extended|dirfix|festival|proper|game|limited|read.?nfo|real|rerip|repack|remastered|retail|samplefix|scan|screener|theatrical|uncut|unrated|incl|winall)\\b|doku|doc|dub|sub|\\(uncut\\))' or r.name REGEXP'(brazilian|chinese|croatian|danish|deutsch|dutch|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|latin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)[\\)]?( \\-)?[ \\-\\.]((19|20)\\d\\d|(480|720|1080)(i|p)|3d|5\\.1|dts|ac3|truehd|(bd|dvd|hd|sat|vhs|web)\\.?rip|(bd.)?(h|x).?2?64|divx|xvid|bluray|svcd|board|custom|\"|(d|h|p|s)d?v?tv|m?dvd(-|sc)?r|int(ernal)?|nzb|par2|\\b(((dc|ld|md|ml|dl|hr|se)[.])|(anime\\.)|(fs|ws)|dsr|pal|ntsc|iso|complete|cracked|ebook|extended|dirfix|festival|proper|game|limited|read.?nfo|real|rerip|repack|remastered|retail|samplefix|scan|screener|theatrical|uncut|unrated|incl|winall)\\b|doku|doc|dub|sub|\\(uncut\\))')\G
+
+# Query 19: 0 QPS, 0x concurrency, ID 0x57F0F69C7302BDB4 at byte 303349348
+# This item is included in the report because it matches --outliers.
+# Scores: V/M = 0.04
+# Time range: all events occurred at 2013-08-08 23:52:22
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0      16
+# Exec time      0    318s     18s     21s     20s     20s   880ms     19s
+# Lock time      0    10ms    50us     8ms   597us   204us     2ms    98us
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0      16       1       1       1       1       0       1
+# Rows affecte   0      16       1       1       1       1       0       1
+# Bytes sent     0     832      52      52      52      52       0      52
+# Query size     0   2.03k     122     136  130.19  130.47    4.24  130.47
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms
+# 100ms
+#    1s
+#  10s+  ################################################################
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'releases'\G
+#    SHOW CREATE TABLE `nzedb`.`releases`\G
+UPDATE releases SET searchname = 'Gary Wright - The Dream Weaver (1975) MP3', categoryID = 3010, relnamestatus = 3 WHERE ID = 25030\G
+# Converted for EXPLAIN
+# EXPLAIN /*!50100 PARTITIONS*/
+select  searchname = 'Gary Wright - The Dream Weaver (1975) MP3', categoryID = 3010, relnamestatus = 3 from releases where  ID = 25030\G
+
+# Query 21: 0.59 QPS, 6.75x concurrency, ID 0x31149DACB128C473 at byte 135270129
+# This item is included in the report because it matches --outliers.
+# Scores: V/M = 0.17
+# Time range: 2013-08-07 23:45:52 to 23:46:31
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0      23
+# Exec time      0    263s     10s     14s     11s     14s      1s     11s
+# Lock time      0     1ms    37us    86us    55us    73us    12us    54us
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0      23       1       1       1       1       0       1
+# Rows affecte   0      23       1       1       1       1       0       1
+# Bytes sent     0   1.17k      52      52      52      52       0      52
+# Query size     0   1.12k      50      50      50      50       0      50
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms
+# 100ms
+#    1s
+#  10s+  ################################################################
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'releases'\G
+#    SHOW CREATE TABLE `nzedb`.`releases`\G
+update releases set nfostatus = 0 where ID = 23562\G
+# Converted for EXPLAIN
+# EXPLAIN /*!50100 PARTITIONS*/
+select  nfostatus = 0 from releases where  ID = 23562\G
+
+# Query 22: 0.01 QPS, 0.01x concurrency, ID 0xF5EA609A0EDED044 at byte 213396386
+# This item is included in the report because it matches --outliers.
+# Scores: V/M = 0.91
+# Time range: 2013-08-07 18:32:27 to 2013-08-08 03:07:07
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0     316
+# Exec time      0    250s     3ms      5s   790ms      3s   848ms   501ms
+# Lock time      0    72ms    93us    12ms   226us   236us   743us   159us
+# Rows sent      0      36       0       3    0.11    0.99    0.43       0
+# Rows examine   0   4.87M      76  37.14k  15.78k  34.83k  11.60k  14.47k
+# Rows affecte   0       0       0       0       0       0       0       0
+# Bytes sent     0  64.12k     196     551  207.77  284.79   45.27  192.76
+# Query size     0  57.71k     187     187     187     187       0     187
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms  ###############
+#  10ms  #################
+# 100ms  ################################################################
+#    1s  ########################################
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'releases'\G
+#    SHOW CREATE TABLE `nzedb`.`releases`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+select ID, guid, searchname from releases where searchname REGEXP '/passworded|password protect|password/i' and nzbstatus in (1, 2) and adddate > (now() - interval 2 hour) order by ID asc\G
+
+# Query 24: 0.00 QPS, 0.00x concurrency, ID 0x813031B8BBC3B329 at byte 228735562
+# This item is included in the report because it matches --outliers.
+# Scores: V/M = 1.29
+# Time range: 2013-08-08 04:13:01 to 2013-08-09 00:29:06
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0      15
+# Exec time      0    230s     10s     24s     15s     23s      4s     14s
+# Lock time      0       0       0       0       0       0       0       0
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0       0       0       0       0       0       0       0
+# Rows affecte   0       0       0       0       0       0       0       0
+# Bytes sent     0     165      11      11      11      11       0      11
+# Query size     0      90       6       6       6       6       0       6
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms
+# 100ms
+#    1s
+#  10s+  ################################################################
+commit\G
+
+# Query 26: 0.01 QPS, 0.01x concurrency, ID 0x84C56E0A6B41405A at byte 203786784
+# This item is included in the report because it matches --outliers.
+# Scores: V/M = 0.38
+# Time range: 2013-08-07 18:32:27 to 2013-08-08 03:07:08
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0     316
+# Exec time      0    168s    29ms      2s   531ms      1s   450ms   393ms
+# Lock time      0   162ms    86us    40ms   513us   348us     3ms   131us
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0   5.54M   1.13k  39.46k  17.96k  38.40k  11.82k  15.96k
+# Rows affecte   0       0       0       0       0       0       0       0
+# Bytes sent     0  54.00k     175     175     175     175       0     175
+# Query size     0  67.27k     218     218     218     218       0     218
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms  #################
+# 100ms  ################################################################
+#    1s  #############
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'releases'\G
+#    SHOW CREATE TABLE `nzedb`.`releases`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'releasefiles'\G
+#    SHOW CREATE TABLE `nzedb`.`releasefiles`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+select r.ID, r.guid, r.searchname from releases r left join releasefiles rf on rf.releaseID = r.ID where (rf.name REGEXP '\.scr$' or r.name REGEXP '\.scr($| |")') and adddate > (now() - interval 2 hour) order by ID asc\G
+
+# Query 32: 0.00 QPS, 0.00x concurrency, ID 0xB2C28C118C5EBBBC at byte 225433788
+# This item is included in the report because it matches --outliers.
+# Scores: V/M = 25.69
+# Time range: 2013-08-07 17:34:42 to 2013-08-08 03:52:12
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0      19
+# Exec time      0     60s   194us     36s      3s     23s      9s    30ms
+# Lock time      0     2ms    45us   365us   104us   194us    67us    80us
+# Rows sent      0     128       0      57    6.74   38.53   15.76       0
+# Rows examine   0 397.48k      59 105.73k  20.92k 101.89k  29.37k  15.58k
+# Rows affecte   0       0       0       0       0       0       0       0
+# Bytes sent     0   7.26k     141   1.88k  391.26   1.61k  553.10  136.99
+# Query size     0   3.43k     184     186  184.84  183.58       0  183.58
+# String:
+# Databases    nzedb
+# Hosts        localhost
+# Last errno   0
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us  ###################################################
+#   1ms  ###################################################
+#  10ms  ################################################################
+# 100ms  ###################################################
+#    1s
+#  10s+  #########################
+# Tables
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'releases'\G
+#    SHOW CREATE TABLE `nzedb`.`releases`\G
+#    SHOW TABLE STATUS FROM `nzedb` LIKE 'category'\G
+#    SHOW CREATE TABLE `nzedb`.`category`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT searchname, ID from releases where consoleinfoID IS NULL and nzbstatus = 1 and categoryID in ( select ID from category where parentID = 1000 ) ORDER BY postdate DESC LIMIT 0,150\G
