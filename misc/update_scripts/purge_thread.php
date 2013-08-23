@@ -45,7 +45,7 @@ if ($next_full_purge['next_purge'] != null && time() > $next_full_purge['next_pu
 
 $consoletools = new ConsoleTools();
 $time = $consoletools->convertTime(TIME() - $timestart);
-exit ("\n\nPurge thread completed in ".$time." seconds. Have a nice day\n");
+exit ("\n\nPurge thread completed in ".$time." seconds.\nHave a nice day...\n");
 
 function setNextPurge($scheduled=true)
 {
