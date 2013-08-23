@@ -316,7 +316,7 @@
     <legend>Purge Processed Collections</legend>
     <table class="input">
         <tr>
-            <td><label for="FIX_NAMES">Purge processed collections:</label></td>
+            <td><label for="PURGE_THREAD">Purge processed collections:</label></td>
             <td>
                 {html_radios id="RUN_PURGE_THREAD" name='RUN_PURGE_THREAD' values=$truefalse_names output=$truefalse_names selected=$ftmux->RUN_PURGE_THREAD separator='<br />'}
                 <div class="hint">Choose to run the collection purge thread.  This thread automatically purges collections that have been processed
@@ -337,9 +337,30 @@
             <td>
                 <input id="PURGE_MAX_COLS" name="PURGE_MAX_COLS" class="long" type="text" value="{$ftmux->PURGE_MAX_COLS}" /><br />
                 <div class="hint">This setting determines how many collections will be purged each time the script runs.  It is <em>highly<br />
-                    recommended</em> to leave this at the default of 1000, unless you have a lot of RAM (more than 32GB) and<br />
+                    recommended</em> to leave this at the default of 500, unless you have a lot of RAM (more than 32GB) and<br />
                     you have MySQL configured appropriately to use lots of RAM.  Even then, it is not recommended to go <br />
-                    above 2000, unless you are not running update_binaries, backfill, or update_releases.
+                    above 1000, unless you are not running update_binaries, backfill, or update_releases.
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width:160px;"><label for="FURIOUS_PURGE">Enable furious purging:</label></td>
+            <td>
+                {html_radios id="FURIOUS_PURGE" name='FURIOUS_PURGE' values=$truefalse_names output=$truefalse_names selected=$ftmux->FURIOUS_PURGE separator='<br />'}
+                <div class="hint">Set this to TRUE while doing your initial update_binaries for all of your groups.<br />
+                    Leave it set to true until all groups have been backfilled. After that, it's up to you.  It doesn't<br />
+                    hurt anything to leave it enabled.
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width:160px;"><label for="FULL_PURGE_FREQ">Frequency, in hours, to run full purge:</label></td>
+            <td>
+                <input id="FULL_PURGE_FREQ" name="FULL_PURGE_FREQ" class="tiny" type="text" value="{$ftmux->FULL_PURGE_FREQ}" />
+                <div class="hint">Set this to the number of HOURS between full purge cycles.  The full purge cycle cleans <br />
+                    up the collections, binaries, and parts databases by deleting items past retention.  It also removes <br />
+                    releases that have gone past their retention.  Recommend to run this once every 24 hours.  It is not really<br />
+                    necessary to run it more often than that.
                 </div>
             </td>
         </tr>
