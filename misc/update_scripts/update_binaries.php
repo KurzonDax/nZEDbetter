@@ -35,8 +35,9 @@ die;
 function GetGroupsNotUpdated()
 {
 	$db = new DB();
-	$groups = array();
-	$groups = $db->querydirect("SELECT * FROM groups WHERE groups.last_updated IS NULL ORDER BY groups.ID ASC");	
+
+    $binaries = new Binaries();
+	$groups = $db->querydirect("SELECT * FROM groups WHERE groups.last_updated IS NULL ORDER BY groups.ID DESC");
 	while ($r = $db->fetchAssoc($groups))
 	{
 		echo "Updating group: ".$r['name']."\n";
