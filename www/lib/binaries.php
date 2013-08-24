@@ -189,7 +189,14 @@ class Binaries
 			while ($done === false)
 			{
 				$this->startLoop = microtime(true);
-
+                // Make sure the group hasn't been deactivated.
+                $active = $db->queryOneRow("SELECT active FROM groups WHERE ID=".$groupArr['ID']);
+                If ($active['active'] == 0)
+                {
+                    // If it has been deactivated, break out of loop.
+                    echo "\033[01;31mGroup ".$groupArr['name']." has been deactivated.  Stopping thread.\033[00;37m\n";
+                    break;
+                }
 				if ($total > $this->messagebuffer)
 				{
 					if ($first + $this->messagebuffer > $grouplast)
@@ -202,7 +209,17 @@ class Binaries
 				flush();
 
 				// Get article headers from newsgroup.
+                // TODO: Bug here that can cause a group to repeatedly grab the same articles.
+                // Seems to happen when the server does not return a large number of messages.  Need to
+                // investigate further.
 				$lastId = $this->scan($nntp, $groupArr, $first, $last);
+                If ($lastId == $first)
+                {
+                    echo "\033[01;31mWARNING!! Server not sending updated messages. Group: ".$groupArr['name'];
+                    echo "Deactivating group, and stopping thread.\033[00;37m\n";
+                    $db->query("UPDATE groups SET active=0, backfill=0 WHERE ID=".$groupArr['ID']);
+                    $done = true;
+                }
 				if ($lastId === false)
 				{
 					// Scan failed - skip group.
