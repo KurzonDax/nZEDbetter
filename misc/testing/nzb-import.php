@@ -90,6 +90,8 @@ foreach ($groups as $group)
 $data = array();
 //$filenames = array();;
 
+$category = new Category();
+
 if (!isset($groups) || count($groups) == 0)
 {
 	echo "no groups specified".$n;
@@ -104,7 +106,9 @@ else
 		return;
 	$objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
 	foreach($objects as $filestoprocess => $nzbFile){
-		if(!$nzbFile->getExtension() == "nzb" || !$nzbFile->getExtension() == "gz")
+		if(preg_match('/\.done|\.blacklisted|\.nogroup/', $nzbFile))
+            continue;
+        if(!$nzbFile->getExtension() == "nzb" || !$nzbFile->getExtension() == "gz")
 		{
 			continue;
 		}
@@ -122,6 +126,8 @@ else
 			$nzba = file_get_contents($nzbc);
 			$compressed = true;
 		}
+
+
 
 		$xml = @simplexml_load_string($nzba);
 		if (!$xml || strtolower($xml->getName()) != 'nzb')
@@ -174,7 +180,12 @@ else
 				if ($res !== false || $res1 !== false)
 				{
 					echo $n."\033[38;5;".$color_skipped."mSkipping ".$cleanerName.", it already exists in your database.\033[0m";
-					@unlink($nzbFile);
+                    $mvfile = rename($nzbFile, $nzbFile.".done");
+                    if(!$mvfile)
+                    {
+                        echo "\nError renaming NZB ".$nzbFile."\n";
+                    }
+                    @unlink($nzbFile);
 					flush();
 					$importfailed = true;
 					break;
@@ -195,7 +206,12 @@ else
 				if ($res !== false)
 				{
 					echo $n."\033[38;5;".$color_skipped."mSkipping ".$cleanerName.", it already exists in your database.\033[0m".$n;
-					@unlink($nzbFile);
+                    $mvfile = rename($nzbFile, $nzbFile.".duplicate");
+                    if(!$mvfile)
+                    {
+                        echo "\nError renaming NZB ".$nzbFile."\n";
+                    }
+                    @unlink($nzbFile);
 					flush();
 					$importfailed = true;
 					break;
@@ -214,7 +230,7 @@ else
 
 				if ($binaries->isBlacklisted($msg, $group))
 				{
-					$isBlackListed = TRUE;
+					$isBlackListed = true;
 				}
 			}
 			if ($groupID != -1 && !$isBlackListed)
@@ -237,10 +253,22 @@ else
 				if ($isBlackListed)
 				{
 					$errorMessage = $n."\033[38;5;".$color_blacklist."mSubject is blacklisted: ".$cleanerName."\033[0m".$n;
+                    $mvfile = rename($nzbFile, $nzbFile.".blacklisted");
+                    if(!$mvfile)
+                    {
+                        echo "\nError renaming NZB ".$nzbFile."\n";
+                    }
+                    @unlink($nzbFile);
 				}
 				else
 				{
 					$errorMessage = $n."\033[38;5;".$color_group."mNo group found for ".$cleanerName." (one of ".implode(', ', $groupArr)." are missing)\033[0m".$n;
+                    $mvfile = rename($nzbFile, $nzbFile.".nogroup");
+                    if(!$mvfile)
+                    {
+                        echo "\nError renaming NZB ".$nzbFile."\n";
+                    }
+                    @unlink($nzbFile);
 				}
 				$importfailed = true;
 				echo $errorMessage.$n;
@@ -251,8 +279,12 @@ else
 		{
 			$relguid = sha1(uniqid());
 			$nzb = new NZB();
-			if($relID = $db->queryInsert(sprintf("insert into releases (name, searchname, totalpart, groupID, adddate, guid, rageID, postdate, fromname, size, passwordstatus, haspreview, categoryID, nfostatus, nzbstatus) values (%s, %s, %d, %d, now(), %s, -1, %s, %s, %s, %d, -1, 7010, -1, 1)", $db->escapeString($subject), $db->escapeString($cleanerName), $totalFiles, $groupID, $db->escapeString($relguid), $db->escapeString($postdate['0']), $db->escapeString($postername['0']), $db->escapeString($totalsize), ($page->site->checkpasswordedrar == "1" ? -1 : 0))));
-			{
+            $catID = $category->determineCategory($cleanerName, $groupID);
+            $sqlInsert=sprintf("insert into releases (name, searchname, totalpart, groupID, adddate, guid, rageID, postdate, fromname, size, passwordstatus, haspreview, categoryID, nfostatus, nzbstatus, nzb_imported, relnamestatus) values (%s, %s, %d, %d, now(), %s, -1, %s, %s, %s, %d, -1, %d, -1, 1, 'TRUE', 1)", $db->escapeString($subject), $db->escapeString($cleanerName), $totalFiles, $groupID, $db->escapeString($relguid), $db->escapeString($postdate['0']), $db->escapeString($postername['0']), $db->escapeString($totalsize), ($page->site->checkpasswordedrar == "1" ? -1 : 0), $catID);
+			if($relID = $db->queryInsert($sqlInsert))
+            {
+                // file_put_contents(WWW_DIR."lib/logging/importnzb.log", "------------------------------".$relID."   ".$sqlInsert."\n", FILE_APPEND);
+
 				if($nzb->copyNZBforImport($relguid, $nzba))
 				{
 					if ( $nzbCount % 100 == 0)
@@ -263,7 +295,8 @@ else
 							$nzbsperhour = number_format(round($nzbCount / $seconds * 3600),0);
 							echo $n."\033[38;5;".$color_blacklist."mAveraging ".$nzbsperhour." imports per hour from ".$path."\033[0m".$n;
 						} else {
-							categorize();
+                            // why not just go ahead and categorize the release when we insert it above?
+							// categorize();
 							echo $n."Imported #".$nzbCount." nzb's in ".relativeTime($time);
 						}
 					} else {
@@ -277,8 +310,18 @@ else
 					$importfailed = true;
 				}
 				$nzbCount++;
+                $mvfile = rename($nzbFile, $nzbFile.".done");
+                if(!$mvfile)
+                {
+                    echo "\nError renaming NZB ".$nzbFile."\n";
+                }
 				@unlink($nzbFile);
 			}
+            else
+            {
+                echo "Failied to insert NZB into database.";
+                file_put_contents(WWW_DIR."lib/logging/importnzb.log", "------------------------------".$relID."   ".$sqlInsert."\n", FILE_APPEND);
+            }
 		}
 	}
 }
