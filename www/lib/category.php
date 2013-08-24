@@ -276,9 +276,10 @@ class Category
 		if($this->isPC($releasename)){ return $this->tmpCat; }
 		if($this->isTV($releasename)){ return $this->tmpCat; }
 		if($this->isMovie($releasename)){ return $this->tmpCat; }
+        if($this->isMusic($releasename)){ return $this->tmpCat; }
 		if($this->isXXX($releasename)){ return $this->tmpCat; }
 		if($this->isConsole($releasename)){ return $this->tmpCat; }
-		if($this->isMusic($releasename)){ return $this->tmpCat; }
+
 		if($this->isBook($releasename)){ return $this->tmpCat; }	
 	}
 
@@ -436,7 +437,12 @@ class Category
 					$this->tmpCat =  Category::CAT_XXX_OTHER;
 					return true;
 				}
-
+                if (preg_match('/erotic|erotica/i', $groupRes["name"]))
+                {
+                    if($this->isXxx($releasename)){ return $this->tmpCat; }
+                    $this->tmpCat =  Category::CAT_XXX_OTHER;
+                    return true;
+                }
 				if (preg_match('/alt\.binaries(\.games)?\.nintendo(\.)?ds/', $groupRes["name"]))
 				{
 					$this->tmpCat =  Category::CAT_GAME_NDS;
@@ -569,7 +575,7 @@ class Category
 					return true;
 				}
 
-				if (preg_match('/alt\.binaries\.sounds\.whitburn\.pop/i', $groupRes["name"]))
+				if (preg_match('/alt\.binaries\.sounds\.whitburn/i', $groupRes["name"]))
 				{
 					if($this->categorizeforeign)
 					{
@@ -599,7 +605,22 @@ class Category
 					$this->tmpCat = Category::CAT_PC_0DAY;
 					return true;
 				}
+                if (preg_match('/alt\.binaries\.town$/', $groupRes["name"]))
+                {
+                    if($this->isXxx($releasename)){ return $this->tmpCat; }
+                    if($this->isPC($releasename)) {return $this->tmpCat;}
+                    $this->tmpCat =  Category::CAT_XXX_OTHER;
+                    return true;
 
+                }
+                if (preg_match('/alt\.binaries\.u\-4all$/', $groupRes["name"]))
+                {
+                    if($this->isXxx($releasename)){ return $this->tmpCat; }
+                    if($this->isPC($releasename)) {return $this->tmpCat;}
+                    $this->tmpCat =  Category::CAT_XXX_OTHER;
+                    return true;
+
+                }
 				if (preg_match('/alt\.binaries\.warez\.smartphone/', $groupRes["name"]))
 				{
 					if($this->isPhone($releasename)){ return $this->tmpCat; }
@@ -1051,7 +1072,7 @@ class Category
 			$this->tmpCat = Category::CAT_XXX_OTHER;
 			return true;
 		}
-		else if(preg_match('/boob|softcore|hardcore|slut|whore|ass|Pervert|FUNKY[\. ]\w{10,}|Femjoy/i', $releasename))
+		else if(preg_match('/boob|softcore|hardcore|slut|whore|ass|Pervert|FUNKY[\. ]\w{10,}|Femjoy|coeds|teenfun|busty|milf|erotic|lolita|Querro/i', $releasename))
 		{
 			if($this->isXxx264($releasename)){ return true; }
 			if($this->isXxxXvid($releasename)){ return true; }
