@@ -1421,43 +1421,47 @@ class Releases
         }
         $db->Commit();
         $db->setAutoCommit(TRUE);
-
-        $collectionsresult=$db->queryDirect("SELECT ID, totalFiles FROM collections WHERE totalFiles!=0 AND filecheck IN (0, 1)".$where);
-        $collectionstotal=$db->getNumRows($collectionsresult);
-        if($echooutput)
-            Echo "\nFound ".$collectionstotal." collections to check.\n";
-
-        if ($collectionstotal>0)
+        if($binaryrowcount>0)
         {
-            $colsupdated=0;
-            $colsprocessed=0;
-            $totalColsUpdateTime = microtime(true);
-            $db->setAutoCommit(FALSE);
-            while($collectionrow=$db->fetchAssoc($collectionsresult))
-            {
-                $colsprocessed++;
-                if($echooutput)
-                    $consoletools->overWrite("Collections processed: ".$consoletools->percentString($colsprocessed,$collectionstotal));
-                $binaryrows=$db->queryDirect("SELECT ID FROM binaries WHERE collectionID=".$collectionrow["ID"]." AND partCheck=1");
-                $binarycount=$db->getNumRows($binaryrows);
-
-                if($binarycount>=$collectionrow["totalFiles"])
-                {
-                    // Echo "Setting File Check to 15 (filenumber 1)\n";
-                    $db->query("UPDATE collections SET filecheck=2 WHERE ID=".$collectionrow["ID"]);
-                    $colsupdated++;
-                }
-            }
-            $totalColsUpdateTime = microtime(true) - $totalColsUpdateTime;
+            $collectionsresult=$db->queryDirect("SELECT ID, totalFiles FROM collections WHERE totalFiles!=0 AND filecheck IN (0, 1)".$where);
+            $collectionstotal=$db->getNumRows($collectionsresult);
             if($echooutput)
-            {
-                echo "\nTotal update time: ".number_format($totalColsUpdateTime,4)." Average update time: ".number_format(($totalColsUpdateTime/$collectionstotal),4);
-                Echo "\nCommitting database changes... ".$colsupdated." total collections were updated.\n";
-            }
-            $db->Commit();
-            $db->setAutoCommit(TRUE);
+                Echo "\nFound ".$collectionstotal." collections to check.\n";
 
+            if ($collectionstotal>0)
+            {
+                $colsupdated=0;
+                $colsprocessed=0;
+                $totalColsUpdateTime = microtime(true);
+                $db->setAutoCommit(FALSE);
+                while($collectionrow=$db->fetchAssoc($collectionsresult))
+                {
+                    $colsprocessed++;
+                    if($echooutput)
+                        $consoletools->overWrite("Collections processed: ".$consoletools->percentString($colsprocessed,$collectionstotal));
+                    $binaryrows=$db->queryDirect("SELECT ID FROM binaries WHERE collectionID=".$collectionrow["ID"]." AND partCheck=1");
+                    $binarycount=$db->getNumRows($binaryrows);
+
+                    if($binarycount>=$collectionrow["totalFiles"])
+                    {
+                        // Echo "Setting File Check to 15 (filenumber 1)\n";
+                        $db->query("UPDATE collections SET filecheck=2 WHERE ID=".$collectionrow["ID"]);
+                        $colsupdated++;
+                    }
+                }
+                $totalColsUpdateTime = microtime(true) - $totalColsUpdateTime;
+                if($echooutput)
+                {
+                    echo "\nTotal update time: ".number_format($totalColsUpdateTime,4)." Average update time: ".number_format(($totalColsUpdateTime/$collectionstotal),4);
+                    Echo "\nCommitting database changes... ".$colsupdated." total collections were updated.\n";
+                }
+                $db->Commit();
+                $db->setAutoCommit(TRUE);
+
+            }
         }
+        else
+            echo "\nNo binaries updated. Skipping collection checks.\n";
         unset($colsupdated, $colsprocessed, $collectionrow, $binaryrows, $binarycount, $binrow);
         unset($collectionsresult, $collectionstotal);
 
