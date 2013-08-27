@@ -8,6 +8,8 @@ require_once(WWW_DIR."/lib/util.php");
 require_once(WWW_DIR."/lib/releaseimage.php");
 require_once(WWW_DIR."/lib/rottentomato.php");
 require_once(WWW_DIR."/lib/trakttv.php");
+require_once(WWW_DIR."/lib/namecleaning.php");
+require_once(WWW_DIR."/lib/consoletools.php");
 
 class Movie
 {
@@ -19,15 +21,21 @@ class Movie
 
 	function Movie($echooutput=false)
 	{
-		$this->echooutput = $echooutput;
+		$this->echooutput = true;
 		$s = new Sites();
 		$site = $s->get();
 		$this->apikey = $site->tmdbkey;
 		$this->movieqty = (!empty($site->maximdbprocessed)) ? $site->maximdbprocessed : 100;
 		$this->service = "";
 		$this->imdburl = ($site->imdburl == "0") ? false : true;
-		$this->imdblanguage = (!empty($site->imdblanguage)) ? $site->imdblanguage : "en";
-		$this->imgSavePath = WWW_DIR.'covers/movies/';
+        $this->imdblanguage = (!empty($site->imdblanguage)) ? $site->imdblanguage : "en";
+
+        $this->tmdbSearch = (!empty($site->movie_search_tmdb)) ? $site->movie_search_tmdb : 'FALSE';
+        $this->googleSearch = (!empty($site->movie_search_google)) ? $site->movie_search_google : 'FALSE';
+        $this->bingSearch = (!empty($site->movie_search_bing)) ? $site->movie_search_bing : 'FALSE';
+        $this->yahooSearch = (!empty($site->movie_search_yahoo)) ? $site->movei_search_yahoo : 'FALSE';
+
+        $this->imgSavePath = WWW_DIR.'covers/movies/';
 		$this->binglimit = 0;
 		$this->yahoolimit = 0;
 	}
@@ -242,15 +250,28 @@ class Movie
 			$db->escapeString($title), $db->escapeString($tagline), $db->escapeString($plot), $db->escapeString($year), $db->escapeString($rating), $db->escapeString($genre), $db->escapeString($director), $db->escapeString($actors), $db->escapeString($language), $cover, $backdrop, $id));
 	}
 
-	public function updateMovieInfo($imdbId)
+	public function updateMovieInfo($imdbId, $tmdbID=false, $tmdbProps=false)
 	{
 		$ri = new ReleaseImage();
 
-		if ($this->echooutput && $this->service == "")
+		if ($this->echooutput && $this->service == false && $tmdbID=false)
 			echo "Fetching IMDB info from TMDB using IMDB ID: ".$imdbId."\n";
+        elseif ($tmdbID != false)
+            echo "Fetching TMDB info using TMDB ID: ".$tmdbID."\n";
+        elseif ($tmdbProps != false)
+            echo "Using previously gathered TMDB info.\n";
 
 		//check themoviedb for imdb info
-		$tmdb = $this->fetchTmdbProperties($imdbId);
+		if($tmdbID != false && $tmdbProps == false)
+        {
+            $tmdb=$this->fetchTmdbProperties($tmdbID);
+            if(!$tmdb)
+                echo "Unable to fetch movie information from TMDB using ID ".$tmdbID."\n";
+        }
+        elseif ($tmdbProps != false)
+            $tmdb = $tmdbProps;
+        else
+            $tmdb = $this->fetchTmdbProperties($imdbId);
 
 		//check imdb for movie info
 		$imdb = $this->fetchImdbProperties($imdbId);
@@ -262,9 +283,12 @@ class Movie
 			return false;
 		}
 
-		$mov = array();
+        $mov = array();
 		$mov['imdb_id'] = $imdbId;
-		$mov['tmdb_id'] = (!isset($tmdb['tmdb_id']) || $tmdb['tmdb_id'] == '') ? "NULL" : $tmdb['tmdb_id'];
+        if($tmdbID != false)
+            $mov['tmdb_id'] = $tmdbID;
+        else
+		    $mov['tmdb_id'] = (!isset($tmdb['tmdb_id']) || $tmdb['tmdb_id'] == '') ? "NULL" : $tmdb['tmdb_id'];
 
 		//prefer tmdb cover over imdb cover
 		$mov['cover'] = 0;
@@ -298,12 +322,14 @@ class Movie
 		if (isset($imdb['tagline']) && $imdb['tagline'] != '') {
 			$mov['tagline'] = html_entity_decode($imdb['tagline'], ENT_QUOTES, 'UTF-8');
 		}
-
+        // From what I've observed, the imdb plot regex either doesn't really work at all
+        // or just returns a tagline, not an actual plot.  Changing this to favor the
+        // tmdb overview field.  WHICH... I fixed in the fucking fetchTMDBProperties function
 		$mov['plot'] = '';
-		if (isset($imdb['plot']) && $imdb['plot'] != '') {
-			$mov['plot'] = $imdb['plot'];
-		} elseif (isset($tmdb['plot']) && $tmdb['plot'] != '') {
+		if (isset($tmdb['plot']) && $tmdb['plot'] != '') {
 			$mov['plot'] = $tmdb['plot'];
+		} elseif (isset($imdb['plot']) && $imdb['plot'] != '') {
+			$mov['plot'] = $imdb['plot'];
 		}
 		$mov['plot'] = html_entity_decode($mov['plot'], ENT_QUOTES, 'UTF-8');
 
@@ -356,7 +382,7 @@ class Movie
 		$movtitle = str_replace(array('/', '\\'), '', $mov['title']);
 		$db = new DB();
 		$query = sprintf("
-			INSERT IGNORE INTO movieinfo
+			INSERT INTO movieinfo
 				(imdbID, tmdbID, title, rating, tagline, plot, year, genre, type, director, actors, language, cover, backdrop, createddate, updateddate)
 			VALUES
 				(%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %d, NOW(), NOW())
@@ -377,7 +403,13 @@ class Movie
 
 		return $movieId;
 	}
+    public function fetchTmdbInfoByName($searchstring, $year=false)
+    {
+        $tmdb = new TMDb($this->apikey, $this->imdblanguage);
+        $results = $tmdb->searchMovie($searchstring, true, ($year===false ? null : $year));
+        return $results;
 
+    }
 	public function fetchTmdbProperties($imdbId, $text=false)
 	{
 		$tmdb = new TMDb($this->apikey, $this->imdblanguage);
@@ -398,8 +430,14 @@ class Movie
 		$ImdbID = str_replace('tt','',$tmdbLookup['imdb_id']);
 		$ret['imdb_id'] = $ImdbID;
 		if (isset($tmdbLookup['vote_average'])) {$ret['rating'] = ($tmdbLookup['vote_average'] == 0) ? '' : $tmdbLookup['vote_average'];}
-		if (isset($tmdbLookup['tagline']))		{$ret['plot'] = $tmdbLookup['tagline'];}
+		// A "plot" and a "tagline" are two entirely different things. wtf?
+        // if (isset($tmdbLookup['tagline']))		{$ret['plot'] = $tmdbLookup['tagline'];}
+        // How about we actually set the tagline to the tagline field??
+        if (isset($tmdbLookup['tagline']))		{$ret['tagline'] = $tmdbLookup['tagline'];}
+        // And maybe we can use the overview for the plot </sarcasm>
+        if (isset($tmdbLookup['overview'])) {$ret['plot'] = $tmdbLookup['overview'];}
 		if (isset($tmdbLookup['release_date'])) {$ret['year'] = date("Y", strtotime($tmdbLookup['release_date']));}
+        if (isset($tmdbLookup['imdb_id'])) {$ret['imdbID'] = str_replace('tt','', $tmdbLookup['imdb_id']);}
 		if (isset($tmdbLookup['genres']) && sizeof($tmdbLookup['genres']) > 0)
 		{
 			$genres = array();
@@ -527,13 +565,13 @@ class Movie
 
 		if ($releaseToWork == '')
 		{
-			$res = $db->queryDirect(sprintf("SELECT searchname as name, ID from releases where imdbID IS NULL and nzbstatus = 1 and categoryID in ( select ID from category where parentID = %d ) order by postdate desc limit %d", Category::CAT_PARENT_MOVIE, $this->movieqty));
+			$res = $db->queryDirect(sprintf("SELECT searchname, ID, name, groupID, categoryID from releases where imdbID IS NULL and nzbstatus = 1 and categoryID in ( select ID from category where parentID = %d ) order by postdate desc limit %d", Category::CAT_PARENT_MOVIE, $this->movieqty));
 			$moviecount = $db->getNumRows($res);
 		}
 		else
 		{
 			$pieces = explode("           =+=            ", $releaseToWork);
-			$res = array(array('name' => $pieces[0], 'ID' => $pieces[1]));
+			$res = array(array('searchname' => $pieces[0], 'ID' => $pieces[1]));
 			$moviecount = 1;
 		}
 
@@ -544,12 +582,19 @@ class Movie
 
 			foreach ($res as $arr)
 			{
-				$moviename = $this->parseMovieSearchName($arr['name']);
+			    if ($this->tmdbSearch == 'TRUE')
+                {
+                    $tmdbResult = $this->searchTMDb($arr);
+                    if($tmdbResult)
+                        continue;
+
+                }
+                $moviename = $this->parseMovieSearchName($arr['searchname']);
 				if ($moviename !== false)
 				{
 					if ($this->echooutput)
 						echo 'Looking up: '.$moviename."\n";
-
+                    // Get's the IMDB number only from traktv
 					$traktimdbid = $trakt->traktMoviesummary($moviename, "imdbid");
 					if ($traktimdbid !== false)
 						$imdbId = $this->domovieupdate($traktimdbid, 'Trakt',  $arr["ID"], $db);
@@ -567,9 +612,9 @@ class Movie
 								$imdbId = $this->domovieupdate($buffer, 'Google1', $arr["ID"], $db);
 								if ($imdbId === false)
 								{
-									if (preg_match('/(?P<name>[\w+].+)(\+\(\d{4}\))/i', $moviename1, $result))
+									if (preg_match('/(?P<searchname>[\w+].+)(\+\(\d{4}\))/i', $moviename1, $result))
 									{
-										$buffer = getUrl("https://www.google.com/search?hl=en&as_q=".urlencode($result["name"])."&as_epq=&as_oq=&as_eq=&as_nlo=&as_nhi=&lr=&cr=&as_qdr=all&as_sitesearch=imdb.com&as_occt=any&safe=images&tbs=&as_filetype=&as_rights=");
+										$buffer = getUrl("https://www.google.com/search?hl=en&as_q=".urlencode($result["searchname"])."&as_epq=&as_oq=&as_eq=&as_nlo=&as_nhi=&lr=&cr=&as_qdr=all&as_sitesearch=imdb.com&as_occt=any&safe=images&tbs=&as_filetype=&as_rights=");
 
 										if ($buffer !== false && strlen($buffer))
 										{
@@ -838,6 +883,106 @@ class Movie
 				echo "Updated successfully.\n";
 	  }
   }
+public function searchTMDb($release)
+{
+    $db = new DB();
+
+    $namecleaning = new nameCleaning();
+    $category = new Category();
+
+    $updatedCategory = $category->determineCategory($release['name'], $release['groupID']);
+    if($updatedCategory != $release['categoryID'])
+    {
+        echo "\n".$release['searchname']." is being assigned to a new category: ".$updatedCategory."\n";
+        $db->query("UPDATE releases SET categoryID=".$db->escapeString($updatedCategory)." WHERE ID=".$release['ID']);
+        if(!($updatedCategory>2000 && $updatedCategory<2999))
+        {
+            echo "\n".$release['searchname']." is no longer considered a movie.\n";
+            return false;
+        }
+    }
+    $refinedSearchName = $namecleaning->releaseCleaner($release['name']);
+
+    if($refinedSearchName != $release['searchname'])
+    {
+        echo "Updating searchname field in database.\n";
+        echo "Old name:     ".$release['searchname']."\n";
+        echo "New name:     ".$refinedSearchName."\n";
+        $db->query("UPDATE rleases SET searchname=".$db->escapeString($refinedSearchName)." WHERE ID=".$release['ID']);
+    }
+    $refinedSearchName = $namecleaning->movieCleaner($refinedSearchName);
+    $movieCleanNameYear = $this->parseMovieSearchName($refinedSearchName);
+
+    if ($movieCleanNameYear != false && preg_match('/(.+)\(((20|19)\d\d)\)/', $movieCleanNameYear, $matches))
+    {
+        $movieCleanName = $matches['1'];
+        $movieCleanYear = $matches['2'];
+    }
+    else
+    {
+        echo "\n".$release['searchname']." does not have a year in the release search name. Skipping...\n";
+        return false;
+    }
+
+    $results = $this->fetchTmdbInfoByName($movieCleanName, $movieCleanYear);
+    //print_r($results);
+    $matchfound = false;
+    if(isset($results['results']['0']))
+    {
+
+        $ourName = strtolower($movieCleanName);
+        $tmdbName = strtolower($results['results']['0']['title']);
+        similar_text($ourName, $tmdbName, $percentSimilar);
+        // echo "TMDb Title 0:     ".$results['results']['0']['title']." (".$results['results']['0']['release_date'].") - Match: ".number_format($percentSimilar, 2)."%.\n";
+        if(isset($results['results']['0']['release_date']) &&  preg_match('/((20|19)\d\d)/',$results['results']['0']['release_date'], $matches))
+            $tmdbYear = $matches['1'];
+        if($movieCleanYear !== false && isset($tmdbYear))
+            $matchedYear = ($tmdbYear >= $movieCleanYear -1 && $tmdbYear < $movieCleanYear + 2) ? true : false;
+        else
+            $matchedYear = true;
+        if ($percentSimilar>80 && $matchedYear)
+        {
+            echo "\033[01;32mMatch found:   ".$results['results']['0']['title']." (".$tmdbYear.") Match: 0  ID: ".$results['results']['0']['id']."\n\033[00;37m";
+            $matchfound = $results['results']['0']['id'];
+        }
+    }
+    if(isset($results['results']['1']) && !$matchfound)
+    {
+        $ourName = strtolower($movieCleanName);
+        $tmdbName = strtolower($results['results']['1']['title']);
+        similar_text($ourName, $tmdbName, $percentSimilar);
+        // echo "TMDb Title 0:     ".$results['results']['0']['title']." (".$results['results']['0']['release_date'].") - Match: ".number_format($percentSimilar, 2)."%.\n";
+        if(isset($results['results']['1']['release_date']) &&  preg_match('/((20|19)\d\d)/',$results['results']['1']['release_date'], $matches))
+            $tmdbYear = $matches['1'];
+        if($movieCleanYear !== false && isset($tmdbYear))
+            $matchedYear = ($tmdbYear >= $movieCleanYear -1 && $tmdbYear < $movieCleanYear + 2) ? true : false;
+        else
+            $matchedYear = true;
+        if ($percentSimilar>80 && $matchedYear)
+        {
+            echo "\033[01;32mMatch found: ".$results['results']['0']['title']." (".$tmdbYear.") Match: 1  ID: ".$results['results']['1']['id']."\n\033[00;37m";
+            $matchfound = $results['results']['1']['id'];
+        }
+
+    }
+    if($matchfound>0)
+    {
+        $tmdbProps = $this->fetchTmdbProperties($matchfound, true);
+        // print_r($tmdbProps);
+        // $consoletools->getUserInput("Press enter to continue with update.");
+        $movieID = $this->updateMovieInfo($tmdbProps['imdb_id'], $matchfound, $tmdbProps);
+        //echo "\nUpdating movie with IMDb ID: ".$tmdbProps['imdb_id']."\n";
+        $db->query("UPDATE releases SET imdbID=".$tmdbProps['imdb_id']." WHERE ID=".$release['ID']);
+        return true;
+    }
+    else
+    {
+        echo "\nNo matches found in IMDB.\n";
+        file_put_contents(WWW_DIR."/lib/logging/tmdb-nomatch.log",$release['ID'].",".$db->escapeString($refinedSearchName)."\n", FILE_APPEND);
+        return false;
+    }
+
+}
 
 	public function updateInsUpcoming($source, $type, $info)
 	{

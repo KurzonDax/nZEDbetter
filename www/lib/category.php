@@ -272,12 +272,12 @@ class Category
 
 		// 
 		// Note that in byGroup() some overrides occur...
-		if($this->byGroup($releasename, $groupID)){ return $this->tmpCat; }
+        if($this->isXXX($releasename)){ return $this->tmpCat; }
+        if($this->byGroup($releasename, $groupID)){ return $this->tmpCat; }
 		if($this->isPC($releasename)){ return $this->tmpCat; }
 		if($this->isTV($releasename)){ return $this->tmpCat; }
 		if($this->isMovie($releasename)){ return $this->tmpCat; }
         if($this->isMusic($releasename)){ return $this->tmpCat; }
-		if($this->isXXX($releasename)){ return $this->tmpCat; }
 		if($this->isConsole($releasename)){ return $this->tmpCat; }
 
 		if($this->isBook($releasename)){ return $this->tmpCat; }	
@@ -1072,7 +1072,7 @@ class Category
 			$this->tmpCat = Category::CAT_XXX_OTHER;
 			return true;
 		}
-		else if(preg_match('/boob|softcore|hardcore|slut|whore|ass|Pervert|FUNKY[\. ]\w{10,}|Femjoy|coeds|teenfun|busty|milf|erotic|lolita|Querro/i', $releasename))
+		else if(preg_match('/boob|softcore|hardcore|slut|whore|ass|Pervert|FUNKY[\. ]\w{10,}|Femjoy|coeds|teenfun|busty|milf|erotic|lolita|Querro|swe6rus|DETOXATiON/i', $releasename))
 		{
 			if($this->isXxx264($releasename)){ return true; }
 			if($this->isXxxXvid($releasename)){ return true; }
