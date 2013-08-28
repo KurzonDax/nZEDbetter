@@ -1585,7 +1585,7 @@ class Releases
                 // See if we got a hit
                 if($tooLittleTooMuch)
                 {
-                    $db->query("UPDATE collections SET filecheck=990 WHERE ID=".$collectionrow['colID']);
+                    $db->query("UPDATE collections SET filecheck=5 WHERE ID=".$collectionrow['colID']);
                     $colsDeleted ++;
                 }
             }
