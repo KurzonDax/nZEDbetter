@@ -154,7 +154,8 @@ class nameCleaning
 		$cleanerName = str_replace(array('[pw]', '[PW]', ' PW ', '(Password)'), ' PASSWORDED ', $cleanerName);
         // echo "6 - ".$cleanerName."\n";
 		//Replaces some characters with 1 space.
-		$cleanerName = str_replace(array(".", "_", '-', "|", "<", ">", '"', "=", '[', "]", "(", ")", "{", "}", "*", ";", ":", ",", "'", "~", "/", "&", "+"), " ", $cleanerName);
+        // Removed the apostrophe - 0827
+		$cleanerName = str_replace(array(".", "_", '-', "|", "<", ">", '"', "=", '[', "]", "(", ")", "{", "}", "*", ";", ":", ",", "~", "/", "&", "+"), " ", $cleanerName);
         // echo "7 - ".$cleanerName."\n";
 		//Replace multiple spaces with 1 space
 		$cleanerName = trim(preg_replace('/\s\s+/i', ' ', $cleanerName));
