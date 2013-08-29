@@ -308,8 +308,8 @@ class Groups
 			$groups = $nntp->getGroups();
 			$nntp->doQuit();
 
-			$regfilter = "/(" . str_replace (array ('.','*'), array ('\.','.*?'), $groupList) . ")$/";
-
+			$regfilter = "/(" . str_replace (array ('.','*'), array ('\.','.*?'), trim($groupList)) . ")$/";
+            echo $regfilter;
 			foreach($groups AS $group)
 			{
 				if (preg_match ($regfilter, $group['group']) > 0)
@@ -324,7 +324,7 @@ class Groups
 					else
 					{
 						$desc = "";
-						$db->queryInsert(sprintf("INSERT INTO groups (name, description, active) VALUES (%s, %s, %d)", $db->escapeString($group['group']), $db->escapeString($desc), $active));
+						$db->queryInsert(sprintf("INSERT INTO groups (name, description, active, minfilestoformrelease, minsizetoformrelease) VALUES (%s, %s, %d, 0, 0)", $db->escapeString($group['group']), $db->escapeString($desc), $active));
 						$ret[] = array ('group' => $group['group'], 'msg' => 'Created');
 					}
 				}
