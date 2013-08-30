@@ -54,6 +54,7 @@ class Category
 	const CAT_XXX_IMAGESET = 6060;
 	const CAT_XXX_PACKS = 6070;
 	const CAT_MISC = 7010;
+    const CAT_HASHED = 7020;
 	const CAT_BOOKS_EBOOK = 8010;
 	const CAT_BOOKS_COMICS = 8020;
 	const CAT_BOOKS_MAGAZINES = 8030;
@@ -868,7 +869,7 @@ class Category
 
 	public function isMovieForeign($releasename)
 	{
-		if(preg_match('/(danish|flemish|Deutsch|dutch|french|german|nl[\.\-_ ]?sub(bed|s)?|\.NL|norwegian|swedish|swesub|spanish|Staffel)[\.\-_ ]|\(german\)/i', $releasename))
+		if(preg_match('/(danish|flemish|Deutsch|dutch|french|german|nl|italian[\.\-_ ]?sub(bed|s)?|\.NL|norwegian|swedish|swesub|spanish|Staffel|italian)[\.\-_ ]|\(german\)/i', $releasename))
 		{
 			$this->tmpCat = Category::CAT_MOVIE_FOREIGN;
 			return true;
@@ -1559,32 +1560,24 @@ class Category
 
 	public function isHashed($releasename)
 	{
-		if (!preg_match('/[\.\-_ ](720p|1080p|s\d{1,2}[.-_ ]?e\d{1,2})[\.\-_ ]/i', $releasename))
-		{
-			if (preg_match('/[a-z0-9]{21,}/i', $releasename))
-			{
-				$this->tmpCat = Category::CAT_MISC;
-				return true;
-			}
+		$db = new DB();
 
-			if (preg_match('/[A-Z0-9]{20,}/', $releasename))
-			{
-				$this->tmpCat = Category::CAT_MISC;
-				return true;
-			}
+        $regexRes = $db->queryDirect("SELECT * FROM hashednameRegex");
+        if($regexRes)
+        {
+            while($regexString=$db->fetchAssoc($regexRes))
+            {
+                $regex = '/'.$regexString['regexString'];
+                if($regexString['caseSensitive']==1)
+                    $regex = $regex.'/i';
+                else
+                    $regex = $regex.'/';
+                if(preg_match($regex, $releasename))
+                    return $this->tmpCat = Category::CAT_HASHED;
 
-			if (preg_match('/^[A-Z0-9]{1,}$/', $releasename))
-			{
-				$this->tmpCat = Category::CAT_MISC;
-				return true;
-			}
+            }
+        }
 
-			if (preg_match('/^[a-z0-9]{1,}$/', $releasename))
-			{
-				$this->tmpCat = Category::CAT_MISC;
-				return true;
-			}
-		}
 		return false;
 	}
 }
