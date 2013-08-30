@@ -216,8 +216,8 @@ class Binaries
                 If ($lastId == $first)
                 {
                     echo "\033[01;31mWARNING!! Server not sending updated messages. Group: ".$groupArr['name'];
-                    echo "Deactivating group, and stopping thread.\033[00;37m\n";
-                    $db->query("UPDATE groups SET active=0, backfill=0 WHERE ID=".$groupArr['ID']);
+                    echo "Skipping group ".$groupArr['name']."\033[00;37m\n";
+                    // $db->query("UPDATE groups SET active=0, backfill=0 WHERE ID=".$groupArr['ID']);
                     $done = true;
                 }
 				if ($lastId === false)
