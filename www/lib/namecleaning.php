@@ -148,14 +148,16 @@ class nameCleaning
 		//Unwanted stuff.
 		$cleanerName = preg_replace('/sample("| )?$|"sample|\(\?\?\?\?\)|\[AoU\]|AsianDVDClub\.org|AutoRarPar\d{1,5}|brothers\-of\-usenet\.(info|net)(\/\.net)?|~bY ([a-z]{3,15}|c-w)|By request|DVD-Freak|Ew-Free-Usenet-\d{1,5}|for\.usenet4ever\.info|ghost-of-usenet.org<<|GOU<<|(http:\/\/www\.)?friends-4u\.nl|\[\d+\]-\[abgxEFNET\]-|\[[a-z\d]+\]\-\[[a-z\d]+\]-\[FULL\]-|\[\d{3,}\]-\[FULL\]-\[(a\.b| abgx).+?\]|\[\d{1,}\]|\-\[FULL\].+?#a\.b[\w.#!@$%^&*\(\){}\|\\:"\';<>,?~` ]+\]|Lords-of-Usenet(\] <> presents)?|nzbcave\.co\.uk( VIP)?|(Partner (of|von) )?SSL\-News\.info>> presents|\/ post: |powere?d by (4ux(\.n\)?l)?|the usenet)|(www\.)?ssl-news(\.info)?|SSL - News\.Info|usenet-piraten\.info|\-\s\[.+?\]\s<>\spresents|<.+?https:\/\/secretusenet\.com>|SECTIONED brings you|team-hush\.org\/| TiMnZb |<TOWN>|www\.binnfo\.in|www\.dreameplace\.biz|wwwworld\.me|www\.town\.ag|(Draak48|Egbert47|jipenjans|Taima) post voor u op|Dik Trom post voor|Sponsored\.by\.SecretUsenet\.com|(::::)?UR-powered by SecretUsenet.com(::::)?|usenet4ever\.info|(www\.)?usenet-4all\.info|www\.torentz\.3xforum\.ro|usenet\-space\-cowboys\.info|> USC <|SecretUsenet\.com|Thanks to OP|\] und \[|www\.michael-kramer\.com|(http:\\\\\\\\)?www(\.| )[a-z0-9]+(\.| )(co(\.| )cc|com|info|net|org)|zoekt nog posters\/spotters|>> presents|Z\[?NZB\]?(\.|_)wz(\.|_)cz|partner[\.\-_ ]of([\.\-_ ]www)?/i', ' ', $cleanerName);
         // echo "5 - ".$cleanerName."\n";
+        //Replaces some characters with 1 space.
+        // Removed the apostrophe - 0827
+        $cleanerName = str_replace(array(".", "_", '-', "|", "<", ">", '"', "=", '[', "]", "(", ")", "{", "}", "*", ";", ":", ",", "~", "/", "&", "+"), " ", $cleanerName);
         // More unwanted crap
-        $cleanerName = preg_match('/as requested|\d{5,10|nmr|repack|AS REQ |by req |2nd try |per req |REPOST |THEATRICAL |AKA |\d{2,} (?=.+(20|19)\d\d)|feature films/i', '', $cleanerName);
+        $cleanerName = preg_replace('/as requested|\d{5,10|nmr|repack|AS REQ |by req |2nd try |per req |REPOST |THEATRICAL |AKA |\d{2,} (?=.+(20|19)\d\d)|feature films/i', '', $cleanerName);
 		//Change [pw] to passworded.
 		$cleanerName = str_replace(array('[pw]', '[PW]', ' PW ', '(Password)'), ' PASSWORDED ', $cleanerName);
         // echo "6 - ".$cleanerName."\n";
-		//Replaces some characters with 1 space.
-        // Removed the apostrophe - 0827
-		$cleanerName = str_replace(array(".", "_", '-', "|", "<", ">", '"', "=", '[', "]", "(", ")", "{", "}", "*", ";", ":", ",", "~", "/", "&", "+"), " ", $cleanerName);
+
+
         // echo "7 - ".$cleanerName."\n";
 		//Replace multiple spaces with 1 space
 		$cleanerName = trim(preg_replace('/\s\s+/i', ' ', $cleanerName));
@@ -164,7 +166,7 @@ class nameCleaning
 		$cleanerName = implode(' ', array_intersect_key(explode(' ', $cleanerName), array_unique(array_map('strtolower', explode(' ', $cleanerName)))));
 
 		if (empty($cleanerName)) {return $subject;}
-		else {return $cleanerName;}
+		else {return trim($cleanerName);}
 	}
 
 	//
@@ -179,13 +181,13 @@ class nameCleaning
 		//Replace multiple spaces with 1 space
 		$cleanerName = preg_replace('/\s\s+/i', ' ', $cleanerName);
 		//Remove Release Name
-		$cleanerName = preg_replace('/^Release Name/i', ' ', $cleanerName);
+		$cleanerName = trim(preg_replace('/^Release Name/i', ' ', $cleanerName));
 		//Remove annoying prefixes
 		$cleanerName = trim(preg_replace('/download all our files with |www allyourbasearebelongtous|^id \d{1,2}|download all our files with|repost|as req/i', '', $cleanerName));
 		//Remove invalid characters.
 		$cleanerName = trim(utf8_encode(preg_replace('/[^(\x20-\x7F)]*/','', $cleanerName)));
 
-		return $cleanerName;
+		return trim($cleanerName);
 	}
 
     public function cleanUnicode($text)
