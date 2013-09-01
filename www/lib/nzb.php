@@ -159,6 +159,11 @@ class NZB
             echo "\nError during NZB creation: {$e}\n";
             echo "Tempfile: {$tempfile}\nNZB File: {$path}\n";
             echo "Release ID: {$relid}  Release GUID: {$relguid}\n";
+            $msg = "----------------------------------------------------------------\n";
+            $msg .= "Tempfile: {$tempfile}\nNZB File: {$path}\n";
+            $msg .= "Release ID: {$relid}  Release GUID: {$relguid}\n";
+            $msg .= "Error: ".$e."\n";
+            file_put_contents(WWW_DIR."/lib/logging/nzb_error.log",$msg, FILE_APPEND);
             return false;
         }
 	}
