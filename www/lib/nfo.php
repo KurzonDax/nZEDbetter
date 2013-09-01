@@ -118,7 +118,9 @@ class Nfo
 					$db->query(sprintf("UPDATE releases SET nfostatus = 1 WHERE ID = %d", $arr["ID"]));
 					$ret++;
 
-					$imdbId = $movie->domovieupdate($fetchedBinary, 'nfo', $arr["ID"], $db, $processImdb);
+                    // I'm removing this for now.  THis appears to be a major factor in the relatively large
+                    // number of mismatched movies.
+					// $imdbId = $movie->domovieupdate($fetchedBinary, 'nfo', $arr["ID"], $db, $processImdb);
 
 					$rageId = $this->parseRageId($fetchedBinary);
 					if ($rageId !== false)
