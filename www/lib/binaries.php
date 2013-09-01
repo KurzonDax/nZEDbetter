@@ -256,7 +256,7 @@ class Binaries
 		$site = $s->get();
 		$tmpPath = $site->tmpunrarpath."/";
 		$n = $this->n;
-
+        $partsInserted = array();
 		if ($this->debug)
 			$consoletools = new ConsoleTools();
 
@@ -333,8 +333,8 @@ class Binaries
 			// Loop articles, figure out files/parts.
 
 
-            if ($insPartsStmt = $db->Prepare("INSERT IGNORE INTO parts (binaryID, number, messageID, partnumber, size, collectionID, parthash) VALUES (?, ?, ?, ?, ?, ?, ?)"))
-                $insPartsStmt->bind_param('dssssds', $pBinaryID, $pNumber, $pMessageID, $pPartNumber, $pSize, $collectionID, $partHash);
+            if ($insPartsStmt = $db->Prepare("INSERT IGNORE INTO parts (binaryID, number, messageID, partnumber, size, collectionID, parthash, groupID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"))
+                $insPartsStmt->bind_param('dssssdsd', $pBinaryID, $pNumber, $pMessageID, $pPartNumber, $pSize, $collectionID, $partHash, $partGroupID);
 
 			foreach($msgs AS $msg)
 			{
@@ -490,7 +490,7 @@ class Binaries
                         if ($lastCollectionHash == $collectionHash)
                         {
 							$collectionID = $lastCollectionID;
-                            $db->query("UPDATE collections SET filesize = filesize+".$partSizeTotal." WHERE ID=".$collectionID);
+                            $db->query("UPDATE collections SET filesize = filesize+".$partSizeTotal.", filecheck=1, dateadded=now() WHERE ID=".$collectionID);
                         }
                         else
 						{
@@ -512,7 +512,7 @@ class Binaries
                             // TODO: Clean up the 'From' field
                             // $from = preg_replace('/[\u007B-\uFEFC]|[\uFF5B-\uFFFD]/',"",$db->escapeString($data['From']));
                             $data['From'] = $namecleaning->cleanUnicode($data['From']);
-                            $csql = sprintf("INSERT INTO collections (subject, fromname, date, xref, groupID, totalFiles, collectionhash, dateadded, filesize) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %s, %s, now(), %d) ON DUPLICATE KEY UPDATE dateadded=now(), filesize=filesize+%d", $db->escapeString($subject), $db->escapeString($data['From']), $db->escapeString($data['Date']), $db->escapeString($data['Xref']), $groupArr['ID'], $db->escapeString($data['MaxFiles']), $db->escapeString($collectionHash), $partSizeTotal, $partSizeTotal);
+                            $csql = sprintf("INSERT INTO collections (subject, fromname, date, xref, groupID, totalFiles, collectionhash, dateadded, filesize) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %s, %s, now(), %d) ON DUPLICATE KEY UPDATE filecheck=1, dateadded=now(), filesize=filesize+%d", $db->escapeString($subject), $db->escapeString($data['From']), $db->escapeString($data['Date']), $db->escapeString($data['Xref']), $groupArr['ID'], $db->escapeString($data['MaxFiles']), $db->escapeString($collectionHash), $partSizeTotal, $partSizeTotal);
 							$colInsertResult = $db->queryInsert($csql);
                             $colsInserted = $db->getAffectedRows();
                             // Must perform a DB Commit here so we don't get screwed up collections due to multiple threads updating the same group
@@ -576,22 +576,26 @@ class Binaries
 							$pPartNumber = round($partdata['part']);
 							$pSize = $partdata['size'];
                             $partHash = sha1($pMessageID.$groupArr['name']);
+                            $partGroupID = $groupArr['ID'];
 
 							$maxnum = ($partdata['number'] > $maxnum) ? $partdata['number'] : $maxnum;
 
-                            // $pSQL = sprintf("INSERT IGNORE INTO parts (binaryID, number, messageID, partnumber, size, collectionID, parthash) VALUES (%d, %d, %s, %d, %d, %d, %s)",$pBinaryID , $pNumber, $db->escapeString($pMessageID), $pPartNumber, $pSize, $collectionID, $db->escapeString($partHash));
+                            $pSQL = sprintf("INSERT IGNORE INTO parts (binaryID, number, messageID, partnumber, size, collectionID, parthash, groupID) VALUES (%d, %d, %s, %d, %d, %d, %s, %d)",$pBinaryID , $pNumber, $db->escapeString($pMessageID), $pPartNumber, $pSize, $collectionID, $db->escapeString($partHash), $partGroupID);
                             // $partInsertResult = $db->queryDirect($pSQL);
 
                             if (!$insPartsStmt->execute())
                             {
                                 $msgsnotinserted[] = $partdata['number'];
-                                // file_put_contents(WWW_DIR."/lib/logging/parts_insert.log","---------------------------\n".$pSQL."\n", FILE_APPEND);
+                                file_put_contents(WWW_DIR."/lib/logging/parts_insert.log","---------------------------\n".$pSQL."\n", FILE_APPEND);
                             }
                             else
                             {
                                 $partsAdded++;
                                 $partCountTotal++;
                                 $partSizeTotal += $pSize;
+                                if($type == 'partrepair')
+                                    $partsInserted[] = $pNumber;
+
                             }
 
 						}
@@ -610,6 +614,10 @@ class Binaries
 				$db->Commit();
 				$db->setAutoCommit(true);
 			}
+            elseif($type=='partrepair')
+            {
+                return false;
+            }
             // $insPartsStmt->close;  This statement returns an error and not sure why.
 			$timeUpdate = number_format(microtime(true) - $this->startUpdate, 2);
 			$timeLoop = number_format(microtime(true)-$this->startLoop, 2);
@@ -617,9 +625,15 @@ class Binaries
 			if ($type != 'partrepair')
 			{
 				echo "\033[01;33m".$timeHeaders."s to download articles, ".$timeCleaning."s to process articles, ".$timeUpdate."s to insert ".number_format($partsAdded)." articles, ".$timeLoop."s total. Group: ".$groupArr['name']."\033[00;37m\n";
-			}
-			unset($this->message, $data);
-			return $maxnum;
+                unset($this->message, $data);
+                return $maxnum;
+            }
+			elseif($type == 'partrepair')
+            {
+                echo "\033[01;33m".$timeHeaders."s to download articles, ".$timeCleaning."s to process articles, ".$timeUpdate."s to insert ".number_format($partsAdded)." articles, ".$timeLoop."s total. Group: ".$groupArr['name']."\033[00;37m\n";
+                unset($this->message, $data);
+                return $partsInserted;
+            }
 		}
 		else
 		{
@@ -629,6 +643,11 @@ class Binaries
 				echo "Skipping group: ${groupArr['name']}".$n;
 				return false;
 			}
+            else
+            {
+                // echo "\nMessage not array\n";
+                return false;
+            }
 		}
 	}
 
@@ -639,9 +658,15 @@ class Binaries
 
 		// Get all parts in partrepair table.
 		$db = new DB();
+
+
 		if ($partID=='')
-			$missingParts = $db->query(sprintf("SELECT * FROM partrepair WHERE groupID = %d AND attempts < 5 ORDER BY numberID ASC LIMIT %d", $groupArr['ID'], $this->partrepairlimit));
-		else
+        {
+            if(!isset($groupArr) || $groupArr=='')
+                $groupArr = $groups->getByID($groupID);
+            $missingParts = $db->query(sprintf("SELECT * FROM partrepair WHERE groupID = %d AND attempts < 5 ORDER BY numberID ASC LIMIT %d", $groupArr['ID'], $this->partrepairlimit));
+        }
+        else
 		{
 			$groupArr = $groups->getByID($groupID);
 			$missingParts = array(array('numberID' => $partID, 'groupID' => $groupArr['ID']));
@@ -651,7 +676,7 @@ class Binaries
 		if (sizeof($missingParts) > 0)
 		{
 			if ($partID=='')
-				echo "Attempting to repair ".sizeof($missingParts)." parts...".$n;
+				echo "Attempting to repair ".sizeof($missingParts)." parts from ".$groupArr['name']." ...".$n;
 
 			// Loop through each part to group into ranges.
 			$ranges = array();
@@ -678,46 +703,92 @@ class Binaries
 				$num_attempted += $partto - $partfrom + 1;
 				if ($partID=='')
 				{
-					echo $n;
-					$consoleTools->overWrite("Attempting repair: ".$consoleTools->percentString($num_attempted,sizeof($missingParts)).": ".$partfrom." to ".$partto);
+					// echo $n;
+					echo "Attempting repair: ".$consoleTools->percentString($num_attempted,sizeof($missingParts)).": ".$partfrom." to ".$partto."  Group: ".$groupArr['name']."\n";
 				}
 				else
 					echo "Attempting repair: ".$partfrom.$n;
 
 				// Get article from newsgroup.
-				$this->scan($nntp, $groupArr, $partfrom, $partto, 'partrepair');
+				$partsInserted = $this->scan($nntp, $groupArr, $partfrom, $partto, 'partrepair');
 
 				// Check if the articles were added.
-				$articles = implode(',', range($partfrom, $partto));
-				$sql = sprintf("SELECT pr.ID, pr.numberID, p.number from partrepair pr LEFT JOIN parts p ON p.number = pr.numberID WHERE pr.groupID=%d AND pr.numberID IN (%s) ORDER BY pr.numberID ASC", $groupArr['ID'], $articles);
 
-				$result = $db->queryDirect($sql);
-				while ($r = $db->fetchAssoc($result))
-				{
-					if (isset($r['number']) && $r['number'] == $r['numberID'])
-					{
-						$partsRepaired++;
+                if($partfrom==$partto)
+                {
+                    if($partsInserted!==false && $partfrom==$partsInserted[0])
+                    {
+                        $partsRepaired++;
+                        $db->query("DELETE FROM partrepair WHERE numberID=".$partfrom." AND groupID=".$groupArr['ID']);
+                    }
+                    else
+                    {
+                        $db->query("UPDATE partrepair SET attempts=attempts+1 WHERE numberID=".$partfrom." AND groupID=".$groupArr['ID']);
+                        $partsFailed++;
+                    }
+                }
+                else
+                {
+                    $partRange = range($partfrom, $partto);
+                    if(is_array($partsInserted))
+                    {
+                        echo "\033[01;36m".count($partsInserted)." parts repaired for ".$groupArr['name']."\n";
+                        $badParts = array_diff($partRange, $partsInserted);
+                        foreach($partsInserted as $key=>$value)
+                        {
+                            $db->query("DELETE FROM partrepair WHERE numberID=".$value." AND groupID=".$groupArr['ID']);
+                            $partsRepaired++;
+                        }
+                        $partsFailed += count($badParts);
+                    }
+                    else
+                    {
+                        $db->query("UPDATE partrepair SET attempts=attempts+1 WHERE groupID=".$groupArr['ID']." AND numberID IN (".implode(',', $partRange).")");
+                        $partsFailed += ($partto-$partfrom);
+                    }
+                }
+                    // $articles = implode(',', range($partfrom, $partto));
+                    // And yet another ridiculously written query.  This massive table scan is prevented
+                    // by adding a groupID column to the parts table, which prevents the need for the join.
+                    // On top of that, since article numbers are not guaranteed to be unique across multiple
+                    // groups, it's entirely possible that the query below would return a false positive if an
+                    // article existed with the right article number, but from a different group.
+                    // $sql = sprintf("SELECT pr.ID, pr.numberID, p.number from partrepair pr LEFT JOIN parts p ON p.number = pr.numberID WHERE pr.groupID=%d AND pr.numberID IN (%s) ORDER BY pr.numberID ASC", $groupArr['ID'], $articles);
+                    // $result = $db->queryDirect($sql);
+                    /*
+                     * OR.... you can simply return an array of parts inserted from the scan function and then compare.
+                     * Ultimately, this is what I think I'm going with.  Simpler, and requires fewer expensive calls to the
+                     * database.
 
-						// Article was added, delete from partrepair.
-						$db->query(sprintf("DELETE FROM partrepair WHERE ID=%d", $r['ID']));
-					}
-					else
-					{
-						$partsFailed++;
+                    while ($r = $db->fetchAssoc($result))
+                    {
+                        if (isset($r['number']) && $r['number'] == $r['numberID'])
+                        {
+                            $partsRepaired++;
 
-						// Article was not added, increment attempts.
-						$db->query(sprintf("UPDATE partrepair SET attempts=attempts+1 WHERE ID=%d", $r['ID']));
-					}
-				}
+                            // Article was added, delete from partrepair.
+                            $db->query(sprintf("DELETE FROM partrepair WHERE ID=%d", $r['ID']));
+                        }
+                        else
+                        {
+                            $partsFailed++;
+
+                            // Article was not added, increment attempts.
+                            $db->query(sprintf("UPDATE partrepair SET attempts=attempts+1 WHERE ID=%d", $r['ID']));
+                        }
+                    }*/
+
+
 			}
 
 			if ($partID=='')
 				echo $n;
-			echo $partsRepaired.' parts repaired.'.$n;
+			echo "\033[01;32m".number_format($partsRepaired)." parts repaired for group ".$groupArr['name']."\033[00;37m".$n;
 		}
 
 		// Remove articles that we cant fetch after 5 attempts.
 		$db->query(sprintf("DELETE FROM partrepair WHERE attempts >= 5 AND groupID = %d", $groupArr['ID']));
+        $db->query("UPDATE groups SET last_repair=NOW() WHERE ID=".$groupArr['ID']);
 
 	}
 
