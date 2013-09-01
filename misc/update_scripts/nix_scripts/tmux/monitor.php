@@ -5,7 +5,9 @@ require_once(WWW_DIR."lib/framework/db.php");
 require_once(WWW_DIR."lib/tmux.php");
 require_once(WWW_DIR."lib/site.php");
 
-$version="0.1r2866";
+// TODO: fix the percentage calculation for the XXX line in monitor
+
+$version="2.0r0001";
 
 $db = new DB();
 $DIR = MISC_DIR;
