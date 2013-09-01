@@ -45,7 +45,8 @@ class Releases
         $this->siteMinFileSize = ($this->site->minsizetoformrelease) ? $this->site->minsizetoformrelease : 0;
         $this->siteMinFileCount = ($this->site->minfilestoformrelease) ? $this->site->minfilestoformrelease : 0;
         $this->siteMaxFileSize = ($this->site->maxsizetoformrelease) ? $this->site->maxsizetoformrelease : 0;
-	}
+	    $this->lastFullCollectionCheck = ($this->site->lastFullCollectionCheck) ? $this->site->lastFullCollectionCheck : 0;
+    }
 
 	public function get()
 	{
@@ -1384,6 +1385,13 @@ class Releases
 		$consoletools = new ConsoleTools();
 		$n = "\n";
 
+        if((time()-1200) > $this->lastFullCollectionCheck)
+        {
+            $doFullCheck = true;
+            $db->query("UPDATE site SET value=".$db->escapeString(time())." WHERE setting='lastFullCollectionCheck'");
+        }
+        else
+            $doFullCheck = false;
 		if ($echooutput)
 			echo "\033[1;33m[".date("H:i:s A")."] Stage 1 -> Try to find complete collections.\033[0m".$n;
 		$stage1 = TIME();
@@ -1421,9 +1429,13 @@ class Releases
         }
         $db->Commit();
         $db->setAutoCommit(TRUE);
-        if($binaryrowcount>0)
+        if($binaryrowcount>0 || $doFullCheck)
         {
-            $collectionsresult=$db->queryDirect("SELECT ID, totalFiles FROM collections WHERE totalFiles!=0 AND filecheck IN (0, 1)".$where);
+            if($doFullCheck)
+                $collectionsresult=$db->queryDirect("SELECT ID, totalFiles FROM collections WHERE totalFiles!=0 AND filecheck IN (0, 1) ".$where);
+            else
+                $collectionsresult=$db->queryDirect("SELECT ID, totalFiles FROM collections WHERE totalFiles!=0 AND filecheck=1 ".$where);
+
             $collectionstotal=$db->getNumRows($collectionsresult);
             if($echooutput)
                 Echo "\nFound ".$collectionstotal." collections to check.\n";
@@ -1444,9 +1456,12 @@ class Releases
 
                     if($binarycount>=$collectionrow["totalFiles"])
                     {
-                        // Echo "Setting File Check to 15 (filenumber 1)\n";
                         $db->query("UPDATE collections SET filecheck=2 WHERE ID=".$collectionrow["ID"]);
                         $colsupdated++;
+                    }
+                    else
+                    {
+                        $db->query("UPDATE collections SET filecheck=0 WHERE ID=".$collectionrow["ID"]);
                     }
                 }
                 $totalColsUpdateTime = microtime(true) - $totalColsUpdateTime;
@@ -1498,10 +1513,18 @@ class Releases
                 $colstotal++;
                 if($echooutput)
                     $consoletools->overWrite("Collections processed: ".$consoletools->percentString($colstotal, $collectioncount));
-                // sum the size of the binaries to get the final collection size
-                $collectionsize=$db->queryOneRow("SELECT COUNT(*) as binNumber FROM binaries AS b WHERE b.collectionID=".$collectionsrow["ID"]);
+
+                /*$collectionsize=$db->queryOneRow("SELECT COUNT(*) as binNumber FROM binaries AS b WHERE b.collectionID=".$collectionsrow["ID"]);
 
                 If($collectionsize['binNumber']>=$collectionsrow['totalFiles'])
+                {
+                    $db->query("UPDATE collections SET filecheck=25 WHERE ID=".$collectionsrow["ID"]);
+                    $colsupdated++;
+                }*/
+                $binaryrows=$db->queryDirect("SELECT ID FROM binaries WHERE collectionID=".$collectionsrow["ID"]." AND partCheck=1");
+                $binarycount=$db->getNumRows($binaryrows);
+
+                if($binarycount>=$collectionsrow["totalFiles"])
                 {
                     $db->query("UPDATE collections SET filecheck=25 WHERE ID=".$collectionsrow["ID"]);
                     $colsupdated++;
@@ -1520,6 +1543,7 @@ class Releases
             $db->query("UPDATE collections SET filecheck=3 WHERE filecheck=25 and filesize>0 LIMIT ".($this->stage5limit * 3));
             if($echooutput)
                 echo "Queueing up ".$db->getAffectedRows()." collections to be processed.\n";
+            sleep(5);
         }
         else
         {
@@ -1577,11 +1601,16 @@ class Releases
                 if($echooutput)
                     $consoletools->overWrite("Collections processed: ".$consoletools->percentString($colsprocessed,$collectionstotal)." ID = ".$collectionrow['colID']);
                 $tooLittleTooMuch = false;
-                if($collectionrow['groupsize'] != 0  && !is_null($collectionrow['groupsize']) && $collectionrow['colfilesize'] < $collectionrow['groupsize']) $tooLittleTooMuch = true;
-                elseif($this->siteMinFileSize != 0 && !is_null($this->siteMinFileSize) && $collectionrow['colfilesize'] < $this->siteMinFileSize) $tooLittleTooMuch = true;
-                elseif($collectionrow['groupfiles'] != 0 && !is_null($collectionrow['groupfiles']) && $collectionrow['coltotalFiles'] < $collectionrow['groupfiles']) $tooLittleTooMuch = true;
-                elseif($this->siteMinFileCount != 0 && !is_null($this->siteMinFileCount) && $collectionrow['coltotalFiles'] < $this->siteMinFileCount) $tooLittleTooMuch = true;
-                elseif($this->siteMaxFileSize !=0 && !is_null($this->siteMaxFileSize) && $collectionrow['colfilesize'] > $this->siteMaxFileSize) $tooLittleTooMuch = true;
+                if($collectionrow['groupsize'] != 0  && !is_null($collectionrow['groupsize']) && $collectionrow['colfilesize'] < $collectionrow['groupsize'])
+                    $tooLittleTooMuch = true;
+                elseif($this->siteMinFileSize != 0 && !is_null($this->siteMinFileSize) && $collectionrow['colfilesize'] < $this->siteMinFileSize)
+                    $tooLittleTooMuch = true;
+                elseif($collectionrow['groupfiles'] != 0 && !is_null($collectionrow['groupfiles']) && $collectionrow['coltotalFiles'] < $collectionrow['groupfiles'])
+                    $tooLittleTooMuch = true;
+                elseif($this->siteMinFileCount != 0 && !is_null($this->siteMinFileCount) && $collectionrow['coltotalFiles'] < $this->siteMinFileCount)
+                    $tooLittleTooMuch = true;
+                elseif($this->siteMaxFileSize !=0 && !is_null($this->siteMaxFileSize) && $collectionrow['colfilesize'] > $this->siteMaxFileSize)
+                    $tooLittleTooMuch = true;
                 // See if we got a hit
                 if($tooLittleTooMuch)
                 {
@@ -1833,14 +1862,14 @@ class Releases
                 if ($echooutput)
                     $consoletools->overWrite("Creating NZBs: ".$consoletools->percentString($nzbcount,mysqli_num_rows($resrel))." Processing ReleaseID: ".$rowrel['ID']);
 				$nzb_guid = $nzb->writeNZBforReleaseId($rowrel['ID'], $rowrel['guid'], $rowrel['name'], $rowrel['categoryID'], $nzb->getNZBPath($rowrel['guid'], $nzbpath, true, $nzbsplitlevel), false, $version, $cat);
-				if($nzb_guid != false)
+				if($nzb_guid !== false)
 				{
 					$db->queryDirect(sprintf("UPDATE releases SET nzbstatus = 1, nzb_guid = %s, relnamestatus=0 WHERE ID = %d", $db->escapestring(md5($nzb_guid)), $rowrel['ID']));
 					$db->queryDirect(sprintf("UPDATE collections SET filecheck = 5 WHERE releaseID = %s", $rowrel['ID']));
 				}
                 else
                 {
-                    // Something went wrong.  THis will need to be checked by the site adming
+                    // Something went wrong.  This will need to be checked by the site admin
 
                     $db->queryDirect("UPDATE collections SET filecheck=999 WHERE releaseID=".$rowrel['ID']);
 
