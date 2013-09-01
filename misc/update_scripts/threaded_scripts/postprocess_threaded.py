@@ -73,7 +73,7 @@ elif sys.argv[1] == "nfo":
 		datas = cur.fetchall()
 		maxtries = maxtries - 1
 elif sys.argv[1] == "movie":
-		cur.execute("SELECT searchname as name, ID, categoryID from releases where imdbID IS NULL and nzbstatus = 1 and categoryID in ( select ID from category where parentID = 2000 ) order by postdate desc limit %d" % (run_threads * movieperrun))
+		cur.execute("SELECT name, searchname, ID, categoryID, groupID from releases where imdbID IS NULL and nzbstatus = 1 and categoryID in ( select ID from category where parentID = 2000 ) order by postdate desc limit %d" % (run_threads * movieperrun))
 		datas = cur.fetchall()
 elif sys.argv[1] == "tv":
 		cur.execute("SELECT searchname, ID from releases where rageID = -1 and nzbstatus = 1 and categoryID in ( select ID from category where parentID = 5000 ) order by postdate desc limit %d" % (run_threads * tvrageperrun))
@@ -139,7 +139,7 @@ def main():
 			my_queue.put("%s           =+=            %s           =+=            %s           =+=            %s" % (release[0], release[1], release[2], release[3]))
 	elif sys.argv[1] == "movie":
 		for release in datas:
-			my_queue.put("%s           =+=            %s           =+=            %s" % (release[0], release[1], release[2]))
+			my_queue.put("%s           =+=            %s           =+=            %s           =+=            %s           =+=            %s" % (release[0], release[1], release[2], release[3], release[4]))
 	elif sys.argv[1] == "tv":
 		for release in datas:
 			my_queue.put("%s           =+=            %s" % (release[0], release[1]))
