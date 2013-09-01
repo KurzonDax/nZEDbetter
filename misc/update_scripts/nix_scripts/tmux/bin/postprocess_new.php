@@ -12,14 +12,15 @@ if (isset($pieces[6]))
 {
 	$postprocess->processAdditional($argv[1]);
 }
+elseif (isset($pieces[4]))
+{
+    $postprocess->processMovies($argv[1]);
+}
 elseif (isset($pieces[3]))
 {
     $postprocess->processNfos($argv[1]);
 }
-elseif (isset($pieces[2]))
-{
-    $postprocess->processMovies($argv[1]);
-}
+
 elseif (isset($pieces[1]))
 {
     $postprocess->processTv($argv[1]);
