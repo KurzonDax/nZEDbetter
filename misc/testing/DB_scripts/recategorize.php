@@ -10,6 +10,8 @@
  * to reprocess the Other->Misc or Other->Hashed categories, or if you've ended up with a bunch of releases
  * in a wrong category for some reason.
  *
+ * NOTE: You must have a directory called logging under your www/lib directory, with full write access
+ *
  * Added ability to enter a parent category ID to reprocess all categories under the parent (i.e. 2000 for
  * all movies)
  */
@@ -59,4 +61,4 @@ if($relsToProcess = $db->queryDirect($sql))
         }
     }
 }
-exit ("Thanks for playing. Total releases changed: ".number_format($relsChanged)."\nThe log file can be found at: ".WWW_DIR."lib/logging/recategorize.log\n");
+exit ("\n\nThanks for playing. Total releases changed: ".number_format($relsChanged)."\nThe log file can be found at: ".WWW_DIR."lib/logging/recategorize.log\n");
