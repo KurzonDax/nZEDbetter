@@ -215,7 +215,7 @@ class nameCleaning
         if( $text == NULL || $text == '')
             return false;
         // First group is case insensitive
-        $text = preg_replace('/director s cut|TGS|E4S|RE UP |^RS |mp4a|unrated |repack |dubbed |subtitled |extended cut |x264 /i', '', $text);
+        $text = preg_replace('/director s cut|TGS|E4S|RE UP |^RS |mp4a|unrated |repack |dubbed |subtitled |extended cut |x264 |unrated /i', '', $text);
         // Second group is case sensitive
         $text = preg_replace('/FILL|AmA (DIVX|XviD)|PROPER /', '', $text);
 
