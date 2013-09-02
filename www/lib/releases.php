@@ -2034,6 +2034,13 @@ class Releases
             $partsDeleted = 0;
             // Using thread ID to mark the collections to delete will allow us to multi-thread this function in the future if desired.
             $threadID = $db->queryOneRow("SELECT connection_ID() as thread_ID");
+            if($threadID<1000)
+                $threadID += 1000;
+            // I suppose it's possible for the thread ID to grow to above 11 digits if
+            // the system was up long enough.  Not sure how big Percona/MySql allows
+            // the thread counter to grow.
+            if($threadID>99999999999)
+                $threadID -= 9999999999;
             if ($echooutput)
                 echo "Using thread ID ".$threadID['thread_ID']." to mark collections.\n";
             $db->query("UPDATE collections SET filecheck=".$threadID['thread_ID']." WHERE filecheck = 5 ".$where." ORDER BY dateadded ASC LIMIT ".$maxcollections);
