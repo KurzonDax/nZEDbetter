@@ -2351,7 +2351,7 @@ class Releases
             // Putting in a countdown delay here so that it's possible to shut down the thread before it loops
             if ($nzbcount>0)
             {
-                $sleepCounter = 15;
+                $sleepCounter = 5;
                 while($sleepCounter > 0)
                 {
 
