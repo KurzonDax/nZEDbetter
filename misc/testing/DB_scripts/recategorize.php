@@ -9,6 +9,9 @@
  * determineCategory function.  This is handy if you've been tweaking the regex in category.php and want
  * to reprocess the Other->Misc or Other->Hashed categories, or if you've ended up with a bunch of releases
  * in a wrong category for some reason.
+ *
+ * Added ability to enter a parent category ID to reprocess all categories under the parent (i.e. 2000 for
+ * all movies)
  */
 
 require(dirname(__FILE__)."/../../../www/config.php");
@@ -22,7 +25,7 @@ $consoletools = new ConsoleTools();
 $gotIt = false;
 do {
 
-    $catToProcess = $consoletools->getUserInput("\nPlease enter the category ID that you want to reprocess or type quit to exit: ");
+    $catToProcess = $consoletools->getUserInput("\nPlease enter the category ID or Parent ID that you want to reprocess, or type quit to exit: ");
     if(is_numeric($catToProcess) && $category->getById($catToProcess) != false)
         $gotIt = true;
     elseif($catToProcess=='quit')
@@ -32,7 +35,12 @@ do {
 
 } while ($gotIt==false);
 
-if($relsToProcess = $db->queryDirect("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE categoryID=".$catToProcess))
+if($catToProcess % 1000 === 0)
+    $sql = "SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE categoryID BETWEEN ".$catToProcess." AND ".($catToProcess+999);
+else
+    $sql = "SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE categoryID=".$catToProcess;
+
+if($relsToProcess = $db->queryDirect($sql))
 {
     echo "\n";
     $relsCount = $db->getNumRows($relsToProcess);
