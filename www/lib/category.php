@@ -865,7 +865,7 @@ class Category
 
 	public function isMovie($releasename)
 	{
-		if(preg_match('/[\.\-_ ]AVC|[\.\-_ ]|(B|H)(D|R)RIP|Bluray|BD[\.\-_ ]?(25|50)?|BR|Camrip|[\.\-_ ]\d{4}[\.\-_ ].+(720p|1080p|Cam)|DIVX|[\.\-_ ]DVD[\.\-_ ]|DVD-?(5|9|R|Rip)|Untouched|VHSRip|XVID|AdSlager|[\.\-_ ](DTS|TVrip)[\.\-_ ]/i', $releasename) && !preg_match('/auto(cad|desk)|divx[\.\-_ ]plus|[\.\-_ ]exe$|[\.\-_ ](jav|XXX)[\.\-_ ]|\wXXX(1080p|720p|DVD)|Xilisoft|XXX|s\d\d|s\d\de\d\d|\d{1,3}x\d{1,3}|\d\.\d\.\d| pc /i', $releasename))
+		if(preg_match('/[\.\-_ ]AVC|[\.\-_ ](B|H)(D|R)RIP|Bluray|HDTV|HDDVD|BD[\.\-_ ]?(25|50)?|BR|Camrip|[\.\-_ ]\d{4}[\.\-_ ].+(576p|720p|1080p|Cam)|DIVX|DVDSCR|[\.\-_ ]DVD[\.\-_ ]|DVD-?(5|9|R|Rip)|Untouched|VHSRip|XVID|AdSlager|[\.\-_ ](DTS|TVrip)[\.\-_ ]/i', $releasename) && !preg_match('/auto(cad|desk)|divx[\.\-_ ]plus|[\.\-_ ]exe$|[\.\-_ ](jav|XXX)[\.\-_ ]|\wXXX(1080p|720p|DVD)|Xilisoft|XXX|s\d{1,3}e\d{1,3}|\d{1,3}x\d{1,3}|\d\.\d\.\d|season[\.\-_ ]\d{1,3}| pc |videomix/i', $releasename))
 		{
 
 
@@ -920,7 +920,7 @@ class Category
 
 	public function isMovieSD($releasename)
 	{
-		if(preg_match('/(bdrip|divx|dvdscr|extrascene|dvdrip|\.CAM|vhsrip|xvid)[\.\-_ ]/i', $releasename))
+		if(preg_match('/(bdrip|divx|dvdscr|extrascene|dvdrip|\.CAM|vhsrip|xvid)[\.\-_ ]|19[0-4][0-9]|(480|576|272|360)p/i', $releasename))
 		{
 			$this->tmpCat = Category::CAT_MOVIE_SD;
 			return true;
@@ -942,7 +942,7 @@ class Category
 
 	public function isMovieBluRay($releasename)
 	{
-		if(preg_match('/bluray\-|[\.\-_ ]bd?[\.\-_ ]?(25|50)|blu-ray|Bluray\s\-\sUntouched|[\.\-_ ]untouched[\.\-_ ]/i', $releasename))
+		if(preg_match('/bluray\-|[\.\-_ ]bd?[\.\-_ ]?(25|50)|blu-ray|Bluray\s\-\sUntouched|[\.\-_ ]untouched[\.\-_ ]|[\.\-_ ]bluray/i', $releasename))
 		{
 			$this->tmpCat = Category::CAT_MOVIE_BLURAY;
 			return true;
