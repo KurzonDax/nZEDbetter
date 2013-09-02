@@ -9,8 +9,12 @@ $db = new DB();
 $DIR = MISC_DIR;
 
 $limited = false;
+$noReset = false;
 if ( isset($argv['1']) && $argv['1'] == "limited" )
 	$limited = true;
+
+if ( isset($argv['1']) && $argv['1'] == "noreset" )
+    $noReset = true;
 
 $tmux = new Tmux();
 $tmux_session = $tmux->get()->TMUX_SESSION;
@@ -84,13 +88,18 @@ foreach ($apps as &$value)
 }
 
 //reset collections dateadded to now
-print("Resetting expired collections and nzbs dateadded to now. This could take a minute or two. Really.\n");
-$db->query("update collections set dateadded = now()");
-if ( $db->getAffectedRows() > 0 )
-	echo $db->getAffectedRows()." collections reset\n";
-$db->query("update nzbs set dateadded = now()");
-if ( $db->getAffectedRows() > 0 )
-    echo $db->getAffectedRows()." nzbs reset\n";
+if(!$noReset)
+{
+    print("Resetting expired collections and nzbs dateadded to now. This could take a minute or two. Really.\n");
+    $db->query("update collections set dateadded = now()");
+    if ( $db->getAffectedRows() > 0 )
+        echo $db->getAffectedRows()." collections reset\n";
+    $db->query("update nzbs set dateadded = now()");
+    if ( $db->getAffectedRows() > 0 )
+        echo $db->getAffectedRows()." nzbs reset\n";
+}
+else
+    echo "Bypassing reset of collections and nzbs due to command line argument.";
 
 function start_apps($tmux_session)
 {
