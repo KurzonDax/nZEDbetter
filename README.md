@@ -1,4 +1,5 @@
-IMPORTANT NOTE: This is psuedo-fork of the original nZEDb project.  I decided not to truly fork it because of the 
+# IMPORTANT NOTE: #
+This is psuedo-fork of the original nZEDb project.  I decided not to truly fork it because of the 
 sheer number of changes I've made to the original code, scripts, and database schema.  
 
 THIS IS A WORK IN PROGRESS, AND IS IN NO WAY, SHAPE, OR FORM STABLE AT PRESENT.
@@ -10,9 +11,11 @@ with MySQL to establish baselines, and then profiling performance based on the c
 making.  The goal of the project as a whole is to optimize performance on generally available 
 commodity hardware, and under virtual environments.
 
+# Info #
+
 The original nZEDb project can be found here: https://github.com/nZEDb/nZEDb
 
-Some of the major changes I'm working on integrating:
+Some of the major changes I'm working on integrating:  
 	* Reworking the update binaries process to not only improve performance, but also
 	  fix some, what I felt were, significant bugs in the process.	
 	* Reworking the update releases stages.  Again, the main goal is improving the performance,
@@ -24,7 +27,7 @@ Some of the major changes I'm working on integrating:
 	  provides significantly better logging and instrumentation over MySQL.
 	* Improving the categorization process.
 
-Future plans:
+Future plans:  
 	* Reintegrating Sphinx full text indexing.  Newznab plus had this, though the support of it
 	  seemed a bit questionable.  nZEDb removed it.  I'm going to take a stab at putting it back
 	  in.  To be honest, it will depend on the cost-to-benefit ratio.  If it negatively impacts
