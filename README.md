@@ -1,4 +1,4 @@
-# Important: #
+# Important: 
 This is psuedo-fork of the original nZEDb project.  I decided not to truly fork it because of the 
 sheer number of changes I've made to the original code, scripts, and database schema.  
 
@@ -11,8 +11,8 @@ with MySQL to establish baselines, and then profiling performance based on the c
 making.  The goal of the project as a whole is to optimize performance on generally available 
 commodity hardware, and under virtual environments.  
 
-## Latest Changes #  
-Some of the things I've added most recently:
+## Latest Changes 
+Some of the things I've added most recently:  
 	* Moved the collection/binary/parts purging to a separate process from the Update Releases.  
 	* Some major purging functions (like old releases, parts out of retention, etc.) now happen only on a user selectable schedule.  
 	* Drastic changes to the movie identification process. Should see much less mismatched movies when browsing the database.  
@@ -26,7 +26,7 @@ Some of the things I've added most recently:
 		+ Good for groups that you want to index, but don't update that often.
 	* Numerous other bug fixes and improvements  
 
-# Info #
+## Info  
 
 The original nZEDb project can be found here: https://github.com/nZEDb/nZEDb
 
