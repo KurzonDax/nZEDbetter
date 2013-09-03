@@ -13,23 +13,23 @@ commodity hardware, and under virtual environments.
 The original nZEDb project can be found here: https://github.com/nZEDb/nZEDb
 
 Some of the major changes I'm working on integrating:
-	- Reworking the update binaries process to not only improve performance, but also
+	* Reworking the update binaries process to not only improve performance, but also
 	  fix some, what I felt were, significant bugs in the process.	
-	- Reworking the update releases stages.  Again, the main goal is improving the performance,
+	* Reworking the update releases stages.  Again, the main goal is improving the performance,
 	  but also fixing bugs along the way.
-	- Standardizing on the InnoDB storage engine, and experimenting with various configurations
+	* Standardizing on the InnoDB storage engine, and experimenting with various configurations
 	  to optimize settings.
-	- All work is being tested using Percona Server, v5.6.  While this is still an unreleased
+	* All work is being tested using Percona Server, v5.6.  While this is still an unreleased
 	  version, I feel there are enough improvements in it to warrant its use.  Additionally, it
 	  provides significantly better logging and instrumentation over MySQL.
-	- Improving the categorization process.
+	* Improving the categorization process.
 
 Future plans:
-	- Reintegrating Sphinx full text indexing.  Newznab plus had this, though the support of it
+	* Reintegrating Sphinx full text indexing.  Newznab plus had this, though the support of it
 	  seemed a bit questionable.  nZEDb removed it.  I'm going to take a stab at putting it back
 	  in.  To be honest, it will depend on the cost-to-benefit ratio.  If it negatively impacts
 	  stability and performance, then I may scrap the idea.
-	- Revising the web front end.  This will focus mainly on better search capabilities (with or
+	* Revising the web front end.  This will focus mainly on better search capabilities (with or
 	  without Sphinx).  Unfortunately, I'm a much better at coding than I am at making web sites
 	  look awesome, but we'll see what I can come up with.
 
