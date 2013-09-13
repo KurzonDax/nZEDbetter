@@ -31,6 +31,8 @@ class Category
 	const CAT_MUSIC_LOSSLESS = 3040;
 	const CAT_MUSIC_OTHER = 3050;
 	const CAT_MUSIC_FOREIGN = 3060;
+    const CAT_MUSIC_SINGLES = 3070;
+    const CAT_MUSIC_TALK_RADIO = 3080;
 	const CAT_PC_0DAY = 4010;
 	const CAT_PC_ISO = 4020;
 	const CAT_PC_MAC = 4030;
@@ -394,7 +396,7 @@ class Category
 
 				if($this->categorizeforeign)
 				{
-					if (preg_match('/alt\.binaries\.(dvdnordic\.org|nordic\.(dvdr?|xvid))|dk\.(binaer|binaries)\.film(\.divx)?/', $groupRes["name"]))
+					if (preg_match('/alt\.binaries\.(dvdnordic\.org|nordic\.(dvdr?|xvid))/', $groupRes["name"]))
 					{
 						$this->tmpCat = Category::CAT_MOVIE_FOREIGN;
 						return true;
@@ -865,7 +867,7 @@ class Category
 
 	public function isMovie($releasename)
 	{
-		if(preg_match('/[\.\-_ ]AVC|[\.\-_ ](B|H)(D|R)RIP|Bluray|HDTV|HDDVD|BD[\.\-_ ]?(25|50)?|BR|Camrip|[\.\-_ ]\d{4}[\.\-_ ].+(576p|720p|1080p|Cam)|DIVX|DVDSCR|[\.\-_ ]DVD[\.\-_ ]|DVD-?(5|9|R|Rip)|Untouched|VHSRip|XVID|AdSlager|[\.\-_ ](DTS|TVrip)[\.\-_ ]/i', $releasename) && !preg_match('/auto(cad|desk)|divx[\.\-_ ]plus|[\.\-_ ]exe$|[\.\-_ ](jav|XXX)[\.\-_ ]|\wXXX(1080p|720p|DVD)|Xilisoft|XXX|s\d{1,3}e\d{1,3}|\d{1,3}x\d{1,3}|\d\.\d\.\d|season[\.\-_ ]\d{1,3}| pc |videomix/i', $releasename))
+		if(preg_match('/[\.\-_ ]AVC|[\.\-_ ](B|H)(D|R)RIP|Bluray|HDTV|HDDVD|BD[\.\-_ ]?(25|50)?|BR|Camrip|[\.\-_ ]\d{4}[\.\-_ ].+(576p|720p|1080p|Cam)|DIVX|DVDSCR|[\.\-_ ]DVD[\.\-_ ]|DVD-?(5|9|R|Rip)|DVD(5|9|r)|Untouched|VHSRip|XVID|AdSlager|[\.\-_ ](DTS|TVrip)[\.\-_ ]/i', $releasename) && !preg_match('/auto(cad|desk)|divx[\.\-_ ]plus|[\.\-_ ]exe$|[\.\-_ ](jav|XXX)[\.\-_ ]|\wXXX(1080p|720p|DVD)|Xilisoft|XXX|s\d{1,3}e\d{1,3}|\d{1,3}x\d{1,3}|\d\.\d\.\d|season[\.\-_ ]\d{1,3}| pc |videomix/i', $releasename))
 		{
 
 
@@ -1090,7 +1092,7 @@ class Category
 			$this->tmpCat = Category::CAT_XXX_OTHER;
 			return true;
 		}
-		else if(preg_match('/boob|softcore|hardcore|slut|whore|ass|Pervert|FUNKY[\. ]\w{10,}|Femjoy|coeds|teenfun|busty|milf|erotic|lolita|Querro|swe6rus|DETOXATiON/i', $releasename))
+		else if(preg_match('/boob|softcore|hardcore|slut|whore|[\._\- ]ass[\._\- ]|Pervert|FUNKY[\. ]\w{10,}|Femjoy|coeds|teenfun|busty|milf|erotic|lolita|Querro|swe6rus|DETOXATiON|strapon|strap\-on/i', $releasename))
 		{
 			if($this->isXxx264($releasename)){ return true; }
 			if($this->isXxxXvid($releasename)){ return true; }
@@ -1316,11 +1318,12 @@ class Category
 
 	public function isMusic($releasename)
 	{
-		if($this->isMusicVideo($releasename)){ return true; }
+        if($this->isTalkRadio($releasename)){return true; }
+        if($this->isMusicVideo($releasename)){ return true; }
 		if($this->isAudiobook($releasename)){ return true; }
 		if($this->isMusicLossless($releasename)){ return true; }
 		if($this->isMusicMP3($releasename)){ return true; }
-		if($this->isMusicOther($releasename)){ return true; }
+        if($this->isMusicOther($releasename)){ return true; }
 
 		return false;
 	}
@@ -1339,6 +1342,19 @@ class Category
 		return false;
 	}
 
+    public function isTalkRadio($releasename)
+    {
+
+        if (preg_match('/Coast[\. ]to[\. ]Coast|Alan[\. ]Colmes[. ]Show|Jerry[\. ]Doyle[\. ]Show|John[\. ]Gibson[\. ]Show|Morning[\. ]Edition|Tom[\. ]Sullivan[\. ]Show|Bill[\. ]Press[\. ]Show|Limbaugh|real[\. ]radio/i', $releasename))
+        {
+            $this->tmpCat = Category::CAT_MUSIC_TALK_RADIO;
+            return true;
+        }
+
+
+        return false;
+    }
+
 	public function isAudiobook($releasename)
 	{
 		if($this->categorizeforeign)
@@ -1349,7 +1365,11 @@ class Category
 				return true;
 			}
 		}
-
+        if (preg_match('/Audiobook/i', $releasename))
+        {
+            $this->tmpCat = Category::CAT_MUSIC_AUDIOBOOK;
+            return true;
+        }
 		return false;
 	}
 
