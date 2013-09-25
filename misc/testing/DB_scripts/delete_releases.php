@@ -20,14 +20,14 @@ $relcount = 0;
 //
 if (sizeof($argv) == 4)
 {
-	if ($argv[2] == "equals" && ($argv[1] == "searchname" || $argv[1] == "name" || $argv[1] == "guid" || $argv[1] == "fromname"))
+	if ($argv[2] == "equals" && ($argv[1] == "searchname" || $argv[1] == "name" || $argv[1] == "guid" || $argv[1] == "fromname" || $argv[1] == "categoryID"))
 	{
-		$relids = $db->query(sprintf("SELECT ID, guid FROM releases where %s = %s", $argv[1], $db->escapeString($argv[3])));
+		$relids = $db->queryDirect(sprintf("SELECT ID, guid FROM releases where %s = %s", $argv[1], $db->escapeString($argv[3])));
 		printf("SELECT ID, guid FROM releases where %s = %s", $argv[1], $db->escapeString($argv[3]));
 	}
 	elseif ($argv[2] == "like" && ($argv[1] == "searchname" || $argv[1] == "name" || $argv[1] == "guid" || $argv[1] == "fromname"))
 	{
-		$relids = $db->query("SELECT ID, guid FROM releases where ".$argv[1]." like '%".$argv[3]."%'");
+		$relids = $db->queryDirect("SELECT ID, guid FROM releases where ".$argv[1]." like '%".$argv[3]."%'");
 		print("SELECT ID, guid FROM releases where ".$argv[1]." like '%".$argv[3]."%'");
 	}
     elseif ($argv[1] == "group")

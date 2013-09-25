@@ -204,12 +204,12 @@ class Groups
 		$db = new DB();
 
 		if ($group["minfilestoformrelease"] == "" || $group["minfilestoformrelease"] == "0")
-			$minfiles = 'null';
+			$minfiles = '0';
 		else
 			$minfiles = $group["minfilestoformrelease"] + 0;
 
 		if ($group["minsizetoformrelease"] == "" || $group["minsizetoformrelease"] == "0")
-			$minsizetoformrelease = 'null';
+			$minsizetoformrelease = '0';
 		else
 			$minsizetoformrelease = $db->escapeString($group["minsizetoformrelease"]);
 
@@ -277,12 +277,12 @@ class Groups
 		$db = new DB();
 
 		if ($group["minfilestoformrelease"] == "" || $group["minfilestoformrelease"] == "0")
-			$minfiles = 'null';
+			$minfiles = '0';
 		else
 			$minfiles = $group["minfilestoformrelease"] + 0;
 
 		if ($group["minsizetoformrelease"] == "" || $group["minsizetoformrelease"] == "0")
-			$minsizetoformrelease = 'null';
+			$minsizetoformrelease = '0';
 		else
 			$minsizetoformrelease = $db->escapeString($group["minsizetoformrelease"]);
 

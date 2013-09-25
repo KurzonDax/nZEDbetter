@@ -1,7 +1,11 @@
 .DS_Store
-config.php
+/config.php
 error_log
-
+/.idea
+/.settings
+/.project
+/.pydevproject
+*.jar
 # Editor temp files
 *#
 *~

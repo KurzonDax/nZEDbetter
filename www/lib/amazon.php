@@ -238,6 +238,43 @@
 			return $this->verifyXmlResponse($xml_response);
 		}
 
+        /**
+         * Parses the average customer rating from the URL
+         * provided.  The proper URL is found in the response
+         * XML under:
+         * Items->Item->CustomerReviews->IFrameURL
+         *
+         * !!! You must check the following for true first:
+         * Items->Item->CustomerReviews->HasReviews
+         *
+         * @param string $url URL of the iFrame that contains
+         * the customer reviews and ratings.
+         * @return mixed float rating : null if no rating found
+         */
+
+        public function getAmazonCustomerRating($url)
+        {
+            $rating = 'null';
+
+            if(empty($url) || $url==='')
+                return $rating;
+
+            $html_response = file_get_contents($url);
+
+            if($html_response === false)
+            {
+                return $rating;
+            }
+            file_put_contents(WWW_DIR."/lib/logging/amazon_response.log",$html_response, FILE_APPEND);
+
+            preg_match('/alt\="(\d\.\d) out of 5 stars"/i', $html_response, $matches);
+
+            $rating = (isset($matches[1])) ? $matches[1] : 'null';
+
+            return $rating;
+
+        }
+
 	}
 
 

@@ -43,9 +43,19 @@ if ($category == -1 && $grp == "")
 elseif ($category != -1 && $grp == "")
 {
 	$cat = new Category();
-	$cdata = $cat->getById($category);
+	$catTitle = $cat->getTitle($category);
+	if($cat->isParent($category))
+    {
+        $page->smarty->assign('catname',$catTitle." - All");
+        $section = $catTitle;
+    }
+    else
+    {
+        $browseCatName = $cat->getParentTitle($category)." - ".$catTitle;
+    }
+	// $cdata = $cat->getById($category);
 	
-	if ($cdata) {
+	/*if ($cdata) {
 		$page->smarty->assign('catname',$cdata["title"]);
 		if ($cdata['parentID'] == Category::CAT_PARENT_GAME || $cdata['ID'] == Category::CAT_PARENT_GAME)
 			$section = 'console';
@@ -57,13 +67,14 @@ elseif ($category != -1 && $grp == "")
 			$section = 'books';
 	} else {
 		$page->show404();
-	}
+	}*/
 }
 elseif ($grp != "")
 {
-	$page->smarty->assign('catname',$grp);			
+	$browseCatName = $grp;
 }
-$page->smarty->assign('section',$section);
+$page->smarty->assign('section', $section);
+$page->smarty->assign('catname', $browseCatName);
 
 foreach($ordering as $ordertype) 
 	$page->smarty->assign('orderby'.$ordertype, WWW_TOP."/browse?t=".$category."&amp;g=".$grp."&amp;ob=".$ordertype."&amp;offset=0");	

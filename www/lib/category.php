@@ -142,6 +142,19 @@ class Category
 		return $db->queryOneRow(sprintf("SELECT c.disablepreview, c.ID, CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) as title, c.status, c.parentID, c.minsize from category c left outer join category cp on cp.ID = c.parentID where c.ID = %d", $id));
 	}
 
+    public function getTitle($catID)
+    {
+        $db = new DB();
+        $query = $db->queryOneRow("SELECT title FROM category WHERE ID=".$catID);
+        return $query['title'];
+    }
+
+    public function getParentTitle($catID)
+    {
+        $db = new DB();
+        $query = $db->queryOneRow("SELECT title FROM category WHERE ID IN(SELECT parentID FROM category WHERE ID=".$catID.")");
+        return $query['title'];
+    }
 	public function getByIds($ids)
 	{
 		$db = new DB();

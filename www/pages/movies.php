@@ -6,20 +6,20 @@ $movie = new Movie;
 $cat = new Category;
 
 if (!$users->isLoggedIn())
-	$page->show403();
+    $page->show403();
 
 
 $moviecats = $cat->getChildren(Category::CAT_PARENT_MOVIE);
 $mtmp = array();
 foreach($moviecats as $mcat) {
-	$mtmp[$mcat['ID']] = $mcat;
+    $mtmp[$mcat['ID']] = $mcat;
 }
 $category = Category::CAT_PARENT_MOVIE;
 if (isset($_REQUEST["t"]) && array_key_exists($_REQUEST['t'], $mtmp))
-	$category = $_REQUEST["t"] + 0;
-	
+    $category = $_REQUEST["t"] + 0;
+
 $catarray = array();
-$catarray[] = $category;	
+$catarray[] = $category;
 
 $page->smarty->assign('catlist', $mtmp);
 $page->smarty->assign('category', $category);
@@ -33,12 +33,12 @@ $orderby = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_RE
 $results = $movies = array();
 $results = $movie->getMovieRange($catarray, $offset, ITEMS_PER_PAGE, $orderby, -1, $page->userdata["categoryexclusions"]);
 foreach($results as $result) {
-	$result['genre'] = $movie->makeFieldLinks($result, 'genre');
-	$result['actors'] = $movie->makeFieldLinks($result, 'actors');
-	$result['director'] = $movie->makeFieldLinks($result, 'director');
-	$result['languages'] = explode(", ", $result['language']);
+    $result['genre'] = $movie->makeFieldLinks($result, 'genre');
+    $result['actors'] = $movie->makeFieldLinks($result, 'actors');
+    $result['director'] = $movie->makeFieldLinks($result, 'director');
+    $result['languages'] = explode(", ", $result['language']);
 
-	$movies[] = $result;
+    $movies[] = $result;
 }
 
 $title = (isset($_REQUEST['title']) && !empty($_REQUEST['title'])) ? stripslashes($_REQUEST['title']) : '';
@@ -78,26 +78,29 @@ $pager = $page->smarty->fetch("pager.tpl");
 $page->smarty->assign('pager', $pager);
 
 if ($category == -1)
-	$page->smarty->assign("catname","All");			
+    $page->smarty->assign("catname","All");
 else
 {
-	$cat = new Category();
-	$cdata = $cat->getById($category);
-	if ($cdata)
-		$page->smarty->assign('catname',$cdata["title"]);			
-	else
-		$page->show404();
+    $cat = new Category();
+    $cdata = $cat->getById($category);
+    if ($cdata)
+        $page->smarty->assign('catname',$cdata["title"]);
+    else
+        $page->show404();
 }
 
-foreach($ordering as $ordertype) 
-	$page->smarty->assign('orderby'.$ordertype, WWW_TOP."/movies?t=".$category.$browseby_link."&amp;ob=".$ordertype."&amp;offset=0");
+foreach($ordering as $ordertype)
+    $page->smarty->assign('orderby'.$ordertype, WWW_TOP."/movies?t=".$category.$browseby_link."&amp;ob=".$ordertype."&amp;offset=0");
 
-$page->smarty->assign('results',$movies);		
+$page->smarty->assign('results',$movies);
+if($category==Category::CAT_PARENT_MOVIE)
+    $catname = "All Movies";
+else
+    $catname = $cat->getTitle($category);
+$page->meta_title = "Browse Movies - ".$catname;
+$page->meta_keywords = "browse,nzb,description,details,movies,downloads";
+$page->meta_description = "Browse for Movie Nzbs";
 
-$page->meta_title = "Browse Nzbs";
-$page->meta_keywords = "browse,nzb,description,details";
-$page->meta_description = "Browse for Nzbs";
-	
 $page->content = $page->smarty->fetch('movies.tpl');
 $page->render();
 
