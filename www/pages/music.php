@@ -87,9 +87,12 @@ else
 foreach($ordering as $ordertype) 
 	$page->smarty->assign('orderby'.$ordertype, WWW_TOP."/music?t=".$category.$browseby_link."&amp;ob=".$ordertype."&amp;offset=0");
 
-$page->smarty->assign('results',$musics);		
-
-$page->meta_title = "Browse Albums";
+$page->smarty->assign('results',$musics);
+if($category==Category::CAT_PARENT_MUSIC)
+    $catname = "All Audio";
+else
+    $catname = $cat->getTitle($category);
+$page->meta_title = "Browse Audio - ".$catname;
 $page->meta_keywords = "browse,nzb,albums,description,details";
 $page->meta_description = "Browse for Albums";
 	

@@ -54,6 +54,7 @@ switch($page->page) {
 	case 'sitemap':
 	case 'contact-us':
 	case 'terms-and-conditions':
+    case 'ajax_get_book_genres':
 	case 'ajax_profile':
 	case 'ajax_release-admin':
 	case 'ajax_rarfilelist':
@@ -72,8 +73,10 @@ switch($page->page) {
 	case 'api':
 	case 'getnzb':
 	case 'login':
+    case 'login_proc':
 		include(WWW_DIR.'pages/'.$page->page.'.php');
-	break;
+    break;
+
 	default:
 		$page->show404();
 	break;

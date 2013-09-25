@@ -5,7 +5,8 @@ RewriteEngine on
 RewriteRule \.(css|jpe?g|gif|ogg|ogv|png|js|ico)$ - [L]
 
 # Leave /admin and /install static
-RewriteRule ^(admin|install).*$ - [L]
+RewriteRule ^(admin|install|min|min_unit_tests).*$ - [L]
+
 
 # Rewrite web pages to one master page
 RewriteRule ^([^/\.]+)/?$ index.php?page=$1 [QSA,L]

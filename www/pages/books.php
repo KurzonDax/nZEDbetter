@@ -33,7 +33,7 @@ $orderby = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_RE
 $results = $books = array();
 $results = $book->getBookRange($catarray, $offset, ITEMS_PER_PAGE, $orderby, -1, $page->userdata["categoryexclusions"]);
 
-$maxwords = 50;
+$maxwords = 75;
 foreach($results as $result) {	
 	if (!empty($result['overview'])) {
 		$words = explode(' ', $result['overview']);
@@ -51,7 +51,16 @@ $page->smarty->assign('author', $author);
 $title = (isset($_REQUEST['title']) && !empty($_REQUEST['title'])) ? stripslashes($_REQUEST['title']) : '';
 $page->smarty->assign('title', $title);
 
-$browseby_link = '&amp;title='.$title.'&amp;author='.$author;
+$genre = (isset($_REQUEST['genre']) && !empty($_REQUEST['genre'])) ? stripslashes($_REQUEST['genre']) : '';
+$page->smarty->assign('genre', $genre);
+
+$publisher = (isset($_REQUEST['publisher']) && !empty($_REQUEST['publisher'])) ? stripslashes($_REQUEST['publisher']) : '';
+$page->smarty->assign('publisher', $publisher);
+
+$minRating = (isset($_REQUEST['minRating']) && !empty($_REQUEST['minRating'])) ? stripslashes($_REQUEST['minRating']) : '';
+$page->smarty->assign('minRating', $minRating);
+
+$browseby_link = '&amp;title='.$title.'&amp;author='.$author.'&amp;genre='.$genre.'&amp;publisher='.$publisher.'&amp;minRating='.$minRating;
 
 $page->smarty->assign('pagertotalitems',$browsecount);
 $page->smarty->assign('pageroffset',$offset);
@@ -77,12 +86,15 @@ else
 foreach($ordering as $ordertype) 
 	$page->smarty->assign('orderby'.$ordertype, WWW_TOP."/books?t=".$category.$browseby_link."&amp;ob=".$ordertype."&amp;offset=0");
 
-$page->smarty->assign('results',$books);		
-
-$page->meta_title = "Browse Books";
+$page->smarty->assign('results',$books);
+if($category==Category::CAT_PARENT_BOOKS)
+    $catname = "All Books";
+else
+    $catname = $cat->getTitle($category);
+$page->meta_title = "Browse Books - ".$catname;
 $page->meta_keywords = "browse,nzb,books,description,details";
 $page->meta_description = "Browse for Books";
-	
+$page->smarty->assign('parentCat','books');
 $page->content = $page->smarty->fetch('books.tpl');
 $page->render();
 

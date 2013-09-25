@@ -25,12 +25,17 @@ $category = new Category();
 $consoletools = new ConsoleTools();
 $echooutput = true;
 
+
+$fetchWithoutYear = true;
+
+
 $movieres = $db->queryDirect("SELECT * FROM releases WHERE categoryID IN (2020, 2030, 2040, 2050, 2060, 2070) AND imdbID IS NULL ORDER BY ID ASC");
 $moviecount = $db->getNumRows($movieres);
 echo "\nFound ".$moviecount." movies to update\n\n";
 $processed = 0;
 $matchedMovies = 0;
 $renamedMovies = 0;
+$movedCategory = 0;
 while ($movierow=$db->fetchAssoc($movieres))
 {
     $processed ++;
@@ -43,6 +48,7 @@ while ($movierow=$db->fetchAssoc($movieres))
         $db->query("UPDATE releases SET categoryID=".$db->escapeString($updatedCategory)." WHERE ID=".$movierow['ID']);
         if(!($updatedCategory>2000 && $updatedCategory<2999))
         {
+            $movedCategory ++;
             echo "Release is no longer considered a movie.\n";
             usleep(500);
             continue;
@@ -52,12 +58,13 @@ while ($movierow=$db->fetchAssoc($movieres))
 
     if($refinedSearchName != $movierow['searchname'])
     {
-        echo "Updating searchname field in database.\n";
+        echo "Updating searchname field in database. Release ID: ".$movierow['ID']."\n";
         echo "Old name:     ".$movierow['searchname']."\n";
         echo "New name:     ".$refinedSearchName."\n";
-        $db->query("UPDATE rleases SET searchname=".$db->escapeString($refinedSearchName)." WHERE ID=".$movierow['ID']);
+        $db->query("UPDATE releases SET searchname=".$db->escapeString($refinedSearchName)." WHERE ID=".$movierow['ID']);
         $renamedMovies ++;
-        usleep(500);
+        //$consoletools->getUserInput("Press enter to continue: ");
+        //usleep(500);
     }
     $refinedSearchName = $namecleaning->movieCleaner($refinedSearchName);
 
@@ -67,49 +74,44 @@ while ($movierow=$db->fetchAssoc($movieres))
     {
         $movieCleanName = $matches['1'];
         $movieCleanYear = $matches['2'];
+        $results = $movie->fetchTmdbInfoByName($movieCleanName, $movieCleanYear);
     }
-    else
+    elseif(!$fetchWithoutYear)
     {
-        echo "Movie does not have a year in the release search name. Skipping...";
+        echo "\nMovie does not have a year in the release search name. Skipping...\n";
         continue;
     }
-
-    $results = $movie->fetchTmdbInfoByName($movieCleanName, $movieCleanYear);
-    //print_r($results);
-    $matchfound = false;
-    if(isset($results['results']['0']))
+    elseif($fetchWithoutYear && $movieCleanNameYear != false)
     {
-
-        $ourName = strtolower($movieCleanName);
-        $tmdbName = strtolower($results['results']['0']['title']);
-        similar_text($ourName, $tmdbName, $percentSimilar);
-        // echo "TMDb Title 0:     ".$results['results']['0']['title']." (".$results['results']['0']['release_date'].") - Match: ".number_format($percentSimilar, 2)."%.\n";
-        if(isset($results['results']['0']['release_date']) &&  preg_match('/((20|19)\d\d)/',$results['results']['0']['release_date'], $matches))
-            $tmdbYear = $matches['1'];
-        if($movieCleanYear !== false && isset($tmdbYear))
-            $matchedYear = ($tmdbYear >= $movieCleanYear -1 && $tmdbYear < $movieCleanYear + 2) ? true : false;
-        else
-            $matchedYear = true;
-        if ($percentSimilar>80 && $matchedYear)
-        {
-            echo "\033[01;32mMatch found:   ".$results['results']['0']['title']." (".$tmdbYear.") Match: 0  ID: ".$results['results']['0']['id']."\n\033[00;37m";
-            $matchfound = $results['results']['0']['id'];
-        }
+        echo "\n\033[00;33mAttempting to match without a year.  Search title: ".$movieCleanNameYear."\n\033[00;37m";
+        $movieCleanYear = false;
+        $results = $movie->fetchTmdbInfoByName($movieCleanNameYear);
     }
-    if(isset($results['results']['1']) && !$matchfound)
-    {
-        $ourName = strtolower($movieCleanName);
-        $tmdbName = strtolower($results['results']['1']['title']);
-        similar_text($ourName, $tmdbName, $percentSimilar);
-        // echo "TMDb Title 0:     ".$results['results']['0']['title']." (".$results['results']['0']['release_date'].") - Match: ".number_format($percentSimilar, 2)."%.\n";
-        if(isset($results['results']['1']['release_date']) &&  preg_match('/((20|19)\d\d)/',$results['results']['1']['release_date'], $matches))
-            $tmdbYear = $matches['1'];
-        if ($percentSimilar>80 && $tmdbYear >= $movierow['year']-1 && $tmdbYear < $movierow['year']+2)
-        {
-            echo "\033[01;32mMatch found: ".$results['results']['0']['title']." (".$tmdbYear.") Match: 1  ID: ".$results['results']['1']['id']."\n\033[00;37m";
-            $matchfound = $results['results']['1']['id'];
-        }
 
+
+    $matchfound = false;
+
+    if(count($results['results'])>0)
+    {
+        foreach ($results['results'] as $possibleMatch)
+        {
+            $ourName = strtolower($movieCleanName);
+            $tmdbName = strtolower($possibleMatch['title']);
+            similar_text($ourName, $tmdbName, $percentSimilar);
+            // echo "TMDb Title 0:     ".$results['results']['0']['title']." (".$results['results']['0']['release_date'].") - Match: ".number_format($percentSimilar, 2)."%.\n";
+            if(isset($possibleMatch['release_date']) &&  preg_match('/((20|19)\d\d)/',$possibleMatch['release_date'], $matches))
+                $tmdbYear = $matches['1'];
+            if($movieCleanYear !== false && isset($tmdbYear))
+                $matchedYear = ($tmdbYear >= $movieCleanYear -1 && $tmdbYear < $movieCleanYear + 2) ? true : false;
+            else
+                $matchedYear = true;
+            if ($percentSimilar>80 && $matchedYear)
+            {
+                echo "\033[01;32mMatch found:   ".$possibleMatch['title']." (".$tmdbYear.") Match: 0  ID: ".$possibleMatch['id']."\n\033[00;37m";
+                $matchfound = $possibleMatch['id'];
+                break;
+            }
+        }
     }
     if($matchfound>0)
     {
@@ -129,9 +131,11 @@ while ($movierow=$db->fetchAssoc($movieres))
     }
     else
     {
-        echo "\nNo matches found in IMDB.\n";
+        echo "\nNo matches found in IMDB.\n\n";
         file_put_contents(WWW_DIR."/lib/logging/tmdb-nomatch.log",$movierow['ID'].",".$db->escapeString($refinedSearchName)."\n", FILE_APPEND);
     }
+    // usleep(750);
 }
-exit ("\nAll done...\nMovies matched: ".$matchedMovies."/".$processed."\n"."Renamed movies: ".$renamedMovies."\n");
+exit ("\nAll done...\nMovies matched: ".$matchedMovies."/".$processed."\n"."Renamed movies: ".$renamedMovies."\nChanged Category: ".$movedCategory."\n");
+
 

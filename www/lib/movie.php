@@ -935,15 +935,15 @@ public function searchTMDb($release)
 //            return false;
 //        }
 //    }
-    $refinedSearchName = $namecleaning->releaseCleaner($release['name']);
-
-    if($refinedSearchName != $release['searchname'])
+    //$refinedSearchName = $namecleaning->releaseCleaner($release['name']);
+    $refinedSearchName = $release['searchname'];
+    /*if($refinedSearchName != $release['searchname'])
     {
         echo "Updating searchname field in database.\n";
         echo "Old name:     ".$release['searchname']."\n";
         echo "New name:     ".$refinedSearchName."\n";
         $db->query("UPDATE releases SET searchname=".$db->escapeString($refinedSearchName)." WHERE ID=".$release['ID']);
-    }
+    }*/
     $refinedSearchName = $namecleaning->movieCleaner($refinedSearchName);
     $movieCleanNameYear = $this->parseMovieSearchName($refinedSearchName);
 

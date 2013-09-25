@@ -69,7 +69,7 @@ class BasePage
 		{
 			$this->userdata = $users->getById($users->currentUserId());
 			$this->userdata["categoryexclusions"] = $users->getCategoryExclusion($users->currentUserId());
-
+            $this->smarty->assign('username', $this->userdata['username']);
 			//update lastlogin every 15 mins
 			if (strtotime($this->userdata['now'])-900 > strtotime($this->userdata['lastlogin']))
 				$users->updateSiteAccessed($this->userdata['ID']);

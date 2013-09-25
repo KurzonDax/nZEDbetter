@@ -18,7 +18,7 @@
 
 </table>
 
-<p>View <a href="group-list.php">all groups</a>.</p>
+<p>View <a href="group-list.php">all groups</a>. <a href="group-bulk.php">Bulk add more groups.</a></p>
 
 {else}
 <p>Regex of groups to add to the site.</p>
