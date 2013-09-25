@@ -6,6 +6,7 @@ require_once(WWW_DIR."/lib/genres.php");
 require_once(WWW_DIR."/lib/site.php");
 require_once(WWW_DIR."/lib/util.php");
 require_once(WWW_DIR."/lib/releaseimage.php");
+require_once(WWW_DIR."/lib/namecleaning.php");
 
 class Music
 {
@@ -19,6 +20,7 @@ class Music
 		$this->asstag = $site->amazonassociatetag;
 		$this->musicqty = (!empty($site->maxmusicprocessed)) ? $site->maxmusicprocessed : 150;
 		$this->sleeptime = (!empty($site->amazonsleep)) ? $site->amazonsleep : 1000;
+        $this->getAmazonRating = (!empty($site->getAmazonRating)) ? $site->getAmazonRating : 'FALSE';
 
 		$this->imgSavePath = WWW_DIR.'covers/music/';
 	}
@@ -320,6 +322,19 @@ class Music
 			return false;
 		}
 
+        if($this->getAmazonRating == 'TRUE')
+        {
+            if(isset($amaz->Items->Item->CustomerReviews->HasReviews) && $amaz->Items->Item->CustomerReviews->HasReviews == 'true')
+            {
+                $obj = new AmazonProductAPI($this->pubkey, $this->privkey, $this->asstag);
+                $mus['customerRating'] = $obj->getAmazonCustomerRating($amaz->Items->Item->CustomerReviews->IFrameURL);
+            }
+            else
+                $mus['customerRating'] = 'null';
+        }
+        else
+            $mus['customerRating'] = 'null';
+
 		$genreKey = -1;
 		$genreName = '';
 		if (isset($amaz->Items->Item->BrowseNodes))
@@ -354,17 +369,17 @@ class Music
 		$mus['musicgenreID'] = $genreKey;
 
 		$query = sprintf("
-		INSERT IGNORE INTO musicinfo  (`title`, `asin`, `url`, `salesrank`,  `artist`, `publisher`, `releasedate`, `review`, `year`, `genreID`, `tracks`, `cover`, `createddate`, `updateddate`)
-		VALUES (%s,		%s,		%s,		%s,		%s,		%s,		%s,		%s,		%s,		%s,		%s,		%d,		now(),		now())
-			ON DUPLICATE KEY UPDATE  `title` = %s,  `asin` = %s,  `url` = %s,  `salesrank` = %s,  `artist` = %s,  `publisher` = %s,  `releasedate` = %s,  `review` = %s,  `year` = %s,  `genreID` = %s,  `tracks` = %s,  `cover` = %d,  createddate = now(),  updateddate = now()",
+		INSERT IGNORE INTO musicinfo  (`title`, `asin`, `url`, `salesrank`,  `artist`, `publisher`, `releasedate`, `review`, `year`, `genreID`, `tracks`, `cover`, `createddate`, `updateddate`, `customerRating`)
+		VALUES (%s,		%s,		%s,		%s,		%s,		%s,		%s,		%s,		%s,		%s,		%s,		%d,		now(),		now(), %s )
+			ON DUPLICATE KEY UPDATE  `title` = %s,  `asin` = %s,  `url` = %s,  `salesrank` = %s,  `artist` = %s,  `publisher` = %s,  `releasedate` = %s,  `review` = %s,  `year` = %s,  `genreID` = %s,  `tracks` = %s,  `cover` = %d,  createddate = now(),  updateddate = now(), `customerRating` = %s",
 		$db->escapeString($mus['title']), $db->escapeString($mus['asin']), $db->escapeString($mus['url']),
 		$mus['salesrank'], $db->escapeString($mus['artist']), $db->escapeString($mus['publisher']),
 		$mus['releasedate'], $db->escapeString($mus['review']), $db->escapeString($mus['year']),
-		($mus['musicgenreID']==-1?"null":$mus['musicgenreID']), $db->escapeString($mus['tracks']), $mus['cover'],
+		($mus['musicgenreID']==-1?"null":$mus['musicgenreID']), $db->escapeString($mus['tracks']), $mus['cover'], $mus['customerRating'],
 		$db->escapeString($mus['title']), $db->escapeString($mus['asin']), $db->escapeString($mus['url']),
 		$mus['salesrank'], $db->escapeString($mus['artist']), $db->escapeString($mus['publisher']),
 		$mus['releasedate'], $db->escapeString($mus['review']), $db->escapeString($mus['year']),
-		($mus['musicgenreID']==-1?"null":$mus['musicgenreID']), $db->escapeString($mus['tracks']), $mus['cover'] );
+		($mus['musicgenreID']==-1?"null":$mus['musicgenreID']), $db->escapeString($mus['tracks']), $mus['cover'], $mus['customerRating'] );
 
 		$musicId = $db->queryInsert($query);
 
@@ -444,21 +459,22 @@ class Music
 					if ($albumId === false)
 					{
 						$albumId = -2;
-						// $logfile = WWW_DIR."lib/musicfailed.log";
-						// file_put_contents($logfile, $newname."\n", FILE_APPEND);
+						$logfile = WWW_DIR."lib/logging/musicfailed.log";
+						file_put_contents($logfile, $arr['ID']." ".$newname."\n", FILE_APPEND);
 					}
 
 					// Update release.
 					$db->query(sprintf("UPDATE releases SET musicinfoID = %d WHERE ID = %d", $albumId, $arr["ID"]));
-
+                    usleep($this->sleeptime*1000);
 				}
 				else
 				{
-					// No album found.
-					$db->query(sprintf("UPDATE releases SET musicinfoID = %d WHERE ID = %d", -2, $arr["ID"]));
+					// No year was found in the name.  Suspect this may be a single for now.
+					$db->query(sprintf("UPDATE releases SET musicinfoID = %d, categoryID=3070 WHERE ID = %d", -2, $arr["ID"]));
+                    echo "Added ".$arr['searchname']." to Singles category.\n";
 					
 				}
-				usleep($this->sleeptime*1000);
+
 			}
 		}
 	}
@@ -467,26 +483,11 @@ class Music
 	{
 		if (preg_match('/(.+?)(\d{1,2} \d{1,2} )?(19\d{2}|20[0-1][0-9])/', $releasename, $name))
 		{
-			$result = array();
+			$namecleaning = new nameCleaning();
+            $result = array();
 			$result["year"] = $name[3];
 
-			$newname = preg_replace('/ (\d{1,2} \d{1,2} )?(Bootleg|Boxset|Clean.+Version|Compiled by.+|\dCD|Digipak|DIRFIX|DVBS|FLAC|(Ltd )?(Deluxe|Limited|Special).+Edition|Promo|PROOF|Reissue|Remastered|REPACK|RETAIL(.+UK)?|SACD|Sampler|SAT|Summer.+Mag|UK.+Import|Deluxe.+Version|VINYL|WEB)/i', ' ', $name[1]);
-			$newname = preg_replace('/ ([a-z]+[0-9]+[a-z]+[0-9]+.+|[a-z]{2,}[0-9]{2,}?.+|3FM|B00[a-z0-9]+|BRC482012|H056|UXM1DW086|(4WCD|ATL|bigFM|CDP|DST|ERE|FIM|MBZZ|MSOne|MVRD|QEDCD|RNB|SBD|SFT|ZYX) \d.+)/i', ' ', $newname);
-			$newname = preg_replace('/ (\d{1,2} \d{1,2} )?([A-Z])( ?$)|[0-9]{8,}| (CABLE|FREEWEB|LINE|MAG|MCD|YMRSMILES)/', ' ', $newname);
-			$newname = preg_replace('/VA( |-)/', 'Various Artists ', $newname);
-			$newname = preg_replace('/ (\d{1,2} \d{1,2} )?(DAB|DE|DVBC|EP|FIX|IT|Jap|NL|PL|(Pure )?FM|SSL|VLS) /i', ' ', $newname);
-			$newname = preg_replace('/ (\d{1,2} \d{1,2} )?(CD(A|EP|M|R|S)?|QEDCD|SBD) /i', ' ', $newname);
-			$newname = trim(preg_replace('/\s\s+/', ' ', $newname));
-			$newname = trim(preg_replace('/ [a-z]{2}$| [a-z]{3} \d{2,}$|\d{5,} \d{5,}$/i', '', $newname));
-			// Below tries to catch a lot of the crap that shows up before and after the title
-            $newname = trim(preg_replace('/music$/i', '', $newname));
-            $newname = trim(preg_replace('/_|\./', ' ', $newname));
-			$newname = trim(preg_replace('/download all our files with|illuminatenboard org|MP3|#a b|inner sanctum@EFNET|[a-z]{1,10}@EFNET|Gate [0-9]{1,2} [0-9]{2,12}|kere ws|[0-9]{3,12}|#altbin@EFNet|www Thunder News org|usenet of inferno us|TOWN|SEK9 FLAC Hip Hop|SEK9 FLAC [A-Za-z]{4,10}|powerd by getnzb com|Wildrose [0-9]{3,6}|DREAM OF USENET INFO|http dream of usenet info/', '', $newname));
-			$newname = trim(preg_replace('/ \( |CD FLAC|[A-Z]{3,12}| 0{2,4}| proof| dl| m3u|2Eleven|[A-Z]{1,8}[0-9]{1,3}|by Secretusenet|[0-9]{3}|DeVOiD|k4|[3-9][0-9]{2,}|FiH|LoKET|SPiEL|[A-Z]{3,}[0-9]{1,4}CD|flacme|nmr@VBR apex 00|12 Vinyl|[0-9]{2,3} kbps|CBR 00/', '', $newname));
-			$newname = trim(preg_replace('/-[A-Za-z]{3}-[0-9]{2}-[0-9]{2}-|--[0-9]{2}-[0-9]{2}|\w{2}-[A-Za-z]{2,3}-[0-9]{2}-[0-9]{2}|\d\d-\d\d-|-cd-|\(Proton Radio\)|\(Pure FM\)|-[A-Za-z]{2,3}-web-|-web-|\(Maxima FM\)/', '', $newname));
-			$newname = trim(preg_replace('/\($/', '', $newname));  // Get rid of extra trailing '(' that shows up for some reason
-
-			// End crap trimming
+            $newname = $namecleaning->musicCleaner($name[1]);
 			if (!preg_match('/^[a-z0-9]+$/i', $newname) && strlen($newname) > 10)
 			{
 				$result["name"] = $newname;

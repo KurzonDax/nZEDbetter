@@ -88,9 +88,12 @@ else
 foreach($ordering as $ordertype) 
 	$page->smarty->assign('orderby'.$ordertype, WWW_TOP."/console?t=".$category.$browseby_link."&amp;ob=".$ordertype."&amp;offset=0");
 
-$page->smarty->assign('results',$consoles);		
-
-$page->meta_title = "Browse Console";
+$page->smarty->assign('results',$consoles);
+if($category==Category::CAT_PARENT_GAME)
+    $catname = "All Games";
+else
+    $catname = $cat->getTitle($category);
+$page->meta_title = "Browse Console - ".$catname;
 $page->meta_keywords = "browse,nzb,console,games,description,details";
 $page->meta_description = "Browse for Games";
 	

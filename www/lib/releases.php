@@ -46,6 +46,7 @@ class Releases
         $this->siteMinFileCount = ($this->site->minfilestoformrelease) ? $this->site->minfilestoformrelease : 0;
         $this->siteMaxFileSize = ($this->site->maxsizetoformrelease) ? $this->site->maxsizetoformrelease : 0;
 	    $this->lastFullCollectionCheck = ($this->site->lastFullCollectionCheck) ? $this->site->lastFullCollectionCheck : 0;
+        $this->nextCrosspostCheck = ($this->site->nextCrosspostCheck == "0") ? 0 : $this->site->nextCrosspostCheck;
     }
 
 	public function get()
@@ -1385,13 +1386,8 @@ class Releases
 		$consoletools = new ConsoleTools();
 		$n = "\n";
 
-        if((time()-1200) > $this->lastFullCollectionCheck)
-        {
-            $doFullCheck = true;
-            $db->query("UPDATE site SET value=".$db->escapeString(time())." WHERE setting='lastFullCollectionCheck'");
-        }
-        else
-            $doFullCheck = false;
+
+
 		if ($echooutput)
 			echo "\033[1;33m[".date("H:i:s A")."] Stage 1 -> Try to find complete collections.\033[0m".$n;
 		$stage1 = TIME();
@@ -1429,6 +1425,10 @@ class Releases
         }
         $db->Commit();
         $db->setAutoCommit(TRUE);
+        if((time()-5400) > $this->lastFullCollectionCheck)
+            $doFullCheck = true;
+        else
+            $doFullCheck = false;
         if($binaryrowcount>0 || $doFullCheck)
         {
             if($doFullCheck)
@@ -1456,7 +1456,7 @@ class Releases
 
                     if($binarycount>=$collectionrow["totalFiles"])
                     {
-                        $db->query("UPDATE collections SET filecheck=2 WHERE ID=".$collectionrow["ID"]);
+                        $db->query("UPDATE collections SET filecheck=25 WHERE ID=".$collectionrow["ID"]);
                         $colsupdated++;
                     }
                     else
@@ -1479,8 +1479,11 @@ class Releases
             echo "\nNo binaries updated. Skipping collection checks.\n";
         unset($colsupdated, $colsprocessed, $collectionrow, $binaryrows, $binarycount, $binrow);
         unset($collectionsresult, $collectionstotal);
+        // Set the next time to do a full check here in case doing the full check took a really long time
+        if($doFullCheck)
+            $db->query("UPDATE site SET value=".$db->escapeString(time())." WHERE setting='lastFullCollectionCheck'");
 
-		if ($echooutput)
+        if ($echooutput)
 			echo "\n".$consoletools->convertTime(TIME() - $stage1)."\n";
 	}
 
@@ -1514,13 +1517,13 @@ class Releases
                 if($echooutput)
                     $consoletools->overWrite("Collections processed: ".$consoletools->percentString($colstotal, $collectioncount));
 
-                /*$collectionsize=$db->queryOneRow("SELECT COUNT(*) as binNumber FROM binaries AS b WHERE b.collectionID=".$collectionsrow["ID"]);
+                $collectionsize=$db->queryOneRow("SELECT COUNT(*) as binNumber FROM binaries AS b WHERE b.collectionID=".$collectionsrow["ID"]);
 
                 If($collectionsize['binNumber']>=$collectionsrow['totalFiles'])
                 {
                     $db->query("UPDATE collections SET filecheck=25 WHERE ID=".$collectionsrow["ID"]);
                     $colsupdated++;
-                }*/
+                }
                 $binaryrows=$db->queryDirect("SELECT ID FROM binaries WHERE collectionID=".$collectionsrow["ID"]." AND partCheck=1");
                 $binarycount=$db->getNumRows($binaryrows);
 
@@ -1543,7 +1546,7 @@ class Releases
             $db->query("UPDATE collections SET filecheck=3 WHERE filecheck=25 and filesize>0 LIMIT ".($this->stage5limit * 3));
             if($echooutput)
                 echo "Queueing up ".$db->getAffectedRows()." collections to be processed.\n";
-            sleep(5);
+            sleep(1);
         }
         else
         {
@@ -1558,7 +1561,7 @@ class Releases
 		if ($echooutput)
             echo "\n".$consoletools->convertTime(TIME() - $stage2)."\n";
 
-        if($colsupdated==0)
+        if($colsupdated < 1)
         {
             // $db->query("UPDATE collections SET filecheck=3 WHERE filecheck=2 AND filesize>0");
             $filecheck3 = $db->queryDirect("SELECT ID FROM collections where filecheck IN (2,25,3,4) AND filesize>0");
@@ -2035,16 +2038,17 @@ class Releases
             // Using thread ID to mark the collections to delete will allow us to multi-thread this function in the future if desired.
             $threadID = $db->queryOneRow("SELECT connection_ID() as thread_ID");
             if($threadID<1000)
-                $threadID += 1000;
+                $threadID['thread_ID'] += 1000;
             // I suppose it's possible for the thread ID to grow to above 11 digits if
             // the system was up long enough.  Not sure how big Percona/MySql allows
             // the thread counter to grow.
-            if($threadID>99999999999)
-                $threadID -= 9999999999;
+            // TODO: Fix opp error below
+            // if($threadID>99999999999)
+            //    $threadID -= 9999999999;
             if ($echooutput)
                 echo "Using thread ID ".$threadID['thread_ID']." to mark collections.\n";
             $db->query("UPDATE collections SET filecheck=".$threadID['thread_ID']." WHERE filecheck = 5 ".$where." ORDER BY dateadded ASC LIMIT ".$maxcollections);
-            $completeCols = $db->queryDirect("SELECT ID FROM collections WHERE filecheck=".$threadID['thread_ID']);
+            $completeCols = $db->queryDirect("SELECT ID, groupID FROM collections WHERE filecheck=".$threadID['thread_ID']);
             $colsToDelete = $db->getNumRows($completeCols);
             if($colsToDelete == 0 || $colsToDelete == false)
             {
@@ -2061,6 +2065,7 @@ class Releases
 
                 $db->queryDirect("DELETE parts FROM parts WHERE collectionID=".$currentCol['ID']);
                 $partsDeleted += $db->getAffectedRows();
+                $db->query("UPDATE groups SET partsInDB=partsInDB-".$partsDeleted." WHERE ID=".$currentCol['groupID']);
 
                 $db->queryDirect("DELETE binaries FROM binaries WHERE collectionID=".$currentCol['ID']);
                 $binsDeleted += $db->getAffectedRows();
@@ -2088,6 +2093,20 @@ class Releases
             }
         } while ($colsDeleted>0 && $fastAndFurious == 'TRUE');
 
+        if(((time()>=$this->nextCrosspostCheck) || $this->nextCrosspostCheck==0)&& ($resrel = $db->query(sprintf("SELECT ID, guid FROM releases WHERE adddate > (now() - interval %d hour) GROUP BY name HAVING count(name) > 1", $this->crosspostt))))
+        {
+            if ($echooutput)
+                echo "\nDeleting cross-posted releases...\n";
+            $db->query("UPDATE site SET value=".(time()+3600)." WHERE setting='nextCrosspostCheck'");
+            $dupecount = 0;
+            foreach ($resrel as $rowrel)
+            {
+                $this->fastDelete($rowrel['ID'], $rowrel['guid'], $this->site);
+                $dupecount ++;
+            }
+            if($echooutput)
+                echo "\n".$dupecount." cross-posted releases deleted.\n";
+        }
         If ($echooutput)
             echo "\nStage completed in ".$consoletools->convertTime(TIME() - $stage7).".\n";
 	}
@@ -2123,7 +2142,7 @@ class Releases
             if ($echooutput)
                 echo "Using thread ID ".$threadID['thread_ID']." to mark collections.";
             $db->query("UPDATE collections SET filecheck=".$threadID['thread_ID']." WHERE filecheck IN (0,1) dateadded < (now() - interval ".$page->site->partretentionhours);
-            $completeCols = $db->queryDirect("SELECT ID FROM collections WHERE filecheck=".$threadID['thread_ID']);
+            $completeCols = $db->queryDirect("SELECT ID, groupID FROM collections WHERE filecheck=".$threadID['thread_ID']);
             $colsToDelete = $db->getNumRows($completeCols);
             if($colsToDelete == 0 || $colsToDelete == false)
             {
@@ -2139,6 +2158,7 @@ class Releases
 
                 $db->queryDirect("DELETE parts FROM parts WHERE collectionID=".$currentCol['ID']);
                 $partsDeleted += $db->getAffectedRows();
+                $db->query("UPDATE groups SET partsInDB=partsInDB-".$partsDeleted." WHERE ID=".$currentCol['groupID']);
 
                 $db->queryDirect("DELETE binaries FROM binaries WHERE collectionID=".$currentCol['ID']);
                 $binsDeleted += $db->getAffectedRows();
@@ -2194,7 +2214,17 @@ class Releases
 				$remcount ++;
 			}
 		}
-
+        if ($echooutput)
+            echo "\nDeteting hashed releases past retention...\n";
+        if($page->site->hashedRetentionHours != 0)
+        {
+            $result = $db->query(sprintf("SELECT ID, guid FROM releases WHERE categoryID=7020 AND adddate < (now() - interval %d hour)", $page->site->hashedRetentionHours));
+            foreach ($result as $rowrel)
+            {
+                $this->fastDelete($rowrel['ID'], $rowrel['guid'], $this->site);
+                $remcount ++;
+            }
+        }
 		// Passworded releases.
         if ($echooutput)
             echo "\nDeteting passworded releases...\n";
@@ -2224,15 +2254,6 @@ class Releases
 		// Crossposted releases.
         // Commenting this out for right now.  I see a couple of problems with it
         // that I need to dig in to a little deeper.
-
-		/*if($resrel = $db->query(sprintf("SELECT ID, guid FROM releases WHERE adddate > (now() - interval %d hour) GROUP BY name HAVING count(name) > 1", $this->crosspostt)))
-		{
-			foreach ($resrel as $rowrel)
-			{
-				$this->fastDelete($rowrel['ID'], $rowrel['guid'], $this->site);
-				$dupecount ++;
-			}
-		}*/
 
 		// Releases below completion %.
         if ($echooutput)

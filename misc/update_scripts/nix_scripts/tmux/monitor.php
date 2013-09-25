@@ -7,7 +7,7 @@ require_once(WWW_DIR."lib/site.php");
 
 // TODO: fix the percentage calculation for the XXX line in monitor
 
-$version="2.0r0001";
+$version="2.0r0003";
 
 $db = new DB();
 $DIR = MISC_DIR;
@@ -29,16 +29,18 @@ $s = new Sites();
 $alternate_nntp_provider = $s->get()->alternate_nntp;
 
 //totals per category in db, results by parentID
+//Made misc only count the releases in Other->Misc category (7010), may need to make this an option
 $qry = "SELECT
 	( SELECT COUNT( * ) FROM `releases` WHERE `categoryID` BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( * ) FROM `releases` WHERE `categoryID` BETWEEN 2000 AND 2999 ) AS movies,
 	( SELECT COUNT( * ) FROM `releases` WHERE `categoryID` BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( * ) FROM `releases` WHERE `categoryID` BETWEEN 4000 AND 4999 ) AS pc,
 	( SELECT COUNT( * ) FROM `releases` WHERE `categoryID` BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( * ) FROM `releases` WHERE `categoryID` BETWEEN 6000 AND 6999 ) AS xxx,
-	( SELECT COUNT( * ) FROM `releases` WHERE `categoryID` BETWEEN 7000 AND 7999 ) AS misc, ( SELECT COUNT( * ) FROM `releases` WHERE `categoryID` BETWEEN 8000 AND 8999 ) AS books";
+	( SELECT COUNT( * ) FROM `releases` WHERE `categoryID` = 7010 ) AS misc, ( SELECT COUNT( * ) FROM `releases` WHERE `categoryID` BETWEEN 8000 AND 8999 ) AS books";
 
 //needs to be processed query
+// Took foreign out of the movies to work section.  May need to make this an option.
 $proc_work = "SELECT
 	( SELECT COUNT( * ) FROM releases WHERE rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv,
-	( SELECT COUNT( * ) FROM releases WHERE imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies,
+	( SELECT COUNT( * ) FROM releases WHERE imdbID IS NULL and categoryID BETWEEN 2020 AND 2999 ) AS movies,
 	( SELECT COUNT( * ) FROM releases WHERE musicinfoID IS NULL and relnamestatus != 0 and categoryID in (3010, 3040, 3050) ) AS audio,
 	( SELECT COUNT( * ) FROM releases WHERE consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console,
 	( SELECT COUNT( * ) FROM releases WHERE bookinfoID IS NULL and categoryID = 8010 ) AS book,
@@ -60,11 +62,12 @@ $proc_work2 = "SELECT
 	( SELECT COUNT( collectionhash ) FROM nzbs WHERE collectionhash IS NOT NULL ) AS totalnzbs,
 	( SELECT COUNT( collectionhash ) FROM ( SELECT collectionhash FROM nzbs GROUP BY collectionhash, totalparts HAVING COUNT(*) >= totalparts ) AS count) AS pendingnzbs";
 
+// Newest release will no longer look at releases in the Misc categories
 $proc_tmux = "SELECT
 	( SELECT UNIX_TIMESTAMP(dateadded) FROM collections order by dateadded ASC limit 1 ) AS oldestcollection,
 	( SELECT UNIX_TIMESTAMP(adddate) FROM predb order by adddate DESC limit 1 ) AS newestpre,
-	( SELECT searchname FROM releases WHERE nzbstatus = 1 order by adddate DESC limit 1 ) AS newestaddname,
-	( SELECT UNIX_TIMESTAMP(adddate) FROM releases WHERE nzbstatus = 1 order by adddate DESC limit 1 ) AS newestadd,
+	( SELECT searchname FROM releases WHERE nzbstatus = 1 AND categoryID !=7010 AND categoryID != 7020 order by adddate DESC limit 1 ) AS newestaddname,
+	( SELECT UNIX_TIMESTAMP(adddate) FROM releases WHERE nzbstatus = 1 AND categoryID !=7010 AND categoryID != 7020 order by adddate DESC limit 1 ) AS newestadd,
 	( SELECT UNIX_TIMESTAMP(dateadded) FROM nzbs order by dateadded ASC limit 1 ) AS oldestnzb,
 	( SELECT VALUE FROM `tmux` WHERE SETTING = 'MONITOR_DELAY' ) AS monitor,
 	( SELECT VALUE FROM `tmux` WHERE SETTING = 'TMUX_SESSION' ) AS tmux_session,
@@ -116,7 +119,9 @@ $proc_tmux = "SELECT
 	( SELECT COUNT( * ) FROM groups WHERE first_record IS NOT NULL and backfill = 1 and first_record_postdate != '2000-00-00 00:00:00' and (now() - interval backfill_target day) < first_record_postdate ) AS backfill_groups_days,
 	( SELECT COUNT( * ) FROM groups WHERE first_record IS NOT NULL and backfill = 1 and first_record_postdate != '2000-00-00 00:00:00' and (now() - interval datediff(curdate(),(SELECT VALUE FROM `site` WHERE SETTING = 'safebackfilldate')) day) < first_record_postdate) AS backfill_groups_date,
 	( SELECT COUNT( * ) FROM groups WHERE name IS NOT NULL ) AS all_groups,
-	( SELECT COUNT( * ) FROM collections WHERE filecheck=5) AS cols_to_purge";
+	( SELECT COUNT( * ) FROM collections WHERE filecheck=5) AS cols_to_purge,
+	( SELECT COUNT( * ) FROM collections WHERE filecheck IN (2, 25)) AS stage2Backlog";
+
 
 //get microtime
 function microtime_float()
@@ -212,6 +217,7 @@ $newestpre = TIME();
 $oldestcollection = TIME();
 $oldestnzb = TIME();
 $cols_to_purge = 0;
+$stage2backlog = 0;
 
 $releases_now_formatted = 0;
 $releases_since_start = 0;
@@ -325,7 +331,8 @@ printf($mask1, "Release Added:", relativeTime("$newestadd")."ago");
 printf($mask1, "Predb Updated:", relativeTime("$newestpre")."ago");
 printf($mask1, "Collection Age:", relativeTime("$oldestcollection")."ago");
 printf($mask1, "NZBs Age:", relativeTime("$oldestnzb")."ago");
-printf($mask1, "Collections to purge: ", number_format($cols_to_purge));
+printf($mask1, "Purge backlog:", number_format($cols_to_purge));
+printf($mask1, "Stage 2 backlog:", number_format($stage2backlog));
 
 $mask = "%-15.15s %27.27s %22.22s\n";
 printf("\033[1;33m\n");
@@ -515,6 +522,9 @@ while( $i > 0 )
     if ( @$proc_tmux_result[0]['purge_sleep'] != NULL ) { $purge_sleep = $proc_tmux_result[0]['purge_sleep']; }
     if ( @$proc_tmux_result[0]['cols_to_purge'] != NULL ) { $cols_to_purge = $proc_tmux_result[0]['cols_to_purge']; }
         else $cols_to_purge = 0;
+    if ( @$proc_tmux_result[0]['stage2Backlog'] != NULL ) { $stage2backlog = $proc_tmux_result[0]['stage2Backlog']; }
+        else $stage2backlog = 0;
+
 
 	//calculate releases difference
 	$releases_misc_diff = number_format( $releases_now - $releases_start );
@@ -552,7 +562,7 @@ while( $i > 0 )
 		$tvrage_percent = sprintf( "%02s", floor(( $tvrage_releases_now / $releases_now) * 100 ));
 		$book_percent = sprintf( "%02s", floor(( $book_releases_now / $releases_now) * 100 ));
 		$misc_percent = sprintf( "%02s", floor(( $misc_releases_now / $releases_now) * 100 ));
-        $porn_percent = sprintf( "%02a", floor(( $porn_releases_now / $releases_now) * 100 ));
+        $porn_percent = sprintf( "%02s", floor(( $porn_releases_now / $releases_now) * 100 ));
 	} else {
 		$nfo_percent = 0;
 		$pre_percent = 0;
@@ -564,6 +574,7 @@ while( $i > 0 )
 		$tvrage_percent = 0;
 		$book_percent = 0;
 		$misc_percent = 0;
+        $porn_percent = 0;
 	}
 
 	//get usenet connections
@@ -592,7 +603,8 @@ while( $i > 0 )
 	printf($mask1, "Predb Updated:", relativeTime("$newestpre")."ago");
 	printf($mask1, "Collection Age:", relativeTime("$oldestcollection")."ago");
 	printf($mask1, "NZBs Age:", relativeTime("$oldestnzb")."ago");
-    printf($mask1, "Collections to purge: ", number_format($cols_to_purge));
+    printf($mask1, "Purge backlog: ", number_format($cols_to_purge));
+    printf($mask1, "Stage 2 backlog:", number_format($stage2backlog));
 	if ( $post == "1" || $post == "3" )
 	{
 		printf($mask1, "Postprocess:", "stale for ".relativeTime($time2));
@@ -965,7 +977,7 @@ while( $i > 0 )
 			//run update_binaries
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes0[2]);
-			if (( $kill_coll == "FALSE" ) && ( $kill_pp == "FALSE" ) && ( TIME() - $time6 <= 4800 ))
+			if (( $kill_coll == "FALSE" ) && ( $kill_pp == "FALSE" ) && ( TIME() - $time6 <= 10800 ))
 			{
 				//runs all/safe less than 4800
 				if (( $binaries == "TRUE" ) && ( $backfill == "4" ) && ( $releases_run == "TRUE" ))
@@ -1070,7 +1082,7 @@ while( $i > 0 )
 				}
 
 			}
-			elseif (( $kill_coll == "FALSE" ) && ( $kill_pp == "FALSE" ) && ( TIME() - $time6 >= 4800 ))
+			elseif (( $kill_coll == "FALSE" ) && ( $kill_pp == "FALSE" ) && ( TIME() - $time6 >= 10800 ))
 			{
 				//run backfill all once and resets the timer
 				if ( $backfill != "0" )
@@ -1124,21 +1136,21 @@ while( $i > 0 )
 			else
 				$backsleep = $back_timer;
 
-			if (( $backfill == "4" ) && ( $kill_coll == "FALSE" ) && ( $kill_pp == "FALSE" ) && ( TIME() - $time6 <= 4800 ))
+			if (( $backfill == "4" ) && ( $kill_coll == "FALSE" ) && ( $kill_pp == "FALSE" ) && ( TIME() - $time6 <= 10800 ))
 			{
 				$color = get_color($colors_start, $colors_end, $colors_exc);
 				$log = writelog($panes0[3]);
 				shell_exec("tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;${color}m\"; \
 						$_python ${DIR}update_scripts/threaded_scripts/backfill_safe_threaded.py $log; date +\"%D %T\"; $_sleep $backsleep' 2>&1 1> /dev/null");
 			}
-			elseif (( $backfill != "0" ) && ( $kill_coll == "FALSE" ) && ( $kill_pp == "FALSE" ) && ( TIME() - $time6 <= 4800 ))
+			elseif (( $backfill != "0" ) && ( $kill_coll == "FALSE" ) && ( $kill_pp == "FALSE" ) && ( TIME() - $time6 <= 10800 ))
 			{
 				$color = get_color($colors_start, $colors_end, $colors_exc);
 				$log = writelog($panes0[3]);
 				shell_exec("tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;${color}m\"; \
 						$_python ${DIR}update_scripts/threaded_scripts/backfill_threaded.py group $log; date +\"%D %T\"; $_sleep $backsleep' 2>&1 1> /dev/null");
 			}
-			elseif (( $backfill != "0" ) && ( $kill_coll == "FALSE" ) && ( $kill_pp == "FALSE" ) && ( TIME() - $time6 >= 4800 ))
+			elseif (( $backfill != "0" ) && ( $kill_coll == "FALSE" ) && ( $kill_pp == "FALSE" ) && ( TIME() - $time6 >= 10800 ))
 			{
 				$color = get_color($colors_start, $colors_end, $colors_exc);
 				$log = writelog($panes0[3]);

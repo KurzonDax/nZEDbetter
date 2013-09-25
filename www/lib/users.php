@@ -278,7 +278,10 @@ class Users
 	public function isDisabled($username)
 	{
 	  $db = new DB();
- 		$role = $db->queryOneRow(sprintf("select role as role from users where username = %s ", $db->escapeString($username)));
+        if(is_numeric($username))
+            $role = $db->queryOneRow(sprintf("select role as role from users where ID = %s ", $db->escapeString($username)));
+        else
+ 		    $role = $db->queryOneRow(sprintf("select role as role from users where username = %s ", $db->escapeString($username)));
  		return ($role["role"] == Users::ROLE_DISABLED);
 	}
 
@@ -419,9 +422,12 @@ class Users
 			$host = '';
 
 		$this->updateSiteAccessed($uid, $host);
+        $loginGuid = sha1(uniqid());
+        setcookie("loginGuid",$loginGuid, (time()+30));
 
-		if ($remember == 1)
+        if ($remember == 1)
 			$this->setCookies($uid);
+        return $loginGuid;
 	}
 
 	public function updateSiteAccessed($uid, $host="")

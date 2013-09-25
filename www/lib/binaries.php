@@ -22,10 +22,10 @@ class Binaries
 		$this->compressedHeaders = ($site->compressedheaders == "1") ? true : false;
 		$this->messagebuffer = (!empty($site->maxmssgs)) ? $site->maxmssgs : 20000;
 		$this->NewGroupScanByDays = ($site->newgroupscanmethod == "1") ? true : false;
-		$this->NewGroupMsgsToScan = (!empty($site->newgroupmsgstoscan)) ? $site->newgroupmsgstoscan : 50000;
+		$this->NewGroupMsgsToScan = (!empty($site->newgroupmsgstoscan)) ? $site->newgroupmsgstoscan : 500000;
 		$this->NewGroupDaysToScan = (!empty($site->newgroupdaystoscan)) ? $site->newgroupdaystoscan : 3;
 
-        $this->NewGroupMaxMsgs = (!empty($site->newGroupMaxMsgs)) ? $site->newGroupMaxMsgs : 0;
+        $this->groupMaxMsgsPerLoop = (!empty($site->groupMaxMsgsPerLoop) && !is_null($site->groupMaxMsgsPerLoop)) ? $site->groupMaxMsgsPerLoop : 1000000;
 
         $this->DoPartRepair = $site->partrepair;  // Why would you turn off part repair if site->partrepair is set to 2?? <- That was based on the original code
         /*
@@ -90,6 +90,18 @@ class Binaries
         $consoletools = new ConsoleTools();
 
 		echo "\033[01;37mProcessing ".$groupArr['name']."\033[00;37m".$n;
+        // Adding a sanity check here.  For some reason (either a bug, or something weird with the USP)
+        // I have seen several times where a group's first_post field ends up being larger than the
+        // last_post field.  Until I can sort out where and why that's happening, adding check below
+        // to deactivate the group.
+        If($groupArr['first_record']>$groupArr['last_record'])
+        {
+            $db->query("UPDATE groups SET active=0, backfill=0 WHERE ID=".$groupArr['ID']);
+            echo "\n\033[01;31mWARNING!! Post records for ".$groupArr['name']." are out of sync. Deactivating group.";
+            file_put_contents(WWW_DIR."lib/logging/group_bad_records.log",date("H:i:s A")." ".$groupArr['ID']." ".$groupArr['name']." ".$groupArr['first_record']." ".$groupArr['last_record']."\n", FILE_APPEND);
+            return;
+        }
+
 
 		// Select the group.
 		$data = $nntp->selectGroup($groupArr['name']);
@@ -149,10 +161,10 @@ class Binaries
                     else
                         $first = $data['last'] - $this->NewGroupMsgsToScan;
                 }
-                if (($this->NewGroupMaxMsgs != 0) && $this->NewGroupScanByDays)
+                if (($this->groupMaxMsgsPerLoop != 0) && $this->NewGroupScanByDays)
                 {
-                    if (($last-$first) > $this->NewGroupMaxMsgs)
-                        $first = $last - $this->NewGroupMaxMsgs;
+                    if (($last-$first) > $this->groupMaxMsgsPerLoop)
+                        $first = $last - $this->groupMaxMsgsPerLoop;
                 }
 			}
 			else
@@ -178,7 +190,16 @@ class Binaries
 		// If total is bigger than 0 it means we have new parts in the newsgroup.
 		if($total > 0)
 		{
-			echo "Group ".$data["group"]." has ".number_format($total)." new articles.\n";
+			// Limit the max records we can get per loop. This helps prevent extremely prolific
+            // groups from tying up the update_binaries thread for an extended amount of time
+            // if update_binaries hasn't been run in a while.
+            if($this->groupMaxMsgsPerLoop != 0 &&  $total > $this->groupMaxMsgsPerLoop)
+            {
+                $grouplast = $total = $first + $this->groupMaxMsgsPerLoop;
+
+            }
+
+            echo "Group ".$data["group"]." has ".number_format($total)." new articles.\n";
 			echo "Server oldest: ".number_format($data['first'])." Server newest: ".number_format($data['last'])." Local newest: ".number_format($groupArr['last_record']).$n.$n;
 			if ($groupArr['last_record'] == 0)
 				echo "New group starting with ".(($this->NewGroupScanByDays) ? $this->NewGroupDaysToScan." days" : $this->NewGroupMsgsToScan." messages")." worth.\n";
@@ -195,7 +216,7 @@ class Binaries
                 {
                     // If it has been deactivated, break out of loop.
                     echo "\033[01;31mGroup ".$groupArr['name']." has been deactivated.  Stopping thread.\033[00;37m\n";
-                    break;
+                    return;
                 }
 				if ($total > $this->messagebuffer)
 				{
@@ -209,17 +230,9 @@ class Binaries
 				flush();
 
 				// Get article headers from newsgroup.
-                // TODO: Bug here that can cause a group to repeatedly grab the same articles.
-                // Seems to happen when the server does not return a large number of messages.  Need to
-                // investigate further.
+
 				$lastId = $this->scan($nntp, $groupArr, $first, $last);
-                If ($lastId == $first)
-                {
-                    echo "\033[01;31mWARNING!! Server not sending updated messages. Group: ".$groupArr['name'];
-                    echo "Skipping group ".$groupArr['name']."\033[00;37m\n";
-                    // $db->query("UPDATE groups SET active=0, backfill=0 WHERE ID=".$groupArr['ID']);
-                    $done = true;
-                }
+
 				if ($lastId === false)
 				{
 					// Scan failed - skip group.
@@ -227,7 +240,23 @@ class Binaries
 				}
 				$db->query(sprintf("UPDATE groups SET last_record = %s, last_updated = now() WHERE ID = %d", $db->escapeString($lastId), $groupArr['ID']));
 
-				if ($last == $grouplast)
+                // TODO: Bug here that can cause a group to repeatedly grab the same articles.
+                // Seems to happen when the server does not return a large number of messages.  Need to
+                // investigate further.
+                /*If ($lastId == $first)
+
+                // This code doesn't work, because we could get just one message, and if so, we need to update the group in database
+                {
+                    echo "\033[01;31mServer did not send any updated messages. Group: ".$groupArr['name'];
+                    echo "Skipping group ".$groupArr['name']."\033[00;37m\n";
+                    // $db->query("UPDATE groups SET active=0, backfill=0 WHERE ID=".$groupArr['ID']);
+                    return;
+                }*/
+                // Added the 'or' part below just as a safety net.  The only way this would happen
+                // would be if the USP returned an article number higher than what we requested. I
+                // assume this could only happen if the last article number we requested didn't exist
+                // on the USP server, that could (theoretically) send us the next available article.
+				if ($last == $grouplast || $lastId >= $grouplast)
 					$done = true;
 				else
 				{
@@ -243,8 +272,12 @@ class Binaries
 			echo $data['group']." processed in ".$timeGroup." seconds.\n\n";
 		}
 		else
+        {
 			echo "No new articles for ".$data['group']." (first ".number_format($first)." last ".number_format($last)." total ".number_format($total).") grouplast ".number_format($groupArr['last_record']).$n.$n;
-	}
+	        // Added following so that groups don't get repeatedly checked over and over if they have no articles
+            $db->query("UPDATE groups SET last_updated = now() WHERE ID = ".$groupArr['ID']);
+        }
+    }
 
 	function scan($nntp, $groupArr, $first, $last, $type='update')
 	{
@@ -590,6 +623,7 @@ class Binaries
                             }
                             else
                             {
+                                // $db->query("UPDATE groups SET partsInDB=partsInDB+1 WHERE ID=".$groupArr['ID']);
                                 $partsAdded++;
                                 $partCountTotal++;
                                 $partSizeTotal += $pSize;
@@ -602,8 +636,6 @@ class Binaries
 
 					}
 
-
-
                 }
 				if (sizeof($msgsnotinserted) > 0)
 				{
@@ -611,6 +643,7 @@ class Binaries
 					if ($this->DoPartRepair)
 						$this->addMissingParts($msgsnotinserted, $groupArr['ID']);
 				}
+                $db->query("UPDATE groups SET partsInDB=partsInDB+".$partsAdded." WHERE ID=".$groupArr['ID']);
 				$db->Commit();
 				$db->setAutoCommit(true);
 			}
@@ -621,17 +654,18 @@ class Binaries
             // $insPartsStmt->close;  This statement returns an error and not sure why.
 			$timeUpdate = number_format(microtime(true) - $this->startUpdate, 2);
 			$timeLoop = number_format(microtime(true)-$this->startLoop, 2);
+            echo "\033[01;33m".$timeHeaders."s to download articles, ".$timeCleaning."s to process articles, ".$timeUpdate."s to insert ".number_format($partsAdded)." articles, ".$timeLoop."s total. Group: ".$groupArr['name']."\033[00;37m\n";
+            unset($this->message, $data);
 
-			if ($type != 'partrepair')
+
+            if ($type != 'partrepair')
 			{
-				echo "\033[01;33m".$timeHeaders."s to download articles, ".$timeCleaning."s to process articles, ".$timeUpdate."s to insert ".number_format($partsAdded)." articles, ".$timeLoop."s total. Group: ".$groupArr['name']."\033[00;37m\n";
-                unset($this->message, $data);
+				$tempMaxNum = max($msgsreceived);
+                $maxnum = ($maxnum>$tempMaxNum) ? $maxnum : $tempMaxNum;
                 return $maxnum;
             }
 			elseif($type == 'partrepair')
             {
-                echo "\033[01;33m".$timeHeaders."s to download articles, ".$timeCleaning."s to process articles, ".$timeUpdate."s to insert ".number_format($partsAdded)." articles, ".$timeLoop."s total. Group: ".$groupArr['name']."\033[00;37m\n";
-                unset($this->message, $data);
                 return $partsInserted;
             }
 		}
@@ -747,39 +781,7 @@ class Binaries
                         $partsFailed += ($partto-$partfrom);
                     }
                 }
-                    // $articles = implode(',', range($partfrom, $partto));
-                    // And yet another ridiculously written query.  This massive table scan is prevented
-                    // by adding a groupID column to the parts table, which prevents the need for the join.
-                    // On top of that, since article numbers are not guaranteed to be unique across multiple
-                    // groups, it's entirely possible that the query below would return a false positive if an
-                    // article existed with the right article number, but from a different group.
-                    // $sql = sprintf("SELECT pr.ID, pr.numberID, p.number from partrepair pr LEFT JOIN parts p ON p.number = pr.numberID WHERE pr.groupID=%d AND pr.numberID IN (%s) ORDER BY pr.numberID ASC", $groupArr['ID'], $articles);
-                    // $result = $db->queryDirect($sql);
-                    /*
-                     * OR.... you can simply return an array of parts inserted from the scan function and then compare.
-                     * Ultimately, this is what I think I'm going with.  Simpler, and requires fewer expensive calls to the
-                     * database.
-
-                    while ($r = $db->fetchAssoc($result))
-                    {
-                        if (isset($r['number']) && $r['number'] == $r['numberID'])
-                        {
-                            $partsRepaired++;
-
-                            // Article was added, delete from partrepair.
-                            $db->query(sprintf("DELETE FROM partrepair WHERE ID=%d", $r['ID']));
-                        }
-                        else
-                        {
-                            $partsFailed++;
-
-                            // Article was not added, increment attempts.
-                            $db->query(sprintf("UPDATE partrepair SET attempts=attempts+1 WHERE ID=%d", $r['ID']));
-                        }
-                    }*/
-
-
-			}
+            }
 
 			if ($partID=='')
 				echo $n;

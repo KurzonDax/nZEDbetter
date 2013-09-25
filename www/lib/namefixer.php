@@ -50,7 +50,7 @@ class Namefixer
         //24 hours, other cats
         if ($time == 1 && $cats == 1)
         {
-            $relres = $db->queryDirect($query." and rel.adddate > (now() - interval 6 hour) and rel.categoryID in (1090, 2020, 3050, 6050, 5050, 7010, 8050) group by rel.ID order by postdate desc");
+            $relres = $db->queryDirect($query." and rel.adddate > (now() - interval 6 hour) and rel.categoryID in (1090, 2020, 3050, 6050, 5050, 7010, 7020, 8050) group by rel.ID order by postdate desc");
         }
         //24 hours, all cats
         if ($time == 1 && $cats == 2)
@@ -66,7 +66,7 @@ class Namefixer
         //other cats
         if ($time == 2 && $cats == 1)
         {
-            $relres = $db->queryDirect($query." and rel.categoryID in (1090, 2020, 3050, 6050, 5050, 7010, 8050) group by rel.ID order by postdate desc");
+            $relres = $db->queryDirect($query." and rel.categoryID in (1090, 2020, 3050, 6050, 5050, 7010, 7020, 8050) group by rel.ID order by postdate desc");
         }
         //all cats
         if ($time == 2 && $cats == 2)
@@ -79,6 +79,18 @@ class Namefixer
             echo "Processing just the MISC category...\n";
             $relres = $db->queryDirect($query." AND rel.categoryID=7010 ORDER BY postdate DESC");
         }
+        if ($time == 2 && $cats >= 1000)
+        {
+            $category = new Category();
+            echo "Procesing category ID: ".$cats." ".$category->getNameByID($cats)."\n";
+            sleep(3);
+            if($category->isParent($cats))
+                $relres = $db->queryDirect($query." and rel.categoryID BETWEEN ".$cats." AND ".($cats+999)." ORDER BY postdate DESC");
+            else
+                $relres = $db->queryDirect($query." and rel.categoryID=".$cats." ORDER BY postdate DESC");
+        }
+
+
         $rowcount = $db->getAffectedRows();
 
         if ($rowcount > 0)
@@ -121,12 +133,12 @@ class Namefixer
 		sleep(10);
         $db = new DB();
         $type = "Filenames, ";
-        // $query = "SELECT relfiles.name as textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID as fileID, rel.ID as releaseID from releases rel inner join releasefiles relfiles on (relfiles.releaseID = rel.ID) where categoryID != 5070 and relnamestatus = 1";
-        $query = "SELECT rel.name as textstring, rel.categoryID, rel.searchname, rel.groupID, rel.ID as releaseID from releases rel where categoryID != 5070 AND relnamestatus = 1";
+        $query = "SELECT relfiles.name as textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID as fileID, rel.ID as releaseID from releases rel inner join releasefiles relfiles on (relfiles.releaseID = rel.ID) where categoryID != 5070 and relnamestatus = 1";
+        // $query = "SELECT rel.name as textstring, rel.categoryID, rel.searchname, rel.groupID, rel.ID as releaseID from releases rel where categoryID != 5070 AND relnamestatus = 1";
         //24 hours, other cats
          if ($time == 1 && $cats == 1)
          {
-             $relres = $db->queryDirect($query." and rel.adddate > (now() - interval 6 hour) and rel.categoryID in (1090, 2020, 3050, 6050, 5050, 7010, 8050) group by rel.ID order by postdate desc");
+             $relres = $db->queryDirect($query." and rel.adddate > (now() - interval 6 hour) and rel.categoryID in (1090, 2020, 3050, 6050, 5050, 7010, 7020, 8050) group by rel.ID order by postdate desc");
          }
         //24 hours, all cats
          if ($time == 1 && $cats == 2)
@@ -136,7 +148,7 @@ class Namefixer
         //other cats
         if ($time == 2 && $cats == 1)
         {
-            $relres = $db->queryDirect($query." and rel.categoryID in (1090, 2020, 3050, 6050, 5050, 7010, 8050) group by rel.ID order by postdate desc");
+            $relres = $db->queryDirect($query." and rel.categoryID in (1090, 2020, 3050, 6050, 5050, 7010, 7020, 8050) group by rel.ID order by postdate desc");
             // $relres = $db->queryDirect($query." and rel.categoryID=7010 order by postdate asc");
         }
         //all cats
@@ -144,6 +156,18 @@ class Namefixer
         {
             $relres = $db->queryDirect($query." order by postdate desc");
         }
+
+        if ($time == 2 && $cats >= 1000)
+        {
+            $category = new Category();
+            echo "Procesing category ID: ".$cats." ".$category->getNameByID($cats)."\n";
+            sleep(3);
+            if($category->isParent($cats))
+                $relres = $db->queryDirect($query." and rel.categoryID BETWEEN ".$cats." AND ".($cats+999)." ORDER BY postdate DESC");
+            else
+                $relres = $db->queryDirect($query." and rel.categoryID=".$cats." ORDER BY postdate DESC");
+        }
+
 
         $rowcount = $db->getAffectedRows();
 
@@ -174,9 +198,21 @@ class Namefixer
     {
         $n = "\n";
         $namecleaning = new nameCleaning();
-        $newname = $namecleaning->fixerCleaner($name);
+        // If we're updating based on filenames, look (from the end of $name backward) if there is a backslash (\), and if so
+        // reset $name to everything after the backslash
+        if ($type == "Filenames, ")
+        {
+            $pos = strrpos($name, "\\");
+            if($pos)
+                $name = substr($name,$pos+1);
 
-        if ($this->relid !== $release["releaseID"])
+        }
+        $newname = $namecleaning->fixerCleaner($name, true);
+
+        // check to make sure we won't make the searchname worse
+        $lengthComparison = (strlen($newname) / strlen($release['searchname'])) * 100;
+
+        if ($this->relid !== $release["releaseID"] && $lengthComparison > 55)
         {
             if ($newname !== $release["searchname"])
             {
@@ -196,16 +232,21 @@ class Namefixer
                 if ($echo == 1)
                 {
                     echo    "New name: ".$newname.$n.
-                            "Old name: ".$release["searchname"].$n.
+                            "Old name: ".$release['searchname'].$n.
                             "New cat:  ".$newcatname.$n.
                             "Old cat:  ".$oldcatname.$n.
                             "Group: ".$groupname.$n.
                             "Method:   ".$type.$method.$n.$n;
-                    file_put_contents(WWW_DIR."/lib/logging/namefixer-success.log","New name: ". $newname."\nOld Name: ".$release["searchname"]."\nNew Cat: ".$newcatname."   Old Cat: ".$oldcatname."\n",FILE_APPEND);
+                    $msg = "New name: ".$newname."\nOld name: ".$release['searchname'];
+                    if ($type == "Filenames, ")
+                        $msg .= "\nFil name: ".$release['textstring'];
+                    $msg .= "\nRelease ID: ".$release['releaseID']."  Length Compare: ".$lengthComparison."\n";
+                    $msg .= "Old Cat: ".$oldcatname."  New Cat: ".$newcatname."\n--------------------------------------------------\n";
+                    file_put_contents(WWW_DIR."/lib/logging/namefixer-success.log", $msg, FILE_APPEND);
                     if ($namestatus == 1)
                     {
                         $db = new DB();
-                        $db->queryDirect(sprintf("UPDATE releases set searchname = %s, relnamestatus = 2, categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
+                        $db->queryDirect(sprintf("UPDATE releases set searchname = %s, relnamestatus = 2, categoryID = %d, rageID=NULL, imdbID=NULL, musicinfoID=NULL, consoleinfoID=NULL, bookinfoID=NULL, anidbID=NULL where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
                     }
                     else
                     {
@@ -216,14 +257,27 @@ class Namefixer
                 if ($echo == 2)
                 {
                     echo    "New name: ".$newname.$n.
-                            "Old name: ".$release["searchname"].$n.
+                            "Old name: ".$release['textstring'].$n.
                             "New cat:  ".$newcatname.$n.
                             "Old cat:  ".$oldcatname.$n.
                             "Group: ".$groupname.$n.
                             "Method:   ".$type.$method.$n.$n;
-                    file_put_contents(WWW_DIR."/lib/logging/namefixer-success.log","New name: ". $newname."\nOld Name: ".$release["searchname"]."\nNew Cat: ".$newcatname."   Old Cat: ".$oldcatname."\n",FILE_APPEND);
+                    $msg = "New name: ".$newname."\nOld name: ".$release['searchname'];
+                    if ($type == "Filenames, ")
+                        $msg .= "\nFil name: ".$release['textstring'];
+                    $msg .= "\nRelease ID: ".$release['releaseID']."  Length Compare: ".$lengthComparison."\n";
+                    $msg .= "Old Cat: ".$oldcatname."  New Cat: ".$newcatname."\n--------------------------------------------------\n";
+                    file_put_contents(WWW_DIR."/lib/logging/namefixer-success.log", $msg, FILE_APPEND);
                 }
             }
+        }
+        elseif($this->relid !== $release["releaseID"] && $lengthComparison <= 55)
+        {
+            $msg = "New name: ".$newname."\nOld name: ".$release['searchname'];
+            if ($type == "Filenames, ")
+                $msg .= "\nFil name: ".$release['textstring'];
+            $msg .= "\nRelease ID: ".$release['releaseID']."  Length Compare: ".$lengthComparison."\n--------------------------------------------------\n";
+            file_put_contents(WWW_DIR."/lib/logging/namefixer-tooshort.log", $msg, FILE_APPEND);
         }
     }
 
@@ -235,7 +289,7 @@ class Namefixer
         $this->_releaseupdated = FALSE;
         $this->relid = 0;
         
-        Echo "\n\nChecking filename: Category: \e[01;33m{$release['categoryID']}  {$release['releaseID']} ".$release['searchname']."\e[00;37m\n";
+        echo "\n\nChecking filename: Category: \033[01;33m{$release['categoryID']}  {$release['releaseID']} ".$release['searchname']."\033[00;37m\n";
         // echo "\n".trim($release['textstring'])."\n\n";
         // sleep(3);
         if ($type == "Filenames, ")
@@ -471,7 +525,7 @@ class Namefixer
     public function EbookCheck($release, $echo, $type, $namestatus)
     {
         Echo "Checcking Ebook\n";
-        if ($this->relid !== $release["releaseID"] && preg_match('/(?<!fac)ebook|epub|mobi|Wiley|OReilly|PDF|Magazine/i', $release["textstring"], $result))
+        if ($this->relid !== $release["releaseID"] && preg_match('/(?<!fac)ebook|epub|mobi|Wiley|OReilly|PDF|Magazine|pdf/i', $release["textstring"], $result))
             $this->updateRelease($release, $release['textstring'], $methdod="Book Check: Ebook 1", $echo, $type, $namestatus);
 
     }
@@ -812,6 +866,8 @@ class Namefixer
             $this->updateRelease($release, $result["0"], $methdod="fileCheck: Title - SxxExx - Eptitle", $echo, $type, $namestatus);
         if ($this->relid !== $release["releaseID"] && preg_match('/\w.+?\)\.nds/i', $release["textstring"], $result))
             $this->updateRelease($release, $result["0"], $methdod="fileCheck: .nds Nintendo DS", $echo, $type, $namestatus);
+        if ($this->relid !== $release["releaseID"] && preg_match('/\.(mobi|ebook|epub|pdf|AZW(3)?|lrf|odt|fb2|lit|pdb|pml|snb)/i', $release["textstring"], $result))
+            $this->updateRelease($release, $release['textstring'], $methdod="fileCheck: Generic eBook", $echo, $type, $namestatus);
     }
 	public function nfoCheckPorn($release, $echo, $type, $namestatus)
     {

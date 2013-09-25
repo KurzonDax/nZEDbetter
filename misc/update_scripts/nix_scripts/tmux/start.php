@@ -99,7 +99,7 @@ if(!$noReset)
         echo $db->getAffectedRows()." nzbs reset\n";
 }
 else
-    echo "Bypassing reset of collections and nzbs due to command line argument.";
+    echo "Bypassing reset of collections and nzbs due to command line argument.\n";
 
 function start_apps($tmux_session)
 {

@@ -4,6 +4,9 @@
  * This script deletes releases that match certain criteria, type php removeCrapReleases.php false for details.
  */
 
+// TODO: Fix all queries so they don't delete a release until nzbstatus=1
+// deletesize is already done
+
 define('FS_ROOT', realpath(dirname(__FILE__)));
 require_once(FS_ROOT."/../../../www/config.php");
 require_once(FS_ROOT."/../../../www/lib/framework/db.php");
@@ -151,9 +154,9 @@ if (isset($argv[1]) && $argv[1] == "true")
 	// Anything that is 1 part and smaller than 1MB and not in MP3/books.
 	function deleteSize($and)
 	{
-		$type = "Size";
+        $type = "Size";
 		$db = new DB();
-		$sql = $db->query("select ID, guid, searchname from releases where totalPart = 1 and size < 1000000 and categoryID not in (8000, 8010, 8020, 8030, 8040, 8050, 8060, 3010)".$and);
+		$sql = $db->query("select ID, guid, searchname from releases where totalPart = 1 and nzbstatus=1 and size < 1000000 and categoryID not in (8000, 8010, 8020, 8030, 8040, 8050, 8060, 3010)".$and);
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
 	}
@@ -185,14 +188,14 @@ if (isset($argv[1]) && $argv[1] == "true")
 		$db = new DB();
 		$regexes = $db->query('select regex from binaryblacklist where status = 1');
 		$delcount = 0;
-		if(sizeof($regexes > 0))
+		/*if(sizeof($regexes > 0))
 		{
 			foreach ($regexes as $regex)
 			{
 				$sql = $db->query("select r.ID, r.guid, r.searchname from releases r left join releasefiles rf on rf.releaseID = r.ID where (rf.name REGEXP".$db->escapeString($regex["regex"])." or r.name REGEXP".$db->escapeString($regex["regex"]).")".$and);
 				$delcount += deleteReleases($sql, $type);
 			}
-		}
+		}*/
 		return $delcount;
 	}
 

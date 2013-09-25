@@ -6,6 +6,7 @@ require_once(WWW_DIR."/lib/genres.php");
 require_once(WWW_DIR."/lib/site.php");
 require_once(WWW_DIR."/lib/util.php");
 require_once(WWW_DIR."/lib/releaseimage.php");
+require_once(WWW_DIR."/lib/namecleaning.php");
 
 class Console
 {
@@ -19,6 +20,7 @@ class Console
 		$this->asstag = $site->amazonassociatetag;
 		$this->gameqty = (!empty($site->maxgamesprocessed)) ? $site->maxgamesprocessed : 150;
 		$this->sleeptime = (!empty($site->amazonsleep)) ? $site->amazonsleep : 1000;
+        $this->getAmazonRating = (!empty($site->getAmazonRating)) ? $site->getAmazonRating : 'FALSE';
 
 		$this->imgSavePath = WWW_DIR.'covers/console/';
 	}
@@ -31,7 +33,54 @@ class Console
 
 	public function getConsoleInfoByName($title, $platform)
 	{
-		$db = new DB();
+        switch($platform)
+        {
+            case 'PS2':
+                $platform="Playstation 2";
+                break;
+            case 'PS3':
+                $platform="Playstation 3";
+                break;
+            case 'PSP':
+                $platform="Sony PSP";
+                break;
+            case 'WII':
+            case 'Wii':
+                $platform="Wii";
+                break;
+            case 'XBOX360':
+            case 'X360':
+                $platform="Xbox 360";
+                break;
+            case 'XBOX':
+            case 'X-BOX':
+                $platform="Xbox";
+                break;
+            case 'NDS':
+                $platform="Nintendo DS";
+                break;
+            case 'N64':
+                $platform="Nintendo 64";
+                break;
+            case 'SNES':
+                $platform="Super NES";
+                break;
+            case 'NES':
+                $platform="NES";
+                break;
+            case 'NGC':
+                $platform="Nintendo GameCube";
+                break;
+            case '3DS':
+                $platform="Nintendo 3DS";
+                break;
+            default:
+
+                break;
+        }
+
+        $db = new DB();
+        $title = preg_replace('/XBLA|WiiWARE|N64|SNES|NES|PS2|PS3|PS 3|PSP|WII|XBOX360|X\-?BOX|X360|NDS|NGC|3DS/i', '', $title);
 		return $db->queryOneRow(sprintf("SELECT * FROM consoleinfo where title like %s and platform like %s", $db->escapeString("%".$title."%"),  $db->escapeString("%".$platform."%")));
 	}
 
@@ -235,7 +284,7 @@ class Console
 		$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url), $salesrank, $db->escapeString($platform), $db->escapeString($publisher), $releasedate, $db->escapeString($esrb), $cover, $genreID, $id));
 	}
 
-	public function updateConsoleInfo($gameInfo)
+	public function updateConsoleInfo($gameInfo, $releaseID='')
 	{
 		$db = new DB();
 		$gen = new Genres();
@@ -244,7 +293,11 @@ class Console
 		$con = array();
 		$amaz = $this->fetchAmazonProperties($gameInfo['title'], $gameInfo['node']);
 		if (!$amaz)
-			return false;
+        {
+            $msg = "Release ID: ".$releaseID."  ".$gameInfo['title']."\nNo Amzon Match Found!!\n------------------------------\n";
+            file_put_contents(WWW_DIR."lib/logging/consolefail.log",$msg, FILE_APPEND);
+            return false;
+        }
 
 		//load genres
 		$defaultGenres = $gen->getGenres(Genres::CONSOLE_TYPE);
@@ -300,6 +353,10 @@ class Console
 			$gameInfo['platform'] = str_replace('Wii', 'Nintendo Wii', $gameInfo['platform']);	// baseline single quote
 			$gameInfo['platform'] = str_replace('WII', 'Nintendo Wii', $gameInfo['platform']);	// baseline single quote
 		}
+        if (preg_match('/^3DS$/i', $gameInfo['platform']))
+        {
+            $gameInfo['platform'] = str_replace('3DS', 'Nintendo 3DS', $gameInfo['platform']);	// baseline single quote
+        }
 		if (preg_match('/^N64$/i', $gameInfo['platform']))
 		{
 			$gameInfo['platform'] = str_replace('N64', 'Nintendo 64', $gameInfo['platform']);	// baseline single quote
@@ -355,22 +412,32 @@ class Console
 		//echo("Matched: Title Percentage: $titlepercent%");
 		//echo("Matched: Platform Percentage: $platformpercent%");
 
-		//If the Title is less than 80% Platform must be 100% unless it is XBLA
-		if ($titlepercent < 70)
+		//If the Title is less than 70% Platform must be 100% unless it is XBLA
+		/*if ($titlepercent < 70)
 		{
 			if ($platformpercent != 100)
 			{
-	  return false;
+                return false;
 			}
-		}
+		}*/
 
-		//If title is less than 80% then its most likely not a match
-		if ($titlepercent < 70)
-		return false;
-
+		//If title is less than 55% then its most likely not a match
+        //In looking at several thousand failures across all platforms,  nearly always, if the title match
+        //is at 55%, it's the correct game, just not a perfect match on title spelling, or missing something
+        //like "Game of the Year" or "Deluxe Edition" or something similar.
+		if ($titlepercent < 54.5)
+        {
+            $msg = "Release ID: ".$releaseID."  ".$gameInfo['title']."\n".$con['title']."   ".$titlepercent."%\n------------------------------\n";
+            file_put_contents(WWW_DIR."lib/logging/consolefail.log",$msg, FILE_APPEND);
+            return false;
+        }
 		//Platform must equal 100%
-		if ($platformpercent != 100)
-		return false;
+		if ($platformpercent != 100 && $titlepercent < 85)
+        {
+            $msg = $gameInfo['title']."  Platform: ".$gameInfo['platform']."\n".$con['title']."  Platform: ".$con['platform']."   ".$titlepercent."%\n------------------------------\n";
+            file_put_contents(WWW_DIR."lib/logging/consolefail.log",$msg, FILE_APPEND);
+            return false;
+        }
 
 		$con['asin'] = (string) $amaz->Items->Item->ASIN;
 
@@ -449,16 +516,29 @@ class Console
 		$con['consolegenre'] = $genreName;
 		$con['consolegenreID'] = $genreKey;
 
-		$query = sprintf("
-		INSERT IGNORE INTO consoleinfo  (`title`, `asin`, `url`, `salesrank`, `platform`, `publisher`, `genreID`, `esrb`, `releasedate`, `review`, `cover`, `createddate`, `updateddate`)
-		VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, now(), now())
-			ON DUPLICATE KEY UPDATE  `title` = %s,  `asin` = %s,  `url` = %s,  `salesrank` = %s,  `platform` = %s,  `publisher` = %s,  `genreID` = %s,  `esrb` = %s,  `releasedate` = %s,  `review` = %s, `cover` = %d,  createddate = now(),  updateddate = now()",
+        if($this->getAmazonRating == 'TRUE')
+        {
+            if(isset($amaz->Items->Item->CustomerReviews->HasReviews) && $amaz->Items->Item->CustomerReviews->HasReviews == 'true')
+            {
+                $obj = new AmazonProductAPI($this->pubkey, $this->privkey, $this->asstag);
+                $con['customerRating'] = $obj->getAmazonCustomerRating($amaz->Items->Item->CustomerReviews->IFrameURL);
+            }
+            else
+                $con['customerRating'] = 'null';
+        }
+        else
+            $con['customerRating'] = 'null';
+
+        $query = sprintf("
+		INSERT IGNORE INTO consoleinfo  (`title`, `asin`, `url`, `salesrank`, `platform`, `publisher`, `genreID`, `esrb`, `releasedate`, `review`, `cover`, `createddate`, `updateddate`, `customerRating`)
+		VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, now(), now(), %s)
+			ON DUPLICATE KEY UPDATE  `title` = %s,  `asin` = %s,  `url` = %s,  `salesrank` = %s,  `platform` = %s,  `publisher` = %s,  `genreID` = %s,  `esrb` = %s,  `releasedate` = %s,  `review` = %s, `cover` = %d,  createddate = now(),  updateddate = now(), `customerRating` = %s",
 		$db->escapeString($con['title']), $db->escapeString($con['asin']), $db->escapeString($con['url']),
 		$con['salesrank'], $db->escapeString($con['platform']), $db->escapeString($con['publisher']), ($con['consolegenreID']==-1?"null":$con['consolegenreID']), $db->escapeString($con['esrb']),
-		$con['releasedate'], $db->escapeString($con['review']), $con['cover'],
+		$con['releasedate'], $db->escapeString($con['review']), $con['cover'], $con['customerRating'],
 		$db->escapeString($con['title']), $db->escapeString($con['asin']), $db->escapeString($con['url']),
 		$con['salesrank'], $db->escapeString($con['platform']), $db->escapeString($con['publisher']), ($con['consolegenreID']==-1?"null":$con['consolegenreID']), $db->escapeString($con['esrb']),
-		$con['releasedate'], $db->escapeString($con['review']), $con['cover'] );
+		$con['releasedate'], $db->escapeString($con['review']), $con['cover'], $con['customerRating'] );
 
 		$consoleId = $db->queryInsert($query);
 
@@ -497,9 +577,9 @@ class Console
 		$threads--;
 		$db = new DB();
 		// Non-fixed release names.
-		$this->processConsoleReleaseTypes($db->queryDirect(sprintf("SELECT searchname, ID from releases where consoleinfoID IS NULL and nzbstatus = 1 and categoryID in ( select ID from category where parentID = %d ) ORDER BY postdate DESC LIMIT %d,%d", Category::CAT_PARENT_GAME, floor(($this->gameqty) * ($threads * 1.5)), $this->gameqty)), 1);
+		$this->processConsoleReleaseTypes($db->queryDirect(sprintf("SELECT ID, searchname, categoryID, name from releases where consoleinfoID IS NULL and nzbstatus = 1 and categoryID BETWEEN %d AND %d ORDER BY postdate DESC LIMIT %d,%d", Category::CAT_PARENT_GAME, Category::CAT_PARENT_GAME+999, floor(($this->gameqty) * ($threads * 1.5)), $this->gameqty)), 1);
 		// Names that were fixed and the release still doesn't have a consoleID.
-		$this->processConsoleReleaseTypes($db->queryDirect(sprintf("SELECT searchname, ID from releases where consoleinfoID = -2 and relnamestatus = 2 and nzbstatus = 1 and categoryID in ( select ID from category where parentID = %d ) ORDER BY postdate DESC LIMIT %d,%d", Category::CAT_PARENT_GAME, floor(($this->gameqty) * ($threads * 1.5)), $this->gameqty)), 2);
+		$this->processConsoleReleaseTypes($db->queryDirect(sprintf("SELECT searchname, ID, categoryID, name from releases where consoleinfoID = -2 and relnamestatus = 2 and nzbstatus = 1 and categoryID in ( select ID from category where parentID = %d ) ORDER BY postdate DESC LIMIT %d,%d", Category::CAT_PARENT_GAME, floor(($this->gameqty) * ($threads * 1.5)), $this->gameqty)), 2);
 
 	}
 
@@ -515,7 +595,14 @@ class Console
 
 			while ($arr = $db->fetchAssoc($res))
 			{
-				$gameInfo = $this->parseTitle($arr['searchname']);
+				if(preg_match('/\.nzb/i',$arr['name']))
+                {
+                    $db->query(sprintf("UPDATE releases SET consoleinfoID = %d WHERE ID = %d", -6, $arr["ID"]));
+                    $msg = "NZB Skipped.  Release ID: ".$arr['ID']."\n------------------------------\n";
+                    file_put_contents(WWW_DIR."lib/logging/consolefail.log",$msg, FILE_APPEND);
+                    continue;
+                }
+                $gameInfo = $this->parseTitle($arr['searchname'], $arr['categoryID']);
 				if ($gameInfo !== false)
 				{
 
@@ -523,25 +610,34 @@ class Console
 						echo 'Looking up: '.$gameInfo["title"].' ('.$gameInfo["platform"].")\n";
 
 					//check for existing console entry
-					$gameCheck = $this->getConsoleInfoByName($gameInfo["title"], $gameInfo["platform"]);
+					// $gameCheck = $this->getConsoleInfoByName($gameInfo["title"], $gameInfo["platform"]);
 
-					if ($gameCheck === false)
-					{
-						$gameId = $this->updateConsoleInfo($gameInfo);
+					/*if ($gameCheck === false)
+					{*/
+						$gameId = $this->updateConsoleInfo($gameInfo, $arr['ID']);
 						if ($gameId === false)
 						{
 							if($type == 1)
 								$gameId = -2;
 							if($type == 2)
 								$gameId = -3;
+
 						}
-					}
+                        else
+                        {
+                            if ($this->echooutput)
+                                echo "\033[00;32mMatch found for ".$gameInfo['title']."\n\033[00;37m";
+                        }
+					/*}
 					else
 					{
-						$gameId = $gameCheck["ID"];
-					}
+                        if ($this->echooutput)
+                            echo "\033[00;32mExisting match found for ".$gameInfo['title']."\n\033[00;37m";
+                        $gameId = $gameCheck["ID"];
+					}*/
 
 					//update release
+
 					$db->query(sprintf("UPDATE releases SET consoleinfoID = %d WHERE ID = %d", $gameId, $arr["ID"]));
 
 				}
@@ -552,19 +648,23 @@ class Console
 						$db->query(sprintf("UPDATE releases SET consoleinfoID = %d WHERE ID = %d", -2, $arr["ID"]));
 					if($type == 2)
 						$db->query(sprintf("UPDATE releases SET consoleinfoID = %d WHERE ID = %d", -3, $arr["ID"]));
-				}
+                    $msg = $arr['categoryID']." ".$arr['searchname']."\nUnable to parse title!!!\n------------------------------\n";
+                    file_put_contents(WWW_DIR."lib/logging/consolefail.log",$msg, FILE_APPEND);
+                }
 				usleep($this->sleeptime*1000);
 			}
 		}
 	}
 
-	function parseTitle($releasename)
+	function parseTitle($releasename, $categoryID)
 	{
-		$releasename = preg_replace('/\sMulti\d?\s/i', '', $releasename);
-		$result = array();
+		// $releasename = preg_replace('/\sMulti\d?\s/i', '', $releasename);
+
+		$namecleaning = new nameCleaning();
+        $result = array();
 
 		//get name of the game from name of release
-		preg_match('/^(.+((abgx360EFNet|EFNet\sFULL|FULL\sabgxEFNet|abgx\sFULL|abgxbox360EFNet)\s|illuminatenboard\sorg))?(?P<title>.*?)[\.\-_ ](v\.?\d\.\d|PAL|NTSC|EUR|USA|JP|ASIA|JAP|JPN|AUS|MULTI\.?5|MULTI\.?4|MULTI\.?3|PATCHED|FULLDVD|DVD5|DVD9|DVDRIP|PROPER|REPACK|RETAIL|DEMO|DISTRIBUTION|REGIONFREE|READ\.?NFO|NFOFIX|PS2|PS3|PSP|WII|X\-?BOX|XBLA|X360|NDS|N64|NGC)/i', $releasename, $matches);
+		/*preg_match('/^(.+((abgx360EFNet|EFNet\sFULL|FULL\sabgxEFNet|abgx\sFULL|abgxbox360EFNet)\s|illuminatenboard\sorg))?(?P<title>.*?)[\.\-_ ](v\.?\d\.\d|PAL|NTSC|EUR|USA|JP|ASIA|JAP|JPN|AUS|MULTI\.?5|MULTI\.?4|MULTI\.?3|PATCHED|FULLDVD|DVD5|DVD9|DVDRIP|PROPER|REPACK|RETAIL|DEMO|DISTRIBUTION|REGIONFREE|READ\.?NFO|NFOFIX|PS2|PS3|PSP|WII|X\-?BOX|XBLA|X360|NDS|N64|NGC)/i', $releasename, $matches);
 		if (isset($matches['title']))
 		{
 			$title = $matches['title'];
@@ -588,10 +688,11 @@ class Console
 					$result['title'] = $dlc[0];
 				}
 			}
-		}
-
+		}*/
+        $title = $namecleaning->consoleCleaner($releasename, $categoryID);
+        $result['title'] = $title;
 		//get the platform of the release
-		preg_match('/[\.\-_ ](?P<platform>XBLA|WiiWARE|N64|SNES|NES|PS2|PS3|PS 3|PSP|WII|XBOX360|X\-?BOX|X360|NDS|NGC)/i', $releasename, $matches);
+		preg_match('/[\.\-_ ](?P<platform>XBLA|WiiWARE|N64|SNES|NES|PS2|PS3|PS 3|PSP|WII|XBOX360|X\-?BOX|X360|NDS|NGC|3DS)/i', $title, $matches);
 		if (isset($matches['platform']))
 		{
 			$platform = $matches['platform'];
@@ -654,6 +755,9 @@ class Console
 			case 'NGC':
 				$nodeId = '541022';
 			break;
+            case '3DS':
+                $nodeId = '2622269011';
+            break;
 			default:
 				$nodeId = '468642';
 			break;

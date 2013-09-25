@@ -2,6 +2,8 @@
 
 class DB
 {
+        // TODO: Fix installation scripts to not define DB_SOCKET if not specified (must also modify python scripts to use socket)
+        // TODO: Modify installation scripts to ask whether DB is local, or on separate server
         //
         // the element relstatus of table releases is used to hold the status of the release
         // The variable is a bitwise AND of status 
@@ -17,13 +19,16 @@ class DB
 		if (DB::$initialized === false)
 		{
 			// initialize db connection
-			if (defined("DB_PORT"))
+            // Change: Now defaulting to socket connection, assuming DB is local
+            // Still need port defined in config.php for the python scripts. May look
+            // into changing that later.
+			if (defined("DB_SOCKET"))
 			{
-				DB::$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT);
+                DB::$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 			}
 			else
 			{
-				DB::$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+                DB::$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT);
 			}
 
 			if (DB::$mysqli->connect_errno) {

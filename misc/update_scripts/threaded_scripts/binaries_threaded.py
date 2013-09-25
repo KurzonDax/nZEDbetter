@@ -1,16 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys, os, time
+import sys, os, time, random
 import threading
 try:
-	import queue
+    import queue
 except ImportError:
-	import Queue as queue
+    import Queue as queue
 try:
-	import cymysql as mdb
+    import cymysql as mdb
 except ImportError:
-	sys.exit("\nPlease install cymysql for python 3, \ninformation can be found in INSTALL.txt\n")
+    sys.exit("\nPlease install cymysql for python 3, \ninformation can be found in INSTALL.txt\n")
 import subprocess
 import string
 import lib.info as info
@@ -32,7 +32,7 @@ cur = con.cursor()
 cur.execute("SELECT name from groups where active = 1 ORDER BY last_updated ASC")
 datas = cur.fetchall()
 if len(datas) == 0:
-	sys.exit("No Active Groups")
+    sys.exit("No Active Groups")
 
 #get threads for update_binaries
 cur.execute("select value from site where setting = 'binarythreads'")
@@ -45,54 +45,59 @@ con.close()
 my_queue = queue.Queue()
 time_of_last_run = time.time()
 
+
 class queue_runner(threading.Thread):
-	def __init__(self, my_queue):
-		threading.Thread.__init__(self)
-		self.my_queue = my_queue
+    def __init__(self, my_queue):
+        threading.Thread.__init__(self)
+        self.my_queue = my_queue
 
-	def run(self):
-		global time_of_last_run
+    def run(self):
+        global time_of_last_run
 
-		while True:
-			try:
-				my_id = self.my_queue.get(True, .5)
-			except:
-				if time.time() - time_of_last_run > 3:
-					return
-			else:
-				if my_id:
-					time_of_last_run = time.time()
-					subprocess.call(["php", pathname+"/../update_binaries.php", ""+my_id])
-					time.sleep(.5)
-					self.my_queue.task_done()
+        while True:
+            try:
+                my_id = self.my_queue.get(True, .5)
+            except:
+                if time.time() - time_of_last_run > 3:
+                    return
+            else:
+                if my_id:
+                    time_of_last_run = time.time()
+                    rnd_sleep = random.randint(1, 15)
+                    print("\nSleeping for %s seconds (random sleep)\n" % rnd_sleep)
+                    time.sleep(rnd_sleep)
+                    subprocess.call(["php", pathname+"/../update_binaries.php", ""+my_id])
+                    time.sleep(.5)
+                    self.my_queue.task_done()
+
 
 def main():
-	global time_of_last_run
-	time_of_last_run = time.time()
+    global time_of_last_run
+    time_of_last_run = time.time()
 
-	print("We will be using a max of %s threads, a queue of %s groups" % (run_threads[0], "{:,}".format(len(datas))))
-	time.sleep(2)
+    print("We will be using a max of %s threads, a queue of %s groups" % (run_threads[0], "{:,}".format(len(datas))))
+    time.sleep(2)
 
-	def signal_handler(signal, frame):
-		sys.exit(0)
+    def signal_handler(signal, frame):
+        sys.exit(0)
 
-	signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler)
 
-	if True:
-		#spawn a pool of worker threads
-		for i in range(int(run_threads[0])):
-			p = queue_runner(my_queue)
-			#p.setDaemon(False)
-			p.start()
+    if True:
+        #spawn a pool of worker threads
+        for i in range(int(run_threads[0])):
+            p = queue_runner(my_queue)
+            #p.setDaemon(False)
+            p.start()
 
-	#now load some arbitrary jobs into the queue
-	for gnames in datas:
-		my_queue.put(gnames[0])
+        #now load some arbitrary jobs into the queue
+        for gnames in datas:
+            my_queue.put(gnames[0])
 
-	my_queue.join()
+        my_queue.join()
 
-	print("\nUpdate Binaries Threaded Completed at %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
-	print("Running time: %s" % (str(datetime.timedelta(seconds=time.time() - start_time))))
-	
+        print("\nUpdate Binaries Threaded Completed at %s" % (datetime.datetime.now().strftime("%H:%M:%S")))
+        print("Running time: %s" % (str(datetime.timedelta(seconds=time.time() - start_time))))
+
 if __name__ == '__main__':
-	main()
+    main()
