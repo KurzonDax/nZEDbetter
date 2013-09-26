@@ -42,25 +42,7 @@
     <script src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/jquery-ui-1.10.3.custom.js"></script>
     <script src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/jquery.jeditable.js"></script>
     <script>var WWW_TOP = "{$smarty.const.WWW_TOP}/..";</script>
-    {literal}
-        <script>
-            $(function() {
-                $( "#accordion" )
-                        .accordion({
-                            header: "> div > legend"
-                        })
-                        .sortable({
-                            axis: "y",
-                            handle: "legend",
-                            stop: function( event, ui ) {
-                                // IE doesn't register the blur when sorting
-                                // so trigger focusout handlers to remove .ui-state-focus
-                                ui.item.children( "legend" ).triggerHandler( "focusout" );
-                            }
-                        });
-            });
-        </script>
-    {/literal}
+
 	{$page->head}
 </head>
 <body>

@@ -654,7 +654,7 @@
     </table>
 </fieldset>
 </div>
-</div>
+
 {* <input type="submit" class="tabpage" value="Save Tmux Settings" /> *}
 <button type="submit" class="btn btn-primary btn-large" style="float: right; margin-top: 15px"><i class="icon-save"></i> Save Tmux Settings</button>
 </form>
