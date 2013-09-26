@@ -8,353 +8,75 @@
     <bookmark url="file://$PROJECT_DIR$/misc/update_scripts/nix_scripts/tmux/monitor.php" line="522" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1d508ce3-27e7-4b8b-a445-803050b9458a" name="Default" comment="Major changes to movie lookups.  Relying heavily on TMDB now, helps to prevent mismatched movies.">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/pages/ajax_get_book_genres.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/pages/login_proc.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/misc/testing/Dev_testing/newSearchName.php" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\db\nzedb-v2.sql" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\db\nzedb-v3-partitions.sql" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\db\parts_definition.sql" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\astra.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\bullet.jpg" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\bullet_hov.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\clearlogo.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\border1-dark.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\border1.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\border2-dark.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\border2.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\controls-dark.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\controls.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\controls2.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\internet_explorer\borderBottomCenter.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\internet_explorer\borderBottomLeft.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\internet_explorer\borderBottomRight.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\internet_explorer\borderMiddleLeft.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\internet_explorer\borderMiddleRight.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\internet_explorer\borderTopCenter.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\internet_explorer\borderTopLeft.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\internet_explorer\borderTopRight.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\colorbox\loading.gif" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\couchpotato.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\favicon.ico" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\7z.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\ai.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\aiff.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\asc.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\audio.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\avi.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\bin.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\bz2.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\c.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\cfc.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\cfm.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\chm.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\class.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\conf.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\cpp.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\cs.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\css.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\csv.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\deb.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\divx.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\doc.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\dot.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\eml.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\enc.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\file.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\gif.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\gz.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\hlp.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\htm.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\html.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\image.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\iso.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\jar.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\java.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\jpeg.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\jpg.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\js.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\lua.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\m.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\mm.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\mov.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\mp3.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\mpg.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\nfo.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\nzb.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\odc.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\odf.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\odg.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\odi.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\odp.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\ods.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\odt.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\ogg.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\par2.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\pdf.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\pgp.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\php.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\pl.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\png.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\ppt.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\ps.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\py.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\ram.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\rar.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\rb.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\rm.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\rpm.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\rtf.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\sfv.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\sig.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\sql.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\srr.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\srt.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\swf.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\sxc.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\sxd.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\sxi.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\sxw.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\tar.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\tex.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\tgz.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\txt.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\vcf.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\video.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\vsd.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\wav.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\wma.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\wmv.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\xls.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\xml.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\xpi.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\xvid.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\fileicons\zip.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\cn.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\cz.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\de.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\dk.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\en.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\es.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\fi.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\fr.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\gb.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\gr.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\hu.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\il.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\in.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\it.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\jp.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\kr.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\nl.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\no.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\ph.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\pk.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\pl.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\pt.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\ro.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\ru.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\se.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\th.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\tr.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\tw.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\us.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\flags\vn.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\icons\broken.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\icons\cartdown.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\icons\cartup.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\icons\check.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\icons\edit.gif" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\icons\go.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\icons\lock.gif" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\icons\lock2.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\icons\magnifier.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\icons\nzbdown.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\icons\nzbup.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\icons\sabdown.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\icons\sabup.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\icons\tvrage.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\icons\warning.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\logo.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\menu.gif" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\multimedia\audio.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\multimedia\video.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\newwindow.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\sabnzbd.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\sickbeard.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\sorting\arrow_down.gif" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\sorting\arrow_up.gif" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\tvrage_small.gif" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\images\valid-xhtml10.png" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\scripts\bootstrap.min.js" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\scripts\html5shiv.js" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\scripts\jquery-1.9.1.js" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\scripts\jquery.colorbox-min.js" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\scripts\jquery.js" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\scripts\jquery.multifile.js" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\scripts\jquery.qtip.js" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\scripts\sorttable.js" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\scripts\subnav.js" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\scripts\utils-admin.js" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\scripts\utils.js" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\styles\admin.css" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\styles\bootstrap-combined.no-icons.min.css" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\styles\font-awesome.min.css" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\styles\jquery.qtip.css" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\styles\style.css" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\styles\subnav.css" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\adminmenu.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\ajax_release-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\anidb-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\anidb-list.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\anidb-remove.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\baseadminpage.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\binaryblacklist-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\binaryblacklist-list.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\category-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\category-list.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\comments-list.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\console-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\console-list.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\content-add.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\content-list.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\db-optimise.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\group-bulk.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\group-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\group-list.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\index.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\menu-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\menu-list.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\movie-add.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\movie-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\movie-list.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\music-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\music-list.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\musicgenre-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\musicgenre-list.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\nzb-export.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\nzb-import.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\rage-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\rage-list.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\rage-remove.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\release-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\release-files.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\release-list.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\role-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\role-list.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\site-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\site-stats.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\tmux-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\user-edit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\admin\user-list.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\apicaps.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\apidesc.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\apidetail.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\apiresult.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\articlesmenu.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\basepage.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\books.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\browse.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\browsegroup.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\cart.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\console.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\contact.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\content.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\forgottenpassword.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\forum.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\forumpost.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\headermenu.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\login.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\mainmenu.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\movies.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\music.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\mymovielist.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\mymovies.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\mymoviesedit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\myshows-add.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\myshows.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\pager.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\predb.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\profile.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\profileedit.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\register.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\rss.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\rssdesc.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\search.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\sitemap-xml.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\sitemap.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\terms.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\upcoming.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\usefullinksmenu.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\viewanime.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\viewanimelist.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\viewcalendar.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\viewconsole.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\viewfilelist.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\viewmovie.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\viewmusic.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\viewnfo.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\viewnzb.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\viewqueue.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\viewseries.tpl" afterPath="" />
-      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\NewBlue\templates\frontend\viewserieslist.tpl" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/themes/Default/images/logo.png" afterPath="$PROJECT_DIR$/www/themes/Default/images/logo.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/themes/alpha/images/logo.png" afterPath="$PROJECT_DIR$/www/themes/alpha/images/logo.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/.htaccess" afterPath="$PROJECT_DIR$/www/.htaccess" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/MusicBrainz.php" afterPath="$PROJECT_DIR$/www/lib/MusicBrainz.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/amazon.php" afterPath="$PROJECT_DIR$/www/lib/amazon.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/automated.config.php" afterPath="$PROJECT_DIR$/www/automated.config.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/misc/update_scripts/threaded_scripts/backfill_safe_threaded.py" afterPath="$PROJECT_DIR$/misc/update_scripts/threaded_scripts/backfill_safe_threaded.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/misc/update_scripts/threaded_scripts/backfill_threaded.py" afterPath="$PROJECT_DIR$/misc/update_scripts/threaded_scripts/backfill_threaded.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/themes/alpha/templates/admin/baseadminpage.tpl" afterPath="$PROJECT_DIR$/www/themes/alpha/templates/admin/baseadminpage.tpl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/framework/basepage.php" afterPath="$PROJECT_DIR$/www/lib/framework/basepage.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/binaries.php" afterPath="$PROJECT_DIR$/www/lib/binaries.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/misc/update_scripts/threaded_scripts/binaries_threaded.py" afterPath="$PROJECT_DIR$/misc/update_scripts/threaded_scripts/binaries_threaded.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/books.php" afterPath="$PROJECT_DIR$/www/lib/books.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/pages/books.php" afterPath="$PROJECT_DIR$/www/pages/books.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/themes/alpha/styles/bootstrap.min.css" afterPath="$PROJECT_DIR$/www/themes/alpha/styles/bootstrap.min.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/pages/browse.php" afterPath="$PROJECT_DIR$/www/pages/browse.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/category.php" afterPath="$PROJECT_DIR$/www/lib/category.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/console.php" afterPath="$PROJECT_DIR$/www/lib/console.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/pages/console.php" afterPath="$PROJECT_DIR$/www/pages/console.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/framework/db.php" afterPath="$PROJECT_DIR$/www/lib/framework/db.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/misc/testing/DB_scripts/delete_releases.php" afterPath="$PROJECT_DIR$/misc/testing/DB_scripts/delete_releases.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/misc/testing/Release_scripts/fixReleaseNames.php" afterPath="$PROJECT_DIR$/misc/testing/Release_scripts/fixReleaseNames.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/misc/testing/Dev_testing/function_tester.php" afterPath="$PROJECT_DIR$/misc/testing/Dev_testing/function_tester.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/pages/getnzb.php" afterPath="$PROJECT_DIR$/www/pages/getnzb.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/grabnzbs.php" afterPath="$PROJECT_DIR$/www/lib/grabnzbs.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/themes/Default/templates/admin/group-bulk.tpl" afterPath="$PROJECT_DIR$/www/themes/Default/templates/admin/group-bulk.tpl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/groups.php" afterPath="$PROJECT_DIR$/www/lib/groups.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/themes/alpha/templates/frontend/headermenu.tpl" afterPath="$PROJECT_DIR$/www/themes/alpha/templates/frontend/headermenu.tpl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/index.php" afterPath="$PROJECT_DIR$/www/index.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/pages/logout.php" afterPath="$PROJECT_DIR$/www/pages/logout.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/misc/update_scripts/nix_scripts/tmux/monitor.php" afterPath="$PROJECT_DIR$/misc/update_scripts/nix_scripts/tmux/monitor.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/movie.php" afterPath="$PROJECT_DIR$/www/lib/movie.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/pages/movies.php" afterPath="$PROJECT_DIR$/www/pages/movies.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/music.php" afterPath="$PROJECT_DIR$/www/lib/music.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/pages/music.php" afterPath="$PROJECT_DIR$/www/pages/music.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/misc/testing/Dev_testing/musicBrainz_test.php" afterPath="$PROJECT_DIR$/misc/testing/Dev_testing/musicBrainz_test.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/namecleaning.php" afterPath="$PROJECT_DIR$/www/lib/namecleaning.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/logging/namefixer.log" afterPath="$PROJECT_DIR$/www/lib/logging/namefixer.log" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/namefixer.php" afterPath="$PROJECT_DIR$/www/lib/namefixer.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/misc/testing/DB_scripts/recat_rename.php" afterPath="$PROJECT_DIR$/misc/testing/DB_scripts/recat_rename.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/releases.php" afterPath="$PROJECT_DIR$/www/lib/releases.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/misc/testing/Release_scripts/removeCrapReleases.php" afterPath="$PROJECT_DIR$/misc/testing/Release_scripts/removeCrapReleases.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/misc/testing/Dev_testing/repair_parts_groupID.php" afterPath="$PROJECT_DIR$/misc/testing/Dev_testing/repair_parts_groupID.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/admin/site-edit.php" afterPath="$PROJECT_DIR$/www/admin/site-edit.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/misc/update_scripts/nix_scripts/tmux/start.php" afterPath="$PROJECT_DIR$/misc/update_scripts/nix_scripts/tmux/start.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/themes/alpha/styles/style.css" afterPath="$PROJECT_DIR$/www/themes/alpha/styles/style.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/misc/testing/Dev_testing/test-amazon.php" afterPath="$PROJECT_DIR$/misc/testing/Dev_testing/test-amazon.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/misc/testing/Dev_testing/tmdb_tester.php" afterPath="$PROJECT_DIR$/misc/testing/Dev_testing/tmdb_tester.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/lib/users.php" afterPath="$PROJECT_DIR$/www/lib/users.php" />
+    <list default="true" id="1d508ce3-27e7-4b8b-a445-803050b9458a" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/themes/Default/images/logo_large.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/themes/alpha/images/logo_large_2.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/themes/Default/images/logo_med.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/themes/alpha/images/logo_med.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/lib/logging/.gitignore" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/.htaccess" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/.htaccess" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Cache/APC.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/MrClay/Cli/Arg.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Controller/Base.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Build.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/CSS.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/CSSmin.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/MrClay/Cli.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/ClosureCompiler.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/JS/ClosureCompiler.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/CommentPreserver.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/CSS/Compressor.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/HTTP/ConditionalGet.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/YUI/CssCompressor.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/YUI/CssCompressor.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/DebugDetector.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/DooDigestAuth.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/HTTP/Encoder.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Cache/File.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Controller/Files.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/FirePHP.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Controller/Groups.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/HTML.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/HTML/Helper.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/ImportProcessor.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/JSMin.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/JSMinPlus.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Lines.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Loader.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Logger.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Cache/Memcache.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Controller/MinApp.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Packer.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Controller/Page.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Source.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/CSS/UriRewriter.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Controller/Version1.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Cache/XCache.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/YUICompressor.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Cache/ZendPlatform.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/_index.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/bm.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/bm2.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/config-test.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/admin/config.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/config.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/groupsConfig.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/index.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/index.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/jquery-1.6.3.min.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/ocCheck.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/quick-test.css" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/quick-test.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/rewriteTest.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/test.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/utils.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
-    <list id="1730ee2f-aef1-478a-a467-69076c707c26" name="Modify partrepair_manual.py to send only groupID" comment="" />
     <ignored path="nZEDb.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1380138590613" ignored="false" />
+    <file path="/Dummy.txt" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1380220335403" ignored="false" />
     <file path="/namefixer.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1379734600582" ignored="false" />
     <file path="/category.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1379629538737" ignored="false" />
     <file path="/a.dummy" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1380047058252" ignored="false" />
@@ -439,6 +161,7 @@
     <file path="/logout.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1380130938689" ignored="false" />
     <file path="/login_proc.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1380135607805" ignored="false" />
     <file path="/basepage.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1380134414124" ignored="false" />
+    <file path="/.gitignore" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1380220260636" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -462,7 +185,17 @@
     <favorites_list name="nZEDb" />
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf>
+      <file leaf-file-name=".gitignore" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/www/lib/logging/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="7" column="0" selection-start="51" selection-end="51" vertical-scroll-proportion="0.18057664">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -482,7 +215,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/www/themes/Cyborg/templates/frontend/search.tpl" />
         <option value="$PROJECT_DIR$/www/themes/Cyborg/templates/frontend/viewfilelist.tpl" />
         <option value="$PROJECT_DIR$/www/themes/Cyborg/templates/frontend/viewseries.tpl" />
         <option value="$PROJECT_DIR$/www/themes/Cyborg/templates/frontend/console (7.17.2013 5.50.05 PM).tpl" />
@@ -498,6 +230,7 @@
         <option value="$PROJECT_DIR$/www/pages/login_proc.php" />
         <option value="$PROJECT_DIR$/www/themes/Cyborg/templates/frontend/basepage.tpl" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/www/lib/logging/.gitignore" />
       </list>
     </option>
   </component>
@@ -577,6 +310,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -597,7 +331,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -614,17 +347,17 @@
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="293" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="971" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="967" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="971" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="292" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="285" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
     <property name="FullScreen" value="false" />
-    <property name="dynamic.classpath" value="false" />
-    <property name="options.searchVisible" value="true" />
     <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
+    <property name="dynamic.classpath" value="false" />
   </component>
   <component name="PublishConfig" serverName="nZEDbetter" serverId="2a869014-a75c-4ab0-b36f-941056d4528d">
     <servers>
@@ -762,7 +495,7 @@
       <updated>1377831452143</updated>
     </task>
     <task id="LOCAL-00019" summary="Modify partrepair_manual.py to send only groupID">
-      <changelist id="1730ee2f-aef1-478a-a467-69076c707c26" name="Modify partrepair_manual.py to send only groupID" comment="" />
+      <changelist id="" name="Modify partrepair_manual.py to send only groupID" comment="" />
       <created>1378000738927</created>
       <updated>1378000758723</updated>
     </task>
@@ -910,11 +643,11 @@
     <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32973504" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32875368" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32908913" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32810968" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.052294556" sideWeight="0.86973554" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22864583" sideWeight="0.49808428" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22864583" sideWeight="0.5019157" order="0" side_tool="true" content_ui="combo" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23105656" sideWeight="0.33398628" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23105656" sideWeight="0.33692458" order="0" side_tool="true" content_ui="combo" />
       <window_info id="DB Browser" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -975,7 +708,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Previous commit messed up.  This is initial commit of what will be the default theme.  Huge number of changes." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add Minify functionality. Adding some files that were not previously committed." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -989,7 +722,6 @@
     <option name="UPDATE_FILTER_BY_SCOPE" value="false" />
     <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
-    <MESSAGE value="Modified IsHashed to use new Hashed category.  Other changes to various regex to improve matching." />
     <MESSAGE value="Added groupID to parts, major changes to partrepair" />
     <MESSAGE value="Update to version number" />
     <MESSAGE value="Major speed improvement to stage 1, added lastFullCollectionCheck. Tweaking stage 2" />
@@ -1014,6 +746,7 @@
     <MESSAGE value="Support for new Talk Radio category under Music" />
     <MESSAGE value="Initial commit of what will be the new default theme.  Many, many, many changes." />
     <MESSAGE value="Previous commit messed up.  This is initial commit of what will be the default theme.  Huge number of changes." />
+    <MESSAGE value="Add Minify functionality. Adding some files that were not previously committed." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1021,18 +754,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/www/pages/login.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="58" selection-start="431" selection-end="431" vertical-scroll-proportion="-9.153846" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/www/lib/binaries.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="281" column="13" selection-start="12595" selection-end="12595" vertical-scroll-proportion="-4.303371">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/www/lib/releases.php">
       <provider selected="true" editor-type-id="text-editor">
         <state line="1662" column="27" selection-start="63194" selection-end="63209" vertical-scroll-proportion="-16.461538">
@@ -1049,9 +770,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/www/pages/logout.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="0" selection-start="90" selection-end="90" vertical-scroll-proportion="-3.9230769">
-          <folding />
-        </state>
+        <state line="6" column="0" selection-start="90" selection-end="90" vertical-scroll-proportion="-3.9230769" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/www/themes/Cyborg/styles/bootstrap.css">
@@ -1063,9 +782,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="1" selection-start="61" selection-end="61" vertical-scroll-proportion="0.100196466">
-          <folding />
-        </state>
+        <state line="6" column="1" selection-start="61" selection-end="61" vertical-scroll-proportion="0.100196466" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/www/themes/Cyborg/templates/frontend/basepage.tpl">
@@ -1077,9 +794,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/www/themes/Cyborg/templates/frontend/mainmenu.tpl">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="5" selection-start="1021" selection-end="1021" vertical-scroll-proportion="0.27783453">
-          <folding />
-        </state>
+        <state line="16" column="5" selection-start="1021" selection-end="1021" vertical-scroll-proportion="0.27783453" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/www/themes/Cyborg/scripts/utils.js">
@@ -1091,16 +806,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/www/index.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="76" column="42" selection-start="1532" selection-end="1532" vertical-scroll-proportion="0.94254035">
-          <folding />
-        </state>
+        <state line="76" column="42" selection-start="1532" selection-end="1532" vertical-scroll-proportion="0.94254035" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/www/pages/forgottenpassword.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="14" selection-start="83" selection-end="83" vertical-scroll-proportion="0.06945863">
-          <folding />
-        </state>
+        <state line="4" column="14" selection-start="83" selection-end="83" vertical-scroll-proportion="0.06945863" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/www/lib/framework/basepage.php">
@@ -1112,9 +823,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/www/pages/login_proc.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="0" selection-start="404" selection-end="404" vertical-scroll-proportion="0.29133064">
-          <folding />
-        </state>
+        <state line="17" column="0" selection-start="404" selection-end="404" vertical-scroll-proportion="0.29133064" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/www/lib/users.php">
@@ -1127,6 +836,20 @@
     <entry file="file://$PROJECT_DIR$/www/themes/Cyborg/styles/style.css">
       <provider selected="true" editor-type-id="text-editor">
         <state line="286" column="19" selection-start="9495" selection-end="9495" vertical-scroll-proportion="0.9666012">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/admin/config.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/lib/logging/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="0" selection-start="51" selection-end="51" vertical-scroll-proportion="0.18057664">
           <folding />
         </state>
       </provider>
