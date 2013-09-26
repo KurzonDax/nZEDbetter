@@ -13,22 +13,54 @@
     <meta name="application-name" content="nZEDb-v{$site->version}">
     <meta name="viewport" content="width=device-width">
 
-    <link href="{$smarty.const.WWW_TOP}/../themes/Cyborg/styles/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="{$smarty.const.WWW_TOP}/../themes/{$site->style}/styles/bootstrap-combined.no-icons.min.css" rel="stylesheet">
     <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.0/css/font-awesome.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Merriweather+Sans:400,400italic,700' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Istok+Web:400,700,400italic' rel='stylesheet' type='text/css'>
-    <link href="{$smarty.const.WWW_TOP}/../themes/Cyborg/styles/old-style.css" rel="stylesheet" media="screen">
-    <link href="{$smarty.const.WWW_TOP}/../themes/Cyborg/styles/admin.css" rel="stylesheet" media="screen">
+    <link href="{$smarty.const.WWW_TOP}/../themes/{$site->style}/styles/old-style.css" rel="stylesheet" media="screen">
+    <link href="{$smarty.const.WWW_TOP}/../themes/{$site->style}/styles/admin.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="{$smarty.const.WWW_TOP}/../themes/{$site->style}/styles/tabs.css" TYPE="text/css" MEDIA="screen">
+    <link rel="stylesheet" href="{$smarty.const.WWW_TOP}/../themes/{$site->style}/styles/jqui-admin-default/jquery-ui-1.10.3.custom.css" TYPE="text/css" MEDIA="screen">
 
-    <link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/../themes/Cyborg/images/favicon.ico">
+    <link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/../themes/{$site->style}/images/favicon.ico">
+
 
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <script>window.html5 || document.write('<script src="{$smarty.const.WWW_TOP}/../themes/Cyborg/scripts/vendor/html5shiv.js"><\/script>')</script>
+    <script>window.html5 || document.write('<script src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/vendor/html5shiv.js"><\/script>')</script>
     <![endif]-->
-    <link rel="stylesheet" href="{$smarty.const.WWW_TOP}/../themes/Cyborg/styles//tabs.css" TYPE="text/css" MEDIA="screen">
 
-    <script type="text/javascript" src="{$smarty.const.WWW_TOP}/../themes/Cyborg/scripts/tabber.js"></script>
+
+    <script type="text/javascript" src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/tabber.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+    {literal}<script>window.jQuery || document.write('<script src="{/literal}{$smarty.const.WWW_TOP}{literal}/../themes/{$site->style}/scripts/vendor/jquery-1.9.1.js"><\/script>')</script>{/literal}
+    {*<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    {literal}<script>window.jQuery || document.write('<script src="{/literal}{$smarty.const.WWW_TOP}{literal}/../themes/alpha/scripts/vendor/bootstrap.min.js"><\/script>')</script>{/literal}*}
+    <script src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/sorttable.js"></script>
+    <script src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/utils-admin.js"></script>
+    <script src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/jquery.multifile.js"></script>
+    <script src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/jquery-ui-1.10.3.custom.js"></script>
+    <script src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/jquery.jeditable.js"></script>
+    <script>var WWW_TOP = "{$smarty.const.WWW_TOP}/..";</script>
+    {literal}
+        <script>
+            $(function() {
+                $( "#accordion" )
+                        .accordion({
+                            header: "> div > legend"
+                        })
+                        .sortable({
+                            axis: "y",
+                            handle: "legend",
+                            stop: function( event, ui ) {
+                                // IE doesn't register the blur when sorting
+                                // so trigger focusout handlers to remove .ui-state-focus
+                                ui.item.children( "legend" ).triggerHandler( "focusout" );
+                            }
+                        });
+            });
+        </script>
+    {/literal}
 	{$page->head}
 </head>
 <body>
@@ -81,14 +113,7 @@
 
     </script>
     {/literal}*}
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
-    {literal}<script>window.jQuery || document.write('<script src="{/literal}{$smarty.const.WWW_TOP}{literal}/../themes/Cyborg/scripts/vendor/jquery-1.9.1.js"><\/script>')</script>{/literal}
-    {*<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-    {literal}<script>window.jQuery || document.write('<script src="{/literal}{$smarty.const.WWW_TOP}{literal}/../themes/alpha/scripts/vendor/bootstrap.min.js"><\/script>')</script>{/literal}*}
-	<script src="{$smarty.const.WWW_TOP}/../themes/Cyborg/scripts/sorttable.js"></script>
-	<script src="{$smarty.const.WWW_TOP}/../themes/Cyborg/scripts/utils-admin.js"></script>
-	<script src="{$smarty.const.WWW_TOP}/../themes/Cyborg/scripts/jquery.multifile.js"></script>
-	<script>var WWW_TOP = "{$smarty.const.WWW_TOP}/..";</script>
+
 
     {if $site->google_analytics_acc != ''}
     {literal}

@@ -27,248 +27,246 @@
 </fieldset>
 </div>
 <div class="tabbertab">
-<h2><a name="Monitor">Monitor</a></h2>
-<fieldset>
-    <legend>Monitor</legend>
-    <table class="input">
-        <tr>
-            <td><label for="explain">Information:</label></td>
-            <td>
-                <div class="explanation">
-                    Monitor is the name of the script that monitors all of the tmux panes and windows. It stops/stops scripts based on user settings. It queries the database to provide stats from your nZEDb database.<br /><br />
-                    There are 2 columns of numbers, 'In Process' and 'In Database'. The 'In Process' is all releases that need to be postprocessed. The 'In Database' is the number of releases matching that category.
-                    <ul>
-                        <li>The 'In Process' column has 2 sets of numbers, the total for each category that needs to be postprocessed and inside the parenthesis is the difference from when the script started to what it is now.</li>
+    <h2><a name="Monitor">Monitor</a></h2>
 
-                        <li>The 'In Database' column also has 2 sets of numbers, the total releases for each category and inside the parenthesis is the percentage that category is to the total number of releases.</li>
-                    </ul>
-                    <b>Special Row Definitions</b><br/>
-                    <table style="margin-left: 15px;">
-                        <tr>
-                            <td><b>Misc Row</b></td>
-                            <td>The Misc row means something different in both columns.<br/>
-                                The 'In Process' column is all releases that have not had 'Additional' run on them. This includes all categories, not just the Misc Category.<br/>
-                                The 'In Database' number is the amount of releases that have not been categorized in any other category.
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><b>PreDB Row</b></td>
-                            <td>The 'In Process' predb is the total predb and inside the parenthesis is number changed since the script started.<br/>
-                                The 'In Database' is the total matched predb's you have and the number inside the parenthesis is the percentage of total releases that you have matched to a predb release.</td>
-                        </tr>
-                        <tr>
-                            <td><b>NZB's Row</b></td>
-                            <td>The 'In Process' NZBs are total nzbs.  Inside the parenthesis is the number of unique nzbs.<br/>
-                                The 'In Database' number represents NZBs that have all parts available and will be processed on next run.</td>
-                        </tr>
-                        <tr>
-                            <td><b>Request ID Row</b></td>
-                            <td>The 'In Process' requestID is the number of releases waiting to be processed.  Inside the parenthesis is the number changed since the script started.<br/>
-                                The 'In Database' number is the total matches of releases to requestIDs.  Inside the parenthesis is percentage of total releases that have been matched to a requestID.</td>
-                        </tr>
-                    </table>
-                    <br/>
-                    <b>Note:</b><br/>
-                    The counts for parts, binaries and predb totals are estimates and can vary wildly between queries. It is too slow to query the db for real counts, when using InnoDB. All of the other counts are actual counts.
+        <fieldset>
+            <legend>Monitor</legend>
+            <table class="input">
+                <tr>
+                    <td><label for="explain">Information:</label></td>
+                    <td>
+                        <div class="explanation">
+                            Monitor is the name of the script that monitors all of the tmux panes and windows. It stops/stops scripts based on user settings. It queries the database to provide stats from your nZEDb database.<br /><br />
+                            There are 2 columns of numbers, 'In Process' and 'In Database'. The 'In Process' is all releases that need to be postprocessed. The 'In Database' is the number of releases matching that category.
+                            <ul>
+                                <li>The 'In Process' column has 2 sets of numbers, the total for each category that needs to be postprocessed and inside the parenthesis is the difference from when the script started to what it is now.</li>
 
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td><label for="RUNNING">Tmux Scripts Running:</label></td>
-            <td>
-                {html_radios id="RUNNING" name='RUNNING' values=$truefalse_names output=$truefalse_names selected=$ftmux->RUNNING separator='<br />'}
-                <div class="hint">This is the shutdown, true/on, it runs, false/off and all scripts are terminated. This will start/stop all panes without terminating the monitor pane.</div>
-            </td>
-        </tr>
+                                <li>The 'In Database' column also has 2 sets of numbers, the total releases for each category and inside the parenthesis is the percentage that category is to the total number of releases.</li>
+                            </ul>
+                            <b>Special Row Definitions</b><br/>
+                            <table style="margin-left: 15px;">
+                                <tr>
+                                    <td><b>Misc Row</b></td>
+                                    <td>The Misc row means something different in both columns.<br/>
+                                        The 'In Process' column is all releases that have not had 'Additional' run on them. This includes all categories, not just the Misc Category.<br/>
+                                        The 'In Database' number is the amount of releases that have not been categorized in any other category.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b>PreDB Row</b></td>
+                                    <td>The 'In Process' predb is the total predb and inside the parenthesis is number changed since the script started.<br/>
+                                        The 'In Database' is the total matched predb's you have and the number inside the parenthesis is the percentage of total releases that you have matched to a predb release.</td>
+                                </tr>
+                                <tr>
+                                    <td><b>NZB's Row</b></td>
+                                    <td>The 'In Process' NZBs are total nzbs.  Inside the parenthesis is the number of unique nzbs.<br/>
+                                        The 'In Database' number represents NZBs that have all parts available and will be processed on next run.</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Request ID Row</b></td>
+                                    <td>The 'In Process' requestID is the number of releases waiting to be processed.  Inside the parenthesis is the number changed since the script started.<br/>
+                                        The 'In Database' number is the total matches of releases to requestIDs.  Inside the parenthesis is percentage of total releases that have been matched to a requestID.</td>
+                                </tr>
+                            </table>
+                            <br/>
+                            <b>Note:</b><br/>
+                            The counts for parts, binaries and predb totals are estimates and can vary wildly between queries. It is too slow to query the db for real counts, when using InnoDB. All of the other counts are actual counts.
 
-        <tr>
-            <td style="width:160px;"><label for="MONITOR_DELAY">Monitor Loop Timer:</label></td>
-            <td>
-                <input id="MONITOR_DELAY" name="MONITOR_DELAY" class="tiny" type="text" value="{$ftmux->MONITOR_DELAY}" />
-                <div class="hint">The time between query refreshes of monitor information, in seconds. This has no effect on any other pane, except in regards to the kill switches. The other panes are checked every 10 seconds. The lower the number, the more often it queries the database for numbers.<br />
-                    <b>As the database gets larger in size, the longer this set of queries takes to process.</b> It is recommended that you set the sleep timer to at least 300 seconds (5 minutes), if any number in postprocess or total releases exceeds 1 million.</div>
-            </td>
-        </tr>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="RUNNING">Tmux Scripts Running:</label></td>
+                    <td>
+                        {html_radios id="RUNNING" name='RUNNING' values=$truefalse_names output=$truefalse_names selected=$ftmux->RUNNING separator='<br />'}
+                        <div class="hint">This is the shutdown, true/on, it runs, false/off and all scripts are terminated. This will start/stop all panes without terminating the monitor pane.</div>
+                    </td>
+                </tr>
 
-        <tr>
-            <td><label for="TMUX_SESSION">Tmux Session:</label></td>
-            <td>
-                <input id="TMUX_SESSION" name="TMUX_SESSION" class="long" type="text" value="{$ftmux->TMUX_SESSION}" />
-                <div class="hint">Enter the session name to be used by tmux, no spaces allowed in the name, this can't be changed after scripts start. If you are running multiple servers, you could put your hostname here</div>
-            </td>
-        </tr>
+                <tr>
+                    <td style="width:160px;"><label for="MONITOR_DELAY">Monitor Loop Timer:</label></td>
+                    <td>
+                        <input id="MONITOR_DELAY" name="MONITOR_DELAY" class="tiny" type="text" value="{$ftmux->MONITOR_DELAY}" />
+                        <div class="hint">The time between query refreshes of monitor information, in seconds. This has no effect on any other pane, except in regards to the kill switches. The other panes are checked every 10 seconds. The lower the number, the more often it queries the database for numbers.<br />
+                            <b>As the database gets larger in size, the longer this set of queries takes to process.</b> It is recommended that you set the sleep timer to at least 300 seconds (5 minutes), if any number in postprocess or total releases exceeds 1 million.</div>
+                    </td>
+                </tr>
 
-        <tr>
-            <td><label for="MONITOR_PATH">Monitor a Ramdisk:</label></td>
-            <td>
-                <input id="MONITOR_PATH" style="margin-bottom: 3px;" name="MONITOR_PATH" class="long" type="text" value="{$ftmux->MONITOR_PATH}" /><br />
-                <input id="MONITOR_PATH_A" style="margin-bottom: 3px;" name="MONITOR_PATH_A" class="long" type="text" value="{$ftmux->MONITOR_PATH_A}" /><br />
-                <input id="MONITOR_PATH_B" name="MONITOR_PATH_B" class="long" type="text" value="{$ftmux->MONITOR_PATH_B}" />
-                <div class="hint">Enter a path here to have Monitor monitor its usage and free space. Must be a valid path.<br />To use this example, add to fstab and edit path, gid and uid, then mount as user not root:<br />tmpfs /var/www/nZEDb/nzbfiles/tmpunrar tmpfs user,uid=1000,gid=33,nodev,nodiratime,nosuid,size=1G,mode=777 0 0<br />
-                    gid == group id == /etc/groups, uid == user id == /etc/passwd</div>
-            </td>
-        </tr>
+                <tr>
+                    <td><label for="TMUX_SESSION">Tmux Session:</label></td>
+                    <td>
+                        <input id="TMUX_SESSION" name="TMUX_SESSION" class="long" type="text" value="{$ftmux->TMUX_SESSION}" />
+                        <div class="hint">Enter the session name to be used by tmux, no spaces allowed in the name, this can't be changed after scripts start. If you are running multiple servers, you could put your hostname here</div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><label for="MONITOR_PATH">Monitor a Ramdisk:</label></td>
+                    <td>
+                        <input id="MONITOR_PATH" style="margin-bottom: 3px;" name="MONITOR_PATH" class="long" type="text" value="{$ftmux->MONITOR_PATH}" /><br />
+                        <input id="MONITOR_PATH_A" style="margin-bottom: 3px;" name="MONITOR_PATH_A" class="long" type="text" value="{$ftmux->MONITOR_PATH_A}" /><br />
+                        <input id="MONITOR_PATH_B" name="MONITOR_PATH_B" class="long" type="text" value="{$ftmux->MONITOR_PATH_B}" />
+                        <div class="hint">Enter a path here to have Monitor monitor its usage and free space. Must be a valid path.<br />To use this example, add to fstab and edit path, gid and uid, then mount as user not root:<br />tmpfs /var/www/nZEDb/nzbfiles/tmpunrar tmpfs user,uid=1000,gid=33,nodev,nodiratime,nosuid,size=1G,mode=777 0 0<br />
+                            gid == group id == /etc/groups, uid == user id == /etc/passwd</div>
+                    </td>
+                </tr>
 
 
-    </table>
-</fieldset>
+            </table>
+        </fieldset>
+
 </div>
 <div class="tabbertab">
-<h2><a name="Update">Update Binaries</a></h2>
-<fieldset>
-    <legend>Sequential Processing</legend>
-    <table class="input">
-        <tr>
-            <td><label for="explain">Information:</label></td>
-            <td>
-                <div class="explanation">Sequential processing causes the update_binaries, backfill, andn update_releases scripts to run one after the other, rather than
-                running simultaneously.  This is generally only recommended for relatively low-powered servers (i.e. less than four processor cores, and less than 8MB RAM.  Running
-                sequentially dramtically lowers the performance requirements of the database engine.</div>
-            </td>
-        </tr>
-        <tr>
-            <td><label for="SEQUENTIAL">Run Sequential:</label></td>
-            <td>
-                {html_radios id="SEQUENTIAL" name='SEQUENTIAL' values=$truefalse_names output=$truefalse_names selected=$ftmux->SEQUENTIAL separator='<br />'}
-                <div class="hint">Choose to run update_binaries, backfill and update releases_sequentially. Changing requires restart. true/false</div>
-            </td>
-        </tr>
+    <h2><a name="Update">Update Binaries</a></h2>
+    <fieldset>
+        <legend>Sequential Processing</legend>
+        <table class="input">
+            <tr>
+                <td><label for="explain">Information:</label></td>
+                <td>
+                    <div class="explanation">Sequential processing causes the update_binaries, backfill, andn update_releases scripts to run one after the other, rather than
+                        running simultaneously.  This is generally only recommended for relatively low-powered servers (i.e. less than four processor cores, and less than 8MB RAM.  Running
+                        sequentially dramtically lowers the performance requirements of the database engine.</div>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="SEQUENTIAL">Run Sequential:</label></td>
+                <td>
+                    {html_radios id="SEQUENTIAL" name='SEQUENTIAL' values=$truefalse_names output=$truefalse_names selected=$ftmux->SEQUENTIAL separator='<br />'}
+                    <div class="hint">Choose to run update_binaries, backfill and update releases_sequentially. Changing requires restart. true/false</div>
+                </td>
+            </tr>
 
-        <tr>
-            <td style="width:160px;"><label for="SEQ_TIMER">Sequential Sleep Timer:</label></td>
-            <td>
-                <input id="SEQ_TIMER" name="SEQ_TIMER" class="tiny" type="text" value="{$ftmux->SEQ_TIMER}" />
-                <div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
-            </td>
-        </tr>
+            <tr>
+                <td style="width:160px;"><label for="SEQ_TIMER">Sequential Sleep Timer:</label></td>
+                <td>
+                    <input id="SEQ_TIMER" name="SEQ_TIMER" class="tiny" type="text" value="{$ftmux->SEQ_TIMER}" />
+                    <div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
+                </td>
+            </tr>
+        </table>
+    </fieldset>
+    <fieldset>
+        <legend>Update Binaries</legend>
+        <table class="input">
+            <tr>
+                <td><label for="BINARIES">Update Binaries:</label></td>
+                <td>
+                    {html_radios id="BINARIES" name='BINARIES' values=$truefalse_names output=$truefalse_names selected=$ftmux->BINARIES separator='<br />'}
+                    <div class="hint">Choose to run update_binaries true/false. Update binaries retrieves articles from the Usenet Service Provider.
+                        Articles are retrieved starting with the most recent post that has been obtained for each group until present. </div>
+                </td>
+            </tr>
 
+            <tr>
+                <td style="width:160px;"><label for="BINS_TIMER">Update Binaries Sleep Timer:</label></td>
+                <td>
+                    <input id="BINS_TIMER" name="BINS_TIMER" class="tiny" type="text" value="{$ftmux->BINS_TIMER}" />
+                    <div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
+                </td>
+            </tr>
+        </table>
+    </fieldset>
+    <fieldset>
+        <legend>Backfill</legend>
+        <table class="input">
+            <tr>
+                <td><label for="BACKFILL">Backfill:</label></td>
+                <td>
+                    {html_options class="siteeditstyle" id="BACKFILL" name='BACKFILL' values=$backfill_ids output=$backfill_names selected=$ftmux->BACKFILL}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{html_options class="siteeditstyle" id="BACKFILL_ORDER" name='BACKFILL_ORDER' values=$backfill_group_ids output=$backfill_group selected=$ftmux->BACKFILL_ORDER}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{html_options class="siteeditstyle" id="BACKFILL_DAYS" name='BACKFILL_DAYS' values=$backfill_days_ids output=$backfill_days selected=$ftmux->BACKFILL_DAYS}
+                    <div class="hint">Choose to run backfill type. Backfill gets from your first_record back.<br />
+                        Disabled - Disables backfill from running.<br />
+                        Safe - Backfills 1 group by backfill days (set in admin-view groups), using the number of threads set in admin. This downloads Backfill Quantity times the Backfill Threads, each loop.<br \>
+                        example: you have Backfill Threads = 10, Backfill Quantity = 20k, Max Messages = 5k: you will run 10 threads, queue of 40 and download 200k headers.<br />
+                        Interval - Backfills the number of groups (set in tmux), by backfill days (set in admin-view groups), completely.<br />
+                        All - Backfills the number of groups (set in tmux), by Backfill Quantity (set in tmux), up to backfill days (set in admin-view groups)<br />
+                        These settings are all per loop and does not use backfill date. Approximately every 80 minutes, every activated backfill group will be backfilled (5k headers). This is to allow incomplete collections to be completed and/or the 2 hour delay reset if the collection is still active. This extra step is not necessary and is not used when using Sequential.<br />
+                        Newest - Sorts the group selection with the least backfill days backfilled, first.<br />
+                        Oldest - Sorts the group selection with the most backfill days backfilled, first.<br />
+                        Alphabetical - Sorts the group selection from a to z.<br />
+                        Alphabetical Reverse - Sorts the group selection from z to a.<br /a>
+                        Most Posts - Sorts the group selection by the highest number of posts, first.<br /a>
+                        Fewest Posts - Sorts the group selection by the lowest number of posts, first.<br />
+                        Backfill days - Days per Group from admin->view group or the Safe Backfill Date from admin->edit site.</div>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:160px;"><label for="BACKFILL_QTY">Backfill Quantity:</label></td>
+                <td>
+                    <input id="BACKFILL_QTY" name="BACKFILL_QTY" class="medium" type="text" value="{$ftmux->BACKFILL_QTY}" />
+                    <div class="hint">When not running backfill intervals, you select the number of headers per group per thread to download.</div>
+                </td>
+            </tr>
 
-    </table>
-</fieldset>
+            <tr>
+                <td style="width:160px;"><label for="BACKFILL_GROUPS">Backfill Groups:</label></td>
+                <td>
+                    <input id="BACKFILL_GROUPS" name="BACKFILL_GROUPS" class="tiny" type="text" value="{$ftmux->BACKFILL_GROUPS}" />
+                    <div class="hint">When running backfill the groups are sorted so that the newest groups are backfilled first. Select the number of groups to backfill per loop.</div>
+                </td>
+            </tr>
 
-<fieldset>
-    <legend>Update Binaries</legend>
-    <table class="input">
-        <tr>
-            <td><label for="BINARIES">Update Binaries:</label></td>
-            <td>
-                {html_radios id="BINARIES" name='BINARIES' values=$truefalse_names output=$truefalse_names selected=$ftmux->BINARIES separator='<br />'}
-                <div class="hint">Choose to run update_binaries true/false. Update binaries retrieves articles from the Usenet Service Provider.
-                    Articles are retrieved starting with the most recent post that has been obtained for each group until present. </div>
-            </td>
-        </tr>
+            <tr>
+                <td style="width:160px;"><label for="BACK_TIMER">Backfill Sleep Timer:</label></td>
+                <td>
+                    <input id="BACK_TIMER" name="BACK_TIMER" class="tiny" type="text" value="{$ftmux->BACK_TIMER}" />
+                    <div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
+                </td>
+            </tr>
 
-        <tr>
-            <td style="width:160px;"><label for="BINS_TIMER">Update Binaries Sleep Timer:</label></td>
-            <td>
-                <input id="BINS_TIMER" name="BINS_TIMER" class="tiny" type="text" value="{$ftmux->BINS_TIMER}" />
-                <div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
-            </td>
-        </tr>
-    </table>
-</fieldset>
+            <tr>
+                <td style="width:160px;"><label for="PROGRESSIVE">Variable Sleep Timer:</label></td>
+                <td>
+                    {html_radios id="PROGRESSIVE" name='PROGRESSIVE' values=$truefalse_names output=$truefalse_names selected=$ftmux->PROGRESSIVE separator='<br />'}
+                    <div class="hint">This will vary the backfill sleep depending on how many collections you have.<br />ie 50k collections would make sleep timer 100 seconds and 20k releases would make sleep timer 40 seconds.</div>
+                </td>
+            </tr>
+        </table>
+    </fieldset>
+    <fieldset>
+        <legend>Import NZBS</legend>
+        <table class="input">
+            <tr>
+                <td><label for="explain">Information:</label></td>
+                <td>
+                    <div class="explanation">This will import all nzbs in the given path. If in your path you have nzbs in the root folder and subfolders(regardless of nzbs inside), threaded scripts will ignore all nzbs in the root path. Then each subfolder is threaded.</div>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="IMPORT">Import NZBS:</label></td>
+                <td>
+                    {html_options class="siteeditstyle" id="IMPORT" name='IMPORT' values=$import_ids output=$import_names selected=$ftmux->IMPORT}
+                    <div class="hint">Choose to run import nzb script true/false. This can point to a single folder with multiple subfolders on just the one folder. If you run this threaded, it will run 1 folder per thread.</div>
+                </td>
+            </tr>
 
-<fieldset>
-    <legend>Backfill</legend>
-    <table class="input">
-        <tr>
-            <td><label for="BACKFILL">Backfill:</label></td>
-            <td>
-                {html_options class="siteeditstyle" id="BACKFILL" name='BACKFILL' values=$backfill_ids output=$backfill_names selected=$ftmux->BACKFILL}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{html_options class="siteeditstyle" id="BACKFILL_ORDER" name='BACKFILL_ORDER' values=$backfill_group_ids output=$backfill_group selected=$ftmux->BACKFILL_ORDER}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{html_options class="siteeditstyle" id="BACKFILL_DAYS" name='BACKFILL_DAYS' values=$backfill_days_ids output=$backfill_days selected=$ftmux->BACKFILL_DAYS}
-                <div class="hint">Choose to run backfill type. Backfill gets from your first_record back.<br />
-                    Disabled - Disables backfill from running.<br />
-                    Safe - Backfills 1 group by backfill days (set in admin-view groups), using the number of threads set in admin. This downloads Backfill Quantity times the Backfill Threads, each loop.<br \>
-                    example: you have Backfill Threads = 10, Backfill Quantity = 20k, Max Messages = 5k: you will run 10 threads, queue of 40 and download 200k headers.<br />
-                    Interval - Backfills the number of groups (set in tmux), by backfill days (set in admin-view groups), completely.<br />
-                    All - Backfills the number of groups (set in tmux), by Backfill Quantity (set in tmux), up to backfill days (set in admin-view groups)<br />
-                    These settings are all per loop and does not use backfill date. Approximately every 80 minutes, every activated backfill group will be backfilled (5k headers). This is to allow incomplete collections to be completed and/or the 2 hour delay reset if the collection is still active. This extra step is not necessary and is not used when using Sequential.<br />
-                    Newest - Sorts the group selection with the least backfill days backfilled, first.<br />
-                    Oldest - Sorts the group selection with the most backfill days backfilled, first.<br />
-                    Alphabetical - Sorts the group selection from a to z.<br />
-                    Alphabetical Reverse - Sorts the group selection from z to a.<br /a>
-                    Most Posts - Sorts the group selection by the highest number of posts, first.<br /a>
-                    Fewest Posts - Sorts the group selection by the lowest number of posts, first.<br />
-                    Backfill days - Days per Group from admin->view group or the Safe Backfill Date from admin->edit site.</div>
-            </td>
-        </tr>
-        <tr>
-            <td style="width:160px;"><label for="BACKFILL_QTY">Backfill Quantity:</label></td>
-            <td>
-                <input id="BACKFILL_QTY" name="BACKFILL_QTY" class="medium" type="text" value="{$ftmux->BACKFILL_QTY}" />
-                <div class="hint">When not running backfill intervals, you select the number of headers per group per thread to download.</div>
-            </td>
-        </tr>
+            <tr>
+                <td><label for="NZBS">Nzbs:</label></td>
+                <td>
+                    <input id="NZBS" class="long" name="NZBS" type="text" value="{$ftmux->NZBS}" />
+                    <div class="hint">Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs. This is by default, recursive and threaded. You set the threads in edit site, Advanced Settings.</div>
+                </td>
+            </tr>
 
-        <tr>
-            <td style="width:160px;"><label for="BACKFILL_GROUPS">Backfill Groups:</label></td>
-            <td>
-                <input id="BACKFILL_GROUPS" name="BACKFILL_GROUPS" class="tiny" type="text" value="{$ftmux->BACKFILL_GROUPS}" />
-                <div class="hint">When running backfill the groups are sorted so that the newest groups are backfilled first. Select the number of groups to backfill per loop.</div>
-            </td>
-        </tr>
+            <tr>
+                <td><label for="IMPORT_BULK">Use Bulk Importer:</label></td>
+                <td>
+                    {html_radios id="IMPORT_BULK" name='IMPORT_BULK' values=$truefalse_names output=$truefalse_names selected=$ftmux->IMPORT_BULK separator='<br />'}
+                    <div class="hint">Choose to run the bulk import nzb script true/false. This uses /dev/shm and can interfere with apparmor. This runs about 10% faster than stock importer. true/false</div>
+                </td>
+            </tr>
 
-        <tr>
-            <td style="width:160px;"><label for="BACK_TIMER">Backfill Sleep Timer:</label></td>
-            <td>
-                <input id="BACK_TIMER" name="BACK_TIMER" class="tiny" type="text" value="{$ftmux->BACK_TIMER}" />
-                <div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
-            </td>
-        </tr>
+            <tr>
+                <td style="width:160px;"><label for="IMPORT_TIMER">Import NZBS Sleep Timer:</label></td>
+                <td>
+                    <input id="IMPORT_TIMER" name="IMPORT_TIMER" class="tiny" type="text" value="{$ftmux->IMPORT_TIMER}" />
+                    <div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
+                </td>
+            </tr>
 
-        <tr>
-            <td style="width:160px;"><label for="PROGRESSIVE">Variable Sleep Timer:</label></td>
-            <td>
-                {html_radios id="PROGRESSIVE" name='PROGRESSIVE' values=$truefalse_names output=$truefalse_names selected=$ftmux->PROGRESSIVE separator='<br />'}
-                <div class="hint">This will vary the backfill sleep depending on how many collections you have.<br />ie 50k collections would make sleep timer 100 seconds and 20k releases would make sleep timer 40 seconds.</div>
-            </td>
-        </tr>
-    </table>
-</fieldset>
-
-<fieldset>
-    <legend>Import NZBS</legend>
-    <table class="input">
-        <tr>
-            <td><label for="explain">Information:</label></td>
-            <td>
-                <div class="explanation">This will import all nzbs in the given path. If in your path you have nzbs in the root folder and subfolders(regardless of nzbs inside), threaded scripts will ignore all nzbs in the root path. Then each subfolder is threaded.</div>
-            </td>
-        </tr>
-        <tr>
-            <td><label for="IMPORT">Import NZBS:</label></td>
-            <td>
-                {html_options class="siteeditstyle" id="IMPORT" name='IMPORT' values=$import_ids output=$import_names selected=$ftmux->IMPORT}
-                <div class="hint">Choose to run import nzb script true/false. This can point to a single folder with multiple subfolders on just the one folder. If you run this threaded, it will run 1 folder per thread.</div>
-            </td>
-        </tr>
-
-        <tr>
-            <td><label for="NZBS">Nzbs:</label></td>
-            <td>
-                <input id="NZBS" class="long" name="NZBS" type="text" value="{$ftmux->NZBS}" />
-                <div class="hint">Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs. This is by default, recursive and threaded. You set the threads in edit site, Advanced Settings.</div>
-            </td>
-        </tr>
-
-        <tr>
-            <td><label for="IMPORT_BULK">Use Bulk Importer:</label></td>
-            <td>
-                {html_radios id="IMPORT_BULK" name='IMPORT_BULK' values=$truefalse_names output=$truefalse_names selected=$ftmux->IMPORT_BULK separator='<br />'}
-                <div class="hint">Choose to run the bulk import nzb script true/false. This uses /dev/shm and can interfere with apparmor. This runs about 10% faster than stock importer. true/false</div>
-            </td>
-        </tr>
-
-        <tr>
-            <td style="width:160px;"><label for="IMPORT_TIMER">Import NZBS Sleep Timer:</label></td>
-            <td>
-                <input id="IMPORT_TIMER" name="IMPORT_TIMER" class="tiny" type="text" value="{$ftmux->IMPORT_TIMER}" />
-                <div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
-            </td>
-        </tr>
-
-    </table>
-</fieldset>
+        </table>
+    </fieldset>
+</div>
 </div>
 <div class="tabbertab">
 <h2><a name="Postprocessing">Postprocessing</a></h2>
