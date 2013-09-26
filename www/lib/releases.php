@@ -2115,21 +2115,23 @@ class Releases
 	{
 		$db = new DB();
 		$page = new Page();
+        $site = new Sites();
 		$category = new Category();
 		$genres = new Genres();
 		$consoletools = new ConsoleTools();
 		$n = "\n";
 		$remcount = $passcount = $passcount = $dupecount = $relsizecount = $completioncount = $disabledcount = $disabledgenrecount = $miscothercount = 0;
+        $site->get();
 
 		$where = (!empty($groupID)) ? " AND collections.groupID = " . $groupID : "";
 
 		// Delete old releases and finished collections.
 		if ($echooutput)
-			echo $n."\033[1;33m[".date("H:i:s A")."] Stage 7b -> Delete old releases and passworded releases.\033[0m".$n;
-		$stage7 = TIME();
+			echo $n."\033[1;33m[".date("H:i:s A")."] Beginning full purge process.\033[0m".$n;
+		$stage7 = time();
 
 
-        if($page->site->partretentionhours)
+        if($this->site->partretentionhours > 0)
         {
             if ($echooutput)
                 echo "\nDeteting collections/binaries/parts that are past retention...\n";
@@ -2141,44 +2143,45 @@ class Releases
             $threadID = $db->queryOneRow("SELECT connection_ID() as thread_ID");
             if ($echooutput)
                 echo "Using thread ID ".$threadID['thread_ID']." to mark collections.";
-            $db->query("UPDATE collections SET filecheck=".$threadID['thread_ID']." WHERE filecheck IN (0,1) dateadded < (now() - interval ".$page->site->partretentionhours);
+            $db->query("UPDATE collections SET filecheck=".$threadID['thread_ID']." WHERE filecheck IN (0,1) AND dateadded < (now() - interval ".$this->site->partretentionhours." hour)");
             $completeCols = $db->queryDirect("SELECT ID, groupID FROM collections WHERE filecheck=".$threadID['thread_ID']);
             $colsToDelete = $db->getNumRows($completeCols);
-            if($colsToDelete == 0 || $colsToDelete == false)
+            if($colsToDelete != 0 && $colsToDelete != false)
             {
-                echo "\n No collections to purge right now.  Exiting stage.";
-                return;
-            }
-            $db->setAutoCommit(false);
-            while ($currentCol=$db->fetchAssoc($completeCols))
-            {
-                $colsDeleted++;
+                $db->setAutoCommit(false);
+                while ($currentCol=$db->fetchAssoc($completeCols))
+                {
+                    $colsDeleted++;
+                    if ($echooutput)
+                        $consoletools->overWrite("Processing collection ".$consoletools->percentString($colsDeleted,$colsToDelete));
+
+                    $db->queryDirect("DELETE parts FROM parts WHERE collectionID=".$currentCol['ID']);
+                    $partsDeleted += $db->getAffectedRows();
+                    $db->query("UPDATE groups SET partsInDB=partsInDB-".$partsDeleted." WHERE ID=".$currentCol['groupID']);
+
+                    $db->queryDirect("DELETE binaries FROM binaries WHERE collectionID=".$currentCol['ID']);
+                    $binsDeleted += $db->getAffectedRows();
+
+                }
+                $db->Commit();
+                $db->queryDirect("DELETE collections FROM collections WHERE filecheck=".$threadID['thread_ID']);
+
+                $db->Commit();
+                $db->setAutoCommit(true);
+
                 if ($echooutput)
-                    $consoletools->overWrite("Processing collection ".$consoletools->percentString($colsDeleted,$colsToDelete));
-
-                $db->queryDirect("DELETE parts FROM parts WHERE collectionID=".$currentCol['ID']);
-                $partsDeleted += $db->getAffectedRows();
-                $db->query("UPDATE groups SET partsInDB=partsInDB-".$partsDeleted." WHERE ID=".$currentCol['groupID']);
-
-                $db->queryDirect("DELETE binaries FROM binaries WHERE collectionID=".$currentCol['ID']);
-                $binsDeleted += $db->getAffectedRows();
-
+                {
+                    echo "\nTotal Objects Removed:\n";
+                    echo "Collections:  ".number_format($colsDeleted)."\n";
+                    // echo "Affected rows: ".number_format($colsDeletedbyAffected)."\n";
+                    echo "Binaries:     ".number_format($binsDeleted)."\n";
+                    echo "Parts:        ".number_format($partsDeleted)."\n\n";
+                    echo "Stage completed in ".$consoletools->convertTime(time() - $stage7).".\n";
+                }
             }
-            $db->Commit();
-            $db->queryDirect("DELETE collections FROM collections WHERE filecheck=".$threadID['thread_ID']);
-            // $colsDeletedbyAffected = $db->getAffectedRows();
-            $db->Commit();
-            $db->setAutoCommit(true);
+            else
+                echo "\n No collections to purge right now.  Exiting stage.";
 
-            if ($echooutput)
-            {
-                echo "\nTotal Objects Removed:\n";
-                echo "Collections:  ".number_format($colsDeleted)."\n";
-                // echo "Affected rows: ".number_format($colsDeletedbyAffected)."\n";
-                echo "Binaries:     ".number_format($binsDeleted)."\n";
-                echo "Parts:        ".number_format($partsDeleted)."\n\n";
-                echo "Stage completed in ".$consoletools->convertTime(TIME() - $stage7).".\n";
-            }
         }
 		// Binaries/parts that somehow have no collection.
         if ($echooutput)
@@ -2205,7 +2208,7 @@ class Releases
 		// Releases past retention.
         if ($echooutput)
             echo "\nDeteting releases past retention...\n";
-		if($page->site->releaseretentiondays != 0)
+		if($this->site->releaseretentiondays != 0)
 		{
 			$result = $db->query(sprintf("SELECT ID, guid FROM releases WHERE postdate < (now() - interval %d day)", $page->site->releaseretentiondays));
 			foreach ($result as $rowrel)
@@ -2216,7 +2219,7 @@ class Releases
 		}
         if ($echooutput)
             echo "\nDeteting hashed releases past retention...\n";
-        if($page->site->hashedRetentionHours != 0)
+        if($this->site->hashedRetentionHours != 0)
         {
             $result = $db->query(sprintf("SELECT ID, guid FROM releases WHERE categoryID=7020 AND adddate < (now() - interval %d hour)", $page->site->hashedRetentionHours));
             foreach ($result as $rowrel)
@@ -2228,7 +2231,7 @@ class Releases
 		// Passworded releases.
         if ($echooutput)
             echo "\nDeteting passworded releases...\n";
-		if($page->site->deletepasswordedrelease == 1)
+		if($this->site->deletepasswordedrelease == 1)
 		{
 			$result = $db->query("SELECT ID, guid FROM releases WHERE passwordstatus = ".Releases::PASSWD_RAR);
 			foreach ($result as $rowrel)
@@ -2241,7 +2244,7 @@ class Releases
 		// Possibly passworded releases.
         if ($echooutput)
             echo "\nDeteting possible passworded releases...\n";
-		if($page->site->deletepossiblerelease == 1)
+		if($this->site->deletepossiblerelease == 1)
 		{
 			$result = $db->query("SELECT ID, guid FROM releases WHERE passwordstatus = ".Releases::PASSWD_POTENTIAL);
 			foreach ($result as $rowrel)
@@ -2250,10 +2253,6 @@ class Releases
 				$passcount ++;
 			}
 		}
-
-		// Crossposted releases.
-        // Commenting this out for right now.  I see a couple of problems with it
-        // that I need to dig in to a little deeper.
 
 		// Releases below completion %.
         if ($echooutput)
@@ -2289,9 +2288,11 @@ class Releases
 		// Disabled music genres.
         if ($echooutput)
             echo "\nDeteting music from disabled genres...\n";
-		if ($genrelist = $genres->getDisabledIDs())
+        $genrelist = $genres->getDisabledIDs();
+		if ($genrelist)
 		{
-			foreach ($genrelist as $genre)
+
+            foreach ($genrelist as $genre)
 			{
 				$rels = $db->query(sprintf("select ID, guid from releases inner join (select ID as mid from musicinfo where musicinfo.genreID = %d) mi on releases.musicinfoID = mid", $genre['ID']));
 				foreach ($rels as $rel)
@@ -2304,7 +2305,7 @@ class Releases
 
 		// misc other
 
-		if ($page->site->miscotherretentionhours > 0)
+		if ($this->site->miscotherretentionhours > 0)
         {
             if ($echooutput)
                 echo "\nDeteting releases from Misc->Other that are past retention...\n";
