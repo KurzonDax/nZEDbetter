@@ -1,6 +1,6 @@
 <h1>{$page->title}</h1>
 <br/>
-<div class="hint">You must click the save settings button under the tabs to preserve any changes you make.</div>
+<div class="hint" style="font-size: medium; margin-bottom: 20px;">You must click the <a href="#SaveSettings" style="margin: 0; text-decoration: underline; color: darkred; font-size: medium;">save settings</a> button under the tabs to preserve any changes you make.</div>
 
 <form action="{$SCRIPT_NAME}?action=submit" method="post">
 
@@ -267,7 +267,7 @@
         </table>
     </fieldset>
 </div>
-</div>
+
 <div class="tabbertab">
 <h2><a name="Postprocessing">Postprocessing</a></h2>
 <fieldset>
@@ -654,8 +654,8 @@
     </table>
 </fieldset>
 </div>
-
+</div>
 {* <input type="submit" class="tabpage" value="Save Tmux Settings" /> *}
-<button type="submit" class="btn btn-primary btn-large" style="float: right; margin-top: 15px"><i class="icon-save"></i> Save Tmux Settings</button>
+<button id="SaveSettings" type="submit" class="btn btn-primary btn-default" style="float: right; margin-top: 15px"><i class="icon-save"></i> Save Tmux Settings</button>
 </form>
 

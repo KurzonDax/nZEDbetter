@@ -9,74 +9,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d508ce3-27e7-4b8b-a445-803050b9458a" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/themes/Default/images/logo_large.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/themes/alpha/images/logo_large_2.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/themes/Default/images/logo_med.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/themes/alpha/images/logo_med.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/lib/logging/.gitignore" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/.htaccess" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/.htaccess" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Cache/APC.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/MrClay/Cli/Arg.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Controller/Base.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Build.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/CSS.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/CSSmin.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/MrClay/Cli.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/ClosureCompiler.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/JS/ClosureCompiler.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/CommentPreserver.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/CSS/Compressor.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/HTTP/ConditionalGet.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/YUI/CssCompressor.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/YUI/CssCompressor.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/DebugDetector.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/DooDigestAuth.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/HTTP/Encoder.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Cache/File.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Controller/Files.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/FirePHP.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Controller/Groups.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/HTML.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/HTML/Helper.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/ImportProcessor.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/JSMin.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/JSMinPlus.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Lines.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Loader.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Logger.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Cache/Memcache.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Controller/MinApp.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Packer.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Controller/Page.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Source.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/CSS/UriRewriter.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Controller/Version1.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Cache/XCache.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/YUICompressor.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/lib/Minify/Cache/ZendPlatform.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/_index.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/bm.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/bm2.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/config-test.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/admin/config.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/config.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/groupsConfig.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/index.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/index.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/jquery-1.6.3.min.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/ocCheck.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/quick-test.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/quick-test.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/rewriteTest.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/builder/test.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/www/min/utils.php" />
+      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\Cyborg\templates\admin\backups\group-list.tpl" afterPath="" />
+      <change type="DELETED" beforePath="E:\PHP Projects\nZEDb\www\themes\Cyborg\templates\admin\tmux-edit_original.tpl" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/themes/Cyborg/templates/admin/site-edit.tpl" afterPath="$PROJECT_DIR$/www/themes/Cyborg/templates/admin/site-edit.tpl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/www/themes/Cyborg/templates/admin/tmux-edit.tpl" afterPath="$PROJECT_DIR$/www/themes/Cyborg/templates/admin/tmux-edit.tpl" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="nZEDb.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1380220335403" ignored="false" />
+    <file path="/Dummy.txt" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1380220408613" ignored="false" />
     <file path="/namefixer.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1379734600582" ignored="false" />
     <file path="/category.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1379629538737" ignored="false" />
     <file path="/a.dummy" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1380047058252" ignored="false" />
@@ -96,7 +37,7 @@
     <file path="/merge_delete_dup_cols.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376675667051" ignored="false" />
     <file path="/backfill.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376766657503" ignored="false" />
     <file path="/test-cleansubject.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376757632127" ignored="false" />
-    <file path="/site-edit.tpl" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1380044023854" ignored="false" />
+    <file path="/site-edit.tpl" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1380224840955" ignored="false" />
     <file path="/admin.css" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1380044089295" ignored="false" />
     <file path="/monitor.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1379080484563" ignored="false" />
     <file path="/test_update_collection.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376793725315" ignored="false" />
@@ -104,7 +45,7 @@
     <file path="/db.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1379385609616" ignored="false" />
     <file path="/start.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1378134646839" ignored="false" />
     <file path="/purge_thread.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1376986527830" ignored="false" />
-    <file path="/tmux-edit.tpl" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1379639091795" ignored="false" />
+    <file path="/tmux-edit.tpl" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1380224756315" ignored="false" />
     <file path="/groups.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1377769639463" ignored="false" />
     <file path="/nzb-import.php" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1377337181780" ignored="false" />
     <file path="/binaries_threaded.py" changelist="1d508ce3-27e7-4b8b-a445-803050b9458a" time="1378214783265" ignored="false" />
@@ -186,11 +127,66 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name=".gitignore" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/www/lib/logging/.gitignore">
+      <file leaf-file-name="tmux-edit.tpl" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/www/themes/Cyborg/templates/admin/tmux-edit.tpl">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="7" column="0" selection-start="51" selection-end="51" vertical-scroll-proportion="0.18057664">
-              <folding />
+            <state line="2" column="0" selection-start="30" selection-end="301" vertical-scroll-proportion="0.055016182">
+              <folding>
+                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#a#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#table#0;n#div#0;n#td#1;n#tr#0;n#table#0;n#fieldset#0;n#div#1;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#0;n#div#1;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#input#0;n#td#1;n#tr#4;n#table#0;n#fieldset#0;n#div#1;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#input#1;n#td#1;n#tr#4;n#table#0;n#fieldset#0;n#div#1;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#0;n#div#2;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#1;n#div#2;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#2;n#div#2;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#2;n#div#2;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#3;n#table#0;n#fieldset#2;n#div#2;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#4;n#table#0;n#fieldset#2;n#div#2;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#4;n#table#0;n#fieldset#3;n#div#2;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#0;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#1;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#1;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#4;n#table#0;n#fieldset#1;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#6;n#table#0;n#fieldset#1;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#2;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#2;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#3;n#table#0;n#fieldset#2;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#4;n#table#0;n#fieldset#2;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#0;n#div#4;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#1;n#div#4;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#2;n#div#4;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#3;n#div#4;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#4;n#div#4;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#0;n#table#0;n#fieldset#0;n#div#5;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#0;n#div#5;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#0;n#div#5;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#3;n#table#0;n#fieldset#0;n#div#5;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#4;n#table#0;n#fieldset#0;n#div#5;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#0;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#3;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#4;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#5;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#6;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#7;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#button#0;n#form#0;n#!!top" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="site-edit.tpl" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/www/themes/Cyborg/templates/admin/site-edit.tpl">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="4" column="58" selection-start="360" selection-end="360" vertical-scroll-proportion="-2.6153846">
+              <folding>
+                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#a#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#button#0;n#form#0;n#!!top" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -215,8 +211,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/www/themes/Cyborg/templates/frontend/viewfilelist.tpl" />
-        <option value="$PROJECT_DIR$/www/themes/Cyborg/templates/frontend/viewseries.tpl" />
         <option value="$PROJECT_DIR$/www/themes/Cyborg/templates/frontend/console (7.17.2013 5.50.05 PM).tpl" />
         <option value="$PROJECT_DIR$/www/themes/Cyborg/templates/frontend/mainmenu.tpl" />
         <option value="$PROJECT_DIR$/www/.htaccess" />
@@ -231,6 +225,8 @@
         <option value="$PROJECT_DIR$/www/themes/Cyborg/templates/frontend/basepage.tpl" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/www/lib/logging/.gitignore" />
+        <option value="$PROJECT_DIR$/www/themes/Cyborg/templates/admin/tmux-edit.tpl" />
+        <option value="$PROJECT_DIR$/www/themes/Cyborg/templates/admin/site-edit.tpl" />
       </list>
     </option>
   </component>
@@ -326,6 +322,116 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="nZEDb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nZEDb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nZEDb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="www" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nZEDb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nZEDb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="www" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="themes" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nZEDb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nZEDb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="www" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="themes" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Cyborg" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="templates" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nZEDb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nZEDb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="www" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="themes" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Cyborg" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="templates" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="admin" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nZEDb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nZEDb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="www" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="themes" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Cyborg" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -603,7 +709,11 @@
       <created>1380137681667</created>
       <updated>1380137681667</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="Added Minify functionality. Adding some files that were not previously committed.">
+      <created>1380220425033</created>
+      <updated>1380220425033</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers>
       <GitHub shared="false">
         <commitMessageFormat>{id} {summary}</commitMessageFormat>
@@ -643,24 +753,24 @@
     <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Changes" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32908913" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32810968" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.052294556" sideWeight="0.86973554" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23105656" sideWeight="0.33398628" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23105656" sideWeight="0.33692458" order="0" side_tool="true" content_ui="combo" />
-      <window_info id="DB Browser" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32875368" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="DB Execution Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32854405" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32875368" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32973504" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.052294556" sideWeight="0.86973554" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32875368" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32854405" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32973504" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32810968" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23105656" sideWeight="0.33366045" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23105656" sideWeight="0.3366045" order="0" side_tool="true" content_ui="combo" />
+      <window_info id="DB Browser" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="DB Execution Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3113027" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32973504" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3994112" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -708,7 +818,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add Minify functionality. Adding some files that were not previously committed." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added Minify functionality. Adding some files that were not previously committed." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -722,7 +832,6 @@
     <option name="UPDATE_FILTER_BY_SCOPE" value="false" />
     <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
-    <MESSAGE value="Added groupID to parts, major changes to partrepair" />
     <MESSAGE value="Update to version number" />
     <MESSAGE value="Major speed improvement to stage 1, added lastFullCollectionCheck. Tweaking stage 2" />
     <MESSAGE value="Fixed some issues with releaseCleaner, added movieCleaner function" />
@@ -747,6 +856,7 @@
     <MESSAGE value="Initial commit of what will be the new default theme.  Many, many, many changes." />
     <MESSAGE value="Previous commit messed up.  This is initial commit of what will be the default theme.  Huge number of changes." />
     <MESSAGE value="Add Minify functionality. Adding some files that were not previously committed." />
+    <MESSAGE value="Added Minify functionality. Adding some files that were not previously committed." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -754,20 +864,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/www/lib/releases.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1662" column="27" selection-start="63194" selection-end="63209" vertical-scroll-proportion="-16.461538">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/www/themes/Cyborg/templates/frontend/headermenu.tpl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="40" selection-start="426" selection-end="430" vertical-scroll-proportion="-3.2692308">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/www/pages/logout.php">
       <provider selected="true" editor-type-id="text-editor">
         <state line="6" column="0" selection-start="90" selection-end="90" vertical-scroll-proportion="-3.9230769" />
@@ -849,8 +945,68 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/www/lib/logging/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="0" selection-start="51" selection-end="51" vertical-scroll-proportion="0.18057664">
+        <state line="9" column="0" selection-start="53" selection-end="53" vertical-scroll-proportion="0.23287672">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/themes/Cyborg/templates/admin/site-edit.tpl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="58" selection-start="360" selection-end="360" vertical-scroll-proportion="-2.6153846">
+          <folding>
+            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#a#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#button#0;n#form#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/www/themes/Cyborg/templates/admin/tmux-edit.tpl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="0" selection-start="30" selection-end="301" vertical-scroll-proportion="0.055016182">
+          <folding>
+            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#a#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#table#0;n#div#0;n#td#1;n#tr#0;n#table#0;n#fieldset#0;n#div#1;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#0;n#div#1;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#input#0;n#td#1;n#tr#4;n#table#0;n#fieldset#0;n#div#1;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#input#1;n#td#1;n#tr#4;n#table#0;n#fieldset#0;n#div#1;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#0;n#div#2;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#1;n#div#2;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#2;n#div#2;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#2;n#div#2;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#3;n#table#0;n#fieldset#2;n#div#2;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#4;n#table#0;n#fieldset#2;n#div#2;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#4;n#table#0;n#fieldset#3;n#div#2;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#0;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#1;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#1;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#4;n#table#0;n#fieldset#1;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#6;n#table#0;n#fieldset#1;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#2;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#2;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#3;n#table#0;n#fieldset#2;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#4;n#table#0;n#fieldset#2;n#div#3;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#0;n#div#4;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#1;n#div#4;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#2;n#div#4;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#3;n#div#4;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#4;n#div#4;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#0;n#table#0;n#fieldset#0;n#div#5;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#0;n#div#5;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#0;n#div#5;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#3;n#table#0;n#fieldset#0;n#div#5;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#4;n#table#0;n#fieldset#0;n#div#5;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#0;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#1;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#2;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#3;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#4;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#5;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#6;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#7;n#table#0;n#fieldset#0;n#div#6;n#div#1;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#button#0;n#form#0;n#!!top" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
