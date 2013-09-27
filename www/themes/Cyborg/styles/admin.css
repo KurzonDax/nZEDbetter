@@ -92,13 +92,7 @@ div.pager .current {
     padding: 0 4px 0px 4px;
     border: 1px #0700AD solid;
 }
-.a.showLink, a.hideLink {
-    text-decoration: none;
-    color: #36f;
-    padding-left: 8px;
-    background: transparent url('../images/show-section.png') no-repeat right; }
-.a.hideLink {
-    background: transparent url('../images/hide-section.png') no-repeat right; }
+
 #content { width: 77%; }
 #sidebar { width: 200px; }
 #sidebar li li:hover { cursor:auto; }
@@ -208,3 +202,41 @@ table.innerdata th { padding:2px; border-style: none; background-color:#EEE;}
 
 table.input th, table.input td { text-align: left; vertical-align:top; min-width: 150px; padding-right: 20px;}
 
+btn-tiny {
+    font-size: x-small;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    height: 16px;
+}
+
+.edit_name input {
+    line-height: 14px;
+    font-size: small;
+}
+
+.edit_desc textarea {
+    height: 75px;
+    width: 210px;
+    line-height: 17px;
+    font-size: small;
+}
+
+.edit_files input {
+    line-height: 14px;
+    font-size: small;
+    width: 20px;
+    display: block;
+    margin-left: 12px;
+    text-align: end;
+    padding-right: 2px;
+}
+
+.edit_size input {
+    line-height: 14px;
+    font-size: small;
+    width: 60px;
+    display: block;
+    /* margin-left: 12px; */
+    text-align: end;
+    padding-right: 2px;
+}
