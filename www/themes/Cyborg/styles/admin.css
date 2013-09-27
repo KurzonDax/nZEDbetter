@@ -240,3 +240,17 @@ btn-tiny {
     text-align: end;
     padding-right: 2px;
 }
+
+.edit_backfill input {
+    line-height: 14px;
+    font-size: small;
+    width: 50px;
+    display: block;
+    /* margin-left: 12px; */
+    text-align: end;
+    padding-right: 2px;
+}
+
+.pointer {
+    cursor: pointer;
+}

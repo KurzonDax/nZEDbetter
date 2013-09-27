@@ -48,6 +48,11 @@ if(isset($_POST['id']) && !empty($_POST['id']))
             $db->query("UPDATE groups SET minfilestoformrelease=".$_POST['files']." WHERE ID=".$groupID);
             print $_POST['files'];
         }
+        elseif (empty($_POST['files']))
+        {
+            $db->query("UPDATE groups SET minfilestoformrelease=0 WHERE ID=".$groupID);
+            print $_POST['files'];
+        }
         else
         {
             $orgValue = $db->queryOneRow("SELECT minfilestoformrelease FROM groups WHERE ID=".$groupID);
@@ -62,14 +67,14 @@ if(isset($_POST['id']) && !empty($_POST['id']))
         {
             if(preg_match('/MB/i', $_POST['size']))
             {
-                $numSize = trim(preg_replace('/ ?MB/i', '', $_POST['size']));
+                $numSize = trim(preg_replace('/,| ?MB/ig', '', $_POST['size']));
                 $textSize = number_format($numSize,2)." MB";
                 $numSize = $numSize * 1048576;
             }
             elseif(preg_match('/GB/i', $_POST['size']))
             {
-                $numSize = trim(preg_replace('/( )?GB/i', '', $_POST['size']));
-                $textSize = number_format($numSize * 1048576,2)." MB";
+                $numSize = trim(preg_replace('/,|( )?GB/ig', '', $_POST['size']));
+                $textSize = number_format($numSize * 1024,2)." MB";
                 $numSize = $numSize * 1073741824;
             }
             $db->query("UPDATE groups SET minsizetoformrelease=".$numSize." WHERE ID=".$groupID);
@@ -86,6 +91,25 @@ if(isset($_POST['id']) && !empty($_POST['id']))
             $orgValue = $db->queryOneRow("SELECT minsizetoformrelease FROM groups WHERE ID=".$groupID);
             $textSize = number_format($orgValue['minsizetoformrelease'] / 1048576, 2)." MB";
             print $textSize;
+        }
+    }
+    elseif(isset($_POST['backfill']))
+    {
+        $db = new DB();
+        if(!empty($_POST['backfill']) && is_numeric($_POST['backfill']))
+        {
+            $db->query("UPDATE groups SET backfill_target=".$_POST['backfill']." WHERE ID=".$groupID);
+            print $_POST['backfill'];
+        }
+        elseif (empty($_POST['backfill']))
+        {
+            $db->query("UPDATE groups SET backfill_target=0 WHERE ID=".$groupID);
+            print $_POST['backfill'];
+        }
+        else
+        {
+            $orgValue = $db->queryOneRow("SELECT backfill_target FROM groups WHERE ID=".$groupID);
+            print $orgValue['backfill_target'];
         }
     }
 }

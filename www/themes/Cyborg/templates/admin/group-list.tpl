@@ -61,7 +61,20 @@
                     method      : "POST",
                     event       : "dblclick",
                     tooltip     : "Double click to edit minimum size",
-                    data        : function (e) { return (e.replace(/ MB/g, '') * 1048576); }
+                    data        : function (e) { return (e.replace(/,| MB/g, '') * 1048576); }
+                });
+
+                $(".edit_backfill").editable("ajax-group-inline-edit.php", {
+                    indicator   : '<img src="'+www_top+'/../themes/'+user_style+'/images/indicator.gif">',
+                    type        : "text",
+                    submit      : "<i class='icon-ok btn-success btn-mini' style='font-size: 15px; padding-top: 2px; padding-bottom: 2px;'></i>",
+                    cancel      : "<i class='icon-remove btn-danger btn-mini' style='font-size: 15px; padding-top: 2px; padding-bottom: 2px;'></i>",
+                    style       : "width: 40px; display: inline-table; line-height: 29px; font-size: 12px; margin-bottom: 0; margin-top: 5px;",
+                    name        : "backfill",
+                    id          : "id",
+                    method      : "POST",
+                    event       : "dblclick",
+                    tooltip     : "Double click to edit target backfill days"
                 });
             });
             {/literal}
@@ -129,9 +142,9 @@
                             <input id="chk{$group.ID}" type="checkbox" class="group_check" value="{$result.guid}">
                         </td>
                         <td>
-                            <div class="pull-left edit_name" style="color: #B22222" id="{$group.ID}" >{$group.name|replace:"alt.binaries":"a.b"}</div>
+                            <div class="pull-left edit_name pointer" style="color: #B22222;" id="{$group.ID}" >{$group.name|replace:"alt.binaries":"a.b"}</div>
                             <div class="pull-right" style="margin-right: 4px; margin-top: 5px; display: inline-block;"><a class="noredtext btn btn-primary btn-mini" href="{$smarty.const.WWW_TOP}/group-edit.php?id={$group.ID}" title="Edit group properties"><i class="icon-pencil"></i></a></div>
-                            <br /><div class="tablehint edit_desc" style="display: inline-block; margin-right: 20px;" id="{$group.ID}">{$group.description}</div>
+                            <br /><div class="tablehint edit_desc pointer" style="display: inline-block; margin-right: 20px;" id="{$group.ID}">{$group.description}</div>
                         </td>
                         <td class="less">{$group.first_record_postdate|timeago}</td>
                         <td class="less">{$group.last_record_postdate|timeago}</td>
@@ -139,9 +152,9 @@
                         <td class="less" id="group-{$group.ID}">{if $group.active=="1"}<a href="javascript:ajax_group_status({$group.ID}, 0)" class="noredtext btn btn-danger btn-mini">Deactivate</a>{else}<a href="javascript:ajax_group_status({$group.ID}, 1)" class="noredtext btn btn-success btn-mini">Activate</a>{/if}</td>
                         <td class="less" id="backfill-{$group.ID}">{if $group.backfill=="1"}<a href="javascript:ajax_backfill_status({$group.ID}, 0)" class="noredtext btn btn-danger btn-mini">Deactivate</a>{else}<a href="javascript:ajax_backfill_status({$group.ID}, 1)" class="noredtext btn btn-success btn-mini">Activate</a>{/if}</td>
                         <td class="less"><a href="{$smarty.const.WWW_TOP}/../browse?g={$group.name}">{$group.num_releases}</a></td>
-                        <td class="less edit_files">{if $group.minfilestoformrelease==""}0{else}{$group.minfilestoformrelease}{/if}</td>
-                        <td class="less edit_size" id="{$group.ID}">{if $group.minsizetoformrelease==""}0.00 MB{else}{$group.minsizetoformrelease|fsize_format:"MB"}{/if}</td>
-                        <td class="less edit_backfill" id="{$group.ID}">{$group.backfill_target}</td>
+                        <td class="less edit_files pointer" id="{$group.ID}">{if $group.minfilestoformrelease==""}0{else}{$group.minfilestoformrelease}{/if}</td>
+                        <td class="less edit_size pointer" id="{$group.ID}" >{if $group.minsizetoformrelease==""}0.00 MB{else}{$group.minsizetoformrelease|fsize_format:"MB"}{/if}</td>
+                        <td class="less edit_backfill pointer" id="{$group.ID}" >{$group.backfill_target}</td>
                         {* <td class="less" id="groupdel-{$group.ID}"><a title="Reset this group" href="javascript:ajax_group_reset({$group.ID})" class="group_reset">Reset</a> | <a href="javascript:ajax_group_delete({$group.ID})" class="group_delete">Delete</a> | <a href="javascript:ajax_group_purge({$group.ID})" class="group_purge" onclick="return confirm('Are you sure? This will delete all releases, binaries/parts in the selected group');" >Purge</a></td>*}
                     </tr>
                 {/foreach}
