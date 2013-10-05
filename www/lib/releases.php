@@ -1708,12 +1708,14 @@ class Releases
 	public function processReleasesStage4dot5($groupID, $echooutput=true)
 	{
 
-        // TODO: And yet another stage that needs to be rewritten, same reasons as Stage 3 (see comments)
+        // TODO: Another stage that to look at rewriting, same reasons as Stage 3 (see comments)
         // Going to remove this stage from the 4567loop function.  I don't really see a need
-        // to perform this stage since anything to big or small should have been caught
+        // to perform this stage during create release process, since anything to big or small should have been caught
         // in stage 3.  Not going to remove the function though, because I can see a use for
         // it to process NZB's that have been imported.  Will need to look at the NZB import
         // process in more detail to see what happens currently.
+
+        // Does removeCrapReleases use this function? Need to look
 
         $db = new DB();
 		$consoletools = new ConsoleTools();
@@ -2134,7 +2136,7 @@ class Releases
         if($this->site->partretentionhours > 0)
         {
             if ($echooutput)
-                echo "\nDeteting collections/binaries/parts that are past retention...\n";
+                echo "\nDeleting collections/binaries/parts that are past retention...\n";
             $colsDeleted = 0;
             $binsDeleted = 0;
             $partsDeleted = 0;
@@ -2185,29 +2187,29 @@ class Releases
         }
 		// Binaries/parts that somehow have no collection.
         if ($echooutput)
-            echo "\nDeteting binaries and parts that have no collection...\n";
+            echo "\nDeleting binaries and parts that have no collection...\n";
 		$db->queryDirect("DELETE binaries, parts FROM binaries LEFT JOIN parts ON binaries.ID = parts.binaryID WHERE binaries.collectionID = 0 " . $where);
 
 		// Parts that somehow have no binaries.
         if ($echooutput)
-            echo "\nDeteting parts that have no binary...\n";
+            echo "\nDeleting parts that have no binary...\n";
 		$db->queryDirect("DELETE parts FROM parts LEFT OUTER JOIN binaries on parts.binaryID=binaries.ID WHERE binaries.ID IS NULL " . $where);
 
 		// Binaries that somehow have no collection.
         if ($echooutput)
-            echo "\nDeteting binaries that have no collection...\n";
+            echo "\nDeleting binaries that have no collection...\n";
 		$db->queryDirect("DELETE binaries FROM `binaries` LEFT OUTER JOIN `collections` ON binaries.collectionID=collections.ID WHERE collections.ID IS NULL " . $where);
 
 		// Collections that somehow have no binaries.
         if ($echooutput)
-            echo "\nDeteting collections that have no binaries...\n";
+            echo "\nDeleting collections that have no binaries...\n";
 		$db->queryDirect("DELETE collections FROM collections LEFT OUTER JOIN binaries ON collections.ID=binaries.collectionID WHERE binaries.collectionID IS NULL " . $where);
 
 		$where = (!empty($groupID)) ? " AND groupID = " . $groupID : "";
 
 		// Releases past retention.
         if ($echooutput)
-            echo "\nDeteting releases past retention...\n";
+            echo "\nDeleting releases past retention...\n";
 		if($this->site->releaseretentiondays != 0)
 		{
 			$result = $db->query(sprintf("SELECT ID, guid FROM releases WHERE postdate < (now() - interval %d day)", $page->site->releaseretentiondays));
@@ -2218,7 +2220,10 @@ class Releases
 			}
 		}
         if ($echooutput)
-            echo "\nDeteting hashed releases past retention...\n";
+            echo "\nDeleting hashed releases past retention...\n";
+
+        // TODO: Check to see if fixname has had a chance to fix release before purging
+
         if($this->site->hashedRetentionHours != 0)
         {
             $result = $db->query(sprintf("SELECT ID, guid FROM releases WHERE categoryID=7020 AND adddate < (now() - interval %d hour)", $page->site->hashedRetentionHours));
@@ -2230,7 +2235,7 @@ class Releases
         }
 		// Passworded releases.
         if ($echooutput)
-            echo "\nDeteting passworded releases...\n";
+            echo "\nDeleting passworded releases...\n";
 		if($this->site->deletepasswordedrelease == 1)
 		{
 			$result = $db->query("SELECT ID, guid FROM releases WHERE passwordstatus = ".Releases::PASSWD_RAR);
@@ -2243,7 +2248,7 @@ class Releases
 
 		// Possibly passworded releases.
         if ($echooutput)
-            echo "\nDeteting possible passworded releases...\n";
+            echo "\nDeleting possible passworded releases...\n";
 		if($this->site->deletepossiblerelease == 1)
 		{
 			$result = $db->query("SELECT ID, guid FROM releases WHERE passwordstatus = ".Releases::PASSWD_POTENTIAL);
@@ -2256,7 +2261,7 @@ class Releases
 
 		// Releases below completion %.
         if ($echooutput)
-            echo "\nDeteting releases less than ".$this->completion."% completed...\n";
+            echo "\nDeleting releases less than ".$this->completion."% completed...\n";
 		if($this->completion > 0)
 		{
 			if($resrel = $db->query(sprintf("SELECT ID, guid FROM releases WHERE completion < %d and completion > 0", $this->completion)))
@@ -2287,7 +2292,7 @@ class Releases
 
 		// Disabled music genres.
         if ($echooutput)
-            echo "\nDeteting music from disabled genres...\n";
+            echo "\nDeleting music from disabled genres...\n";
         $genrelist = $genres->getDisabledIDs();
 		if ($genrelist)
 		{
@@ -2307,8 +2312,9 @@ class Releases
 
 		if ($this->site->miscotherretentionhours > 0)
         {
+            // TODO: Check to see if fixname has had a chance to fix release before purging
             if ($echooutput)
-                echo "\nDeteting releases from Misc->Other that are past retention...\n";
+                echo "\nDeleting releases from Misc->Other that are past retention...\n";
             $sql = sprintf("select ID, guid from releases where categoryID = %d AND adddate <= NOW() - INTERVAL %d HOUR", CATEGORY::CAT_MISC, $page->site->miscotherretentionhours);
 
 			if ($resrel = $db->query($sql)) {
