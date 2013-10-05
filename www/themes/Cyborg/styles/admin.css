@@ -1,6 +1,6 @@
 #page { width: 85%; margin: 0 auto; padding: 10px 0px 0px 0px;}
 body { margin: 0; padding: 0; background: #FFF url(../images/menu.gif) repeat-x left top; font-family: 'Merriweather Sans',"Helvetica Neue",Helvetica,Arial,sans-serif;	font-size: 12px; color: #515151; }
-.logo { background-image:url("../images/logo_med.png")}
+
 textarea { height:100px; width:400px; }
 fieldset { margin-bottom:20px; }
 legend {
@@ -135,14 +135,7 @@ a.backfill_deactive:visited,
 a.backfill_deactive:active {
     color: #008C00;
 }
-div.tablehint, div.tablehint a {
-    font-size: 12px;
-    font-style: italic;
-    color: #0700AD;
-    word-wrap: break-word;
-    margin-bottom: 10px;
-    margin-right: 5px;
-}
+
 table.data { border-collapse:collapse; }
 table.data th {
     text-align:left;
@@ -202,55 +195,3 @@ table.innerdata th { padding:2px; border-style: none; background-color:#EEE;}
 
 table.input th, table.input td { text-align: left; vertical-align:top; min-width: 150px; padding-right: 20px;}
 
-btn-tiny {
-    font-size: x-small;
-    padding-top: 1px;
-    padding-bottom: 1px;
-    height: 16px;
-}
-
-.edit_name input {
-    line-height: 14px;
-    font-size: small;
-}
-
-.edit_desc textarea {
-    height: 75px;
-    width: 210px;
-    line-height: 17px;
-    font-size: small;
-}
-
-.edit_files input {
-    line-height: 14px;
-    font-size: small;
-    width: 20px;
-    display: block;
-    margin-left: 12px;
-    text-align: end;
-    padding-right: 2px;
-}
-
-.edit_size input {
-    line-height: 14px;
-    font-size: small;
-    width: 60px;
-    display: block;
-    /* margin-left: 12px; */
-    text-align: end;
-    padding-right: 2px;
-}
-
-.edit_backfill input {
-    line-height: 14px;
-    font-size: small;
-    width: 50px;
-    display: block;
-    /* margin-left: 12px; */
-    text-align: end;
-    padding-right: 2px;
-}
-
-.pointer {
-    cursor: pointer;
-}

@@ -95,6 +95,9 @@
         var onsubmit = settings.onsubmit || function() { };
         var onreset  = settings.onreset  || function() { };
         var onerror  = settings.onerror  || reset;
+        var funcSuccess = settings.successCallback || '';
+
+
           
         /* Show tooltip. */
         if (settings.tooltip) {
@@ -108,8 +111,8 @@
         return this.each(function() {
                         
             /* Save this to self because this changes when scope changes. */
-            var self = this;  
-                   
+            var self = this;
+
             /* Inlined block elements lose their width and height after first edit. */
             /* Save them for later use as workaround. */
             var savedwidth  = $(self).width();
@@ -221,11 +224,7 @@
                        url  : settings.loadurl,
                        data : loaddata,
                        async : false,
-                       success: function(result) {
-                          window.clearTimeout(t);
-                          input_content = result;
-                          input.disabled = false;
-                       }
+                       success: funcSuccess
                     });
                 } else if (settings.data) {
                     input_content = settings.data;
@@ -290,6 +289,18 @@
                       /* TODO: maybe something here */
                     });
                 }
+                if(!isFunction(funcSuccess)) {
+
+                    funcSuccess = function(result, status) {
+                        if (ajaxoptions.dataType == 'html') {
+                            $(self).html(result);
+                        }
+                        self.editing = false;
+                        callback.apply(self, [result, settings]);
+                        if (!$.trim($(self).html())) {
+                            $(self).html(settings.placeholder);
+                        }};
+                }
 
                 form.submit(function(e) {
 
@@ -338,6 +349,7 @@
                               $(self).html(settings.indicator);
                               
                               /* Defaults for ajaxoptions. */
+                              if(!("success" in settings.ajaxoptions)){
                               var ajaxoptions = {
                                   type    : 'POST',
                                   data    : submitdata,
@@ -345,10 +357,10 @@
                                   url     : settings.target,
                                   success : function(result, status) {
                                       if (ajaxoptions.dataType == 'html') {
-                                        $(self).html(result);
+                                          $(self).html(result);
                                       }
                                       self.editing = false;
-                                      callback.apply(self, [result, settings]);
+                                      callback.apply(self, [result, settings, self.revert, submitdata]);
                                       if (!$.trim($(self).html())) {
                                           $(self).html(settings.placeholder);
                                       }
@@ -357,7 +369,14 @@
                                       onerror.apply(form, [settings, self, xhr]);
                                   }
                               };
-                              
+                              } else {
+                                  var ajaxoptions = {
+                                      type    : 'POST',
+                                      data    : submitdata,
+                                      dataType: 'html',
+                                      url     : settings.target
+                              }}
+
                               /* Override with what is given in settings.ajaxoptions. */
                               $.extend(ajaxoptions, settings.ajaxoptions);   
                               $.ajax(ajaxoptions);          
@@ -395,6 +414,10 @@
 
     };
 
+    function isFunction(functionToCheck) {
+        var getType = {};
+        return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
+    }
 
     $.editable = {
         types: {

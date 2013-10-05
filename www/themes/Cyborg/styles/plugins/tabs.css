@@ -28,7 +28,7 @@ ul.tabbernav
  margin:0;
  padding: 3px 0;
  border-bottom: 1px solid #778;
- font: 400 12px 'Merriweather Sans', Verdana, sans-serif;
+ font: 400 12px 'Roboto', Helvetica,Arial,sans-serif;;
 }
 
 ul.tabbernav li
@@ -41,12 +41,21 @@ ul.tabbernav li
 ul.tabbernav li a {
     color: #FFF;
     font-size: 14px;
-    padding: 5px 0.5em;
+    font-weight: 600;
+    padding: 5px 5px 3px 5px;;
     margin-left: 5px;
     border: 1px solid #778;
     border-bottom: none;
     background: #DDE;
-    background-image: linear-gradient(to bottom, #08C 11%,#04C 100%);
+    background-image: -moz-linear-gradient(top, #a0c277, #7da64b);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#A0C277), to(#7DA64B));
+    background-image: -webkit-linear-gradient(top, #A0C277, #7DA64B);
+    background-image: -o-linear-gradient(top, #a0c277, #7da64b);
+    background-image: linear-gradient(to bottom, #A0C277, #7DA64B);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffa0c277', endColorstr='#ff7da64b', GradientType=0);
+    border-color: #7DA64B #7DA64B #567233;
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
     text-decoration: none;
 }
 
@@ -56,23 +65,29 @@ ul.tabbernav li a:visited { color: #FFF; }
 ul.tabbernav li a:hover
 {
     color: #FFF;
-    background: #08C;
-    background-image: linear-gradient(to bottom, #09F 11%,#07D 100%);
-    border-color: #227;
+    background: #7aa349; /* Old browsers */
+    background: -moz-linear-gradient(top,  #7aa349 0%, #5e7d39 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#7aa349), color-stop(100%,#5e7d39)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #7aa349 0%,#5e7d39 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #7aa349 0%,#5e7d39 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #7aa349 0%,#5e7d39 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #7aa349 0%,#5e7d39 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7aa349', endColorstr='#5e7d39',GradientType=0 ); /* IE6-9 */
 }
 
 ul.tabbernav li.tabberactive a
 {
     background-color: #FFF;
+    border-color: #888;
     border-bottom: 1px solid #FFF;
     background-image: none;
-    color: #048;
+    color: #555;
     font-weight: 600;
 }
 
 ul.tabbernav li.tabberactive a:hover
 {
-    color: #048;
+    color: #333;
     background: #FFF;
     border-bottom: 1px solid #FFF;
 }
@@ -101,9 +116,9 @@ ul.tabbernav li.tabberactive a:hover
 .tabberlive .tabbertab h2 {
  display:none;
 }
-.tabberlive .tabbertab h3 {
+/* .tabberlive .tabbertab h3 {
  display:none;
-}
+}*/
 
 /* Example of using an ID to set different styles for the tabs on the page */
 .tabberlive#tab1 {

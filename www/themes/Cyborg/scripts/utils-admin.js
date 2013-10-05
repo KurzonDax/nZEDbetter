@@ -1,84 +1,3 @@
-/**
- * ajax_group_status()
- *
- * @param id        group id
- * @param status    0 = deactive, 1 = activate
- */
-function ajax_group_status(id, what)
-{
-    // no caching of results
-    var rand_no = Math.random();
-    if (what != undefined)
-    {
-        $.ajax({
-          url       : WWW_TOP + '/admin/ajax_group-edit.php?rand=' + rand_no,
-          data      : { group_id: id, group_status: what },
-          dataType  : "html",
-          success   : function(data)
-          {
-              // $('div#message').html(data);
-              // $('div#message').show('fast', function() {});
-
-              // switch some links around
-              if (what == 0) {
-                  $('td#group-' + id).html('<a href="javascript:ajax_group_status('+ id +', 1)" class="noredtext btn btn-success btn-mini">Activate</a>');
-              }
-              else {
-                  $('td#group-' + id).html('<a href="javascript:ajax_group_status('+ id +', 0)" class="noredtext btn btn-danger btn-mini">Deactivate</a>');
-              }
-
-              // fade.. mm
-              // $('#message').fadeOut(5000);
-          },
-          error: function(xhr,err,e) { alert( "Error in ajax_group_status: " + err ); }
-        });
-    }
-    else
-    {
-        alert('Weird.. what group id are looking for?');
-    }
-}
-
-/**
- * ajax_backfill_status()
- *
- * @param id        group id
- * @param status    0 = deactive, 1 = activate
- */
-function ajax_backfill_status(id, what)
-{
-    // no caching of results
-    var rand_no = Math.random();
-    if (what != undefined)
-    {
-        $.ajax({
-          url       : WWW_TOP + '/admin/ajax_group-edit.php?rand=' + rand_no,
-          data      : { group_id: id, backfill_status: what },
-          dataType  : "html",
-          success   : function(data)
-          {
-              // $('div#message').html(data);
-              // $('div#message').show('fast', function() {});
-
-              // switch some links around
-              if (what == 0) {
-                  $('td#backfill-' + id).html('<a href="javascript:ajax_backfill_status('+ id +', 1)" class="noredtext btn btn-success btn-mini">Activate</a>');
-              }
-              else {
-                  $('td#backfill-' + id).html('<a href="javascript:ajax_backfill_status('+ id +', 0)" class="noredtext btn btn-danger btn-mini">Deactivate</a>');
-              }
-
-              // fade.. mm
-              // $('#message').fadeOut(5000);
-          },
-          error: function(xhr,err,e) { alert( "Error in ajax_backfill_status: " + err ); }
-        });
-    }
-    else
-    {
-        alert('Weird.. what group id are looking for?');
-    }
-}
 
 /**
  * ajax_group_delete()
@@ -226,12 +145,13 @@ function ajax_binaryblacklist_delete(id)
 
 jQuery(function($){
 
-$('#regexGroupSelect').change(function() {
-  document.location="?group=" + $("#regexGroupSelect option:selected").attr('value');
-});
+    $('#regexGroupSelect').change(function() {
+        document.location="?group=" + $("#regexGroupSelect option:selected").attr('value');
+    });
 
 // misc
-$('.confirm_action').click(function(){ return confirm('Are you sure?'); });
+    $('.confirm_action').click(function(){ return confirm('Are you sure?'); });
+
 
 });
 

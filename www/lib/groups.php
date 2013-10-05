@@ -20,6 +20,14 @@ class Groups
 							) rel ON rel.groupID = groups.ID ORDER BY groups.name");
 	}
 
+    public function getAllNames()
+    {
+        $db = new DB();
+        $nameArr = $db->queryDirect("SELECT name FROM groups");
+
+        return $nameArr['name'];
+    }
+
 	public function getGroupsForSelect()
 	{
 		$db = new DB();
@@ -333,12 +341,17 @@ class Groups
 		return $ret;
 	}
 
-	public function updateGroupStatus($id, $status = 0)
+    /**
+     * @param $id
+     * @param int $status=0
+     * @return string
+     */
+    public function updateGroupStatus($id, $status = 0)
 	{
 		$db = new DB();
 		$db->query(sprintf("UPDATE groups SET active = %d WHERE id = %d", $status, $id));
 		$status = ($status == 0) ? 'deactivated' : 'activated';
-		return "Group $id has been $status.";
+		return "Group ".$this->getByNameByID($id)." has been ".$status.".";
 	}
 
 	public function updateBackfillStatus($id, $status = 0)
@@ -346,6 +359,66 @@ class Groups
 		$db = new DB();
 		$db->query(sprintf("UPDATE groups SET backfill = %d WHERE id = %d", $status, $id));
 		$status = ($status == 0) ? 'deactivated' : 'activated';
-		return "Group $id has been $status.";
+		return "Backfill for group ".$this->getByNameByID($id)." has been ".$status.".";
 	}
+
+    /**
+     * Multiple group actions.  Possible values for $action are:
+     * allActive, allInactive, toggleActive, allBackfillActive,
+     * allBackfillInactive, allBackfillToggle, deleteGroups,
+     * and resetGroups
+     *
+     * @param $groupIDs
+     * @param $action
+     * @return string
+     */
+    public function multiGroupAction($groupIDs, $action)
+    {
+        $db = new DB();
+        $inClause = '(';
+        foreach($groupIDs as $id)
+            $inClause .= $id.",";
+        switch ($action)
+        {
+            case 'allActive':
+                $sql = "UPDATE groups AS g SET g.active = 1 WHERE g.id IN ".substr($inClause,0,-1).')';
+                $msg = "Selected groups have been set to ACTIVE status.";
+                break;
+            case 'allInactive':
+                $sql = "UPDATE groups AS g SET g.active = 0 WHERE g.id IN ".substr($inClause,0,-1).')';
+                $msg = "Selected groups have been set to an INACTIVE status.";
+                break;
+            case 'toggleActive':
+                $sql = "UPDATE groups AS g JOIN groups AS g1 ON g.ID=g1.ID SET g.active = IF(g1.active=0,1,0) WHERE g.id IN ".substr($inClause,0,-1).')';
+                $msg = "Selected groups ACTIVE status has been toggled.";
+                break;
+            case 'allBackfillActive':
+                $sql = "UPDATE groups AS g SET g.backfill = 1 WHERE g.id IN ".substr($inClause,0,-1).')';
+                $msg = "The backfill status for selected groups has been set to ACTIVE.";
+                break;
+            case 'allBackfillInactive':
+                $sql = "UPDATE groups AS g SET g.backfill = 0 WHERE g.id IN ".substr($inClause,0,-1).')';
+                $msg = "The backfill status for selected groups has been set to INACTIVE.";
+                break;
+            case 'toggleBackfill':
+                $sql = "UPDATE groups AS g JOIN groups AS g1 ON g.ID=g1.ID SET g.backfill = IF(g1.backfill=0,1,0) WHERE g.id IN ".substr($inClause,0,-1).')';
+                $msg = "Selected groups backfill status has been toggled.";
+                break;
+            case 'deleteGroups':
+                $sql = "DELETE groups FROM groups WHERE ID IN ".substr($inClause,0,-1).')';
+                $msg = "Selected groups have been DELETED";
+                break;
+            case 'resetGroups':
+                $sql = "UPDATE groups SET backfill_target=0, first_record=0, first_record_postdate=null, last_record=0, last_record_postdate=null, active = 0, last_updated=null WHERE ID IN ".substr($inClause,0,-1).')';
+                $msg = "Selected groups have been RESET.";
+                break;
+            default:
+                return "ERROR IN multiGroupAction. Invalid action.";
+        }
+
+        file_put_contents(WWW_DIR."lib/logging/multiGroupAction.log",$sql."\n-------------------------------\n", FILE_APPEND);
+        $db->query($sql);
+        return $msg;
+    }
+
 }

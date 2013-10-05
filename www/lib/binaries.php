@@ -535,12 +535,12 @@ class Binaries
                             // elsewhere in the project.
                             if (strlen($db->escapeString($data['Xref'])) > 254)
                                 $data['Xref'] = substr($db->escapeString($data['Xref']),0, 254);
-                            // And yet three more bugs.  Subjects that are too long, subjects that contain backslashes, and subjects (or From's) that contain non-UTF8 characters
+                            // Three more bugs.  Subjects that are too long, subjects that contain backslashes, and subjects (or From's) that contain non-UTF8 characters
                             if (strlen($db->escapeString($subject)) > 254)
                                 $subject = substr($db->escapeString($subject),0,254);
                             // TODO: Get rid of the garbage in the subject
                             // Getting an error on the following.  Since it's a pretty limited use case, going to disable for now
-                            //$subject = preg_replace('/[\u007B-\uFEFC]|[\uFF5B-\uFFFD]/u',"",$db->escapeString($subject));
+                            // $subject = preg_replace('/[\u007B-\uFEFC]|[\uFF5B-\uFFFD]/u',"",$db->escapeString($subject));
                             $subject = $namecleaning->cleanUnicode($subject);
                             // TODO: Clean up the 'From' field
                             // $from = preg_replace('/[\u007B-\uFEFC]|[\uFF5B-\uFFFD]/',"",$db->escapeString($data['From']));

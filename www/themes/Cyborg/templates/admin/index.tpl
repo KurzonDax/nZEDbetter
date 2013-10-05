@@ -1,5 +1,4 @@
- 
-<h1>{$page->title}</h1>
+
 
 <p>
 	Welcome to nZEDb. In this area you will be able to configure many aspects of your site.<br>

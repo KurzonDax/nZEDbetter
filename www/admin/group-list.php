@@ -24,14 +24,14 @@ $page->smarty->assign('pageritemsperpage',ITEMS_PER_PAGE);
 
 $groupsearch = ($gname != "") ? 'groupname='.$gname.'&amp;' : '';
 $page->smarty->assign('pagerquerybase', WWW_TOP."/group-list.php?".$groupsearch."offset=");
-$pager = $page->smarty->fetch("pager.tpl");
+$pager = $page->smarty->fetch("pager-admin.tpl");
 $page->smarty->assign('pager', $pager);
 
 $grouplist = $groups->getRange($offset, ITEMS_PER_PAGE, $gname);
 
 $page->smarty->assign('grouplist',$grouplist);	
 
-$page->title = "Group List";
+$page->title = "News Groups";
 
 $page->content = $page->smarty->fetch('group-list.tpl');
 $page->render();
