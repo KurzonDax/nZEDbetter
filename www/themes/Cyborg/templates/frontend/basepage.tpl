@@ -18,7 +18,8 @@
     <!-- nZEDb core CSS -->
     {if $site->useMinify == '0' || $site->useMinify == ''}
         <link href="{$smarty.const.WWW_TOP}/themes/{$site->style}/styles/bootstrap.css" rel="stylesheet" media="screen">
-        <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+        {* <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet"> *}
+        <link href="{$smarty.const.WWW_TOP}/themes/{$site->style}/styles/font-awesome/css/font-awesome.css" rel="stylesheet">
         <link href="{$smarty.const.WWW_TOP}/themes/{$site->style}/styles/style.css" rel="stylesheet" media="screen">
         <link href="{$smarty.const.WWW_TOP}/themes/{$site->style}/styles/wip.css" rel="stylesheet" media="screen">
         <!-- nZEDb extras -->
@@ -26,6 +27,7 @@
         <link href="{$smarty.const.WWW_TOP}/themes/{$site->style}/styles/jquery.pnotify.default.css" rel="stylesheet" media="screen">
         <link href="{$smarty.const.WWW_TOP}/themes/{$site->style}/styles/jquery.qtip.css" rel="stylesheet" media="screen">
     {/if}
+
     {if $site->useMinify == '1'}
         <link type="text/css" rel="stylesheet" href="/min/b=themes/{$site->style}/styles&amp;f=bootstrap.css,style.css,wip.css,jquery.pnotify.default.css,jquery.qtip.css" />
         <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
@@ -123,7 +125,7 @@
         <input type="text" name="username" class="large" id="username" placeholder="User Name"><br />
         {* <label for="password">Password:</label><br /> *}
         <input type="password" name="password" class="large" id="password" placeholder="Password"><br />
-        <input type="checkbox" id="rememberme" name="rememberme"><label for="rememberme">Remember Me</label></label>
+        <input type="checkbox" id="rememberme" name="rememberme"><label for="rememberme">Remember Me</label>
         <button class="btn btn-success btn-small" style="float: right; margin-top: 10px;" id="login-button">Login</button>
     </form>
     <div class="login-failed" id="login-failed"><i class="icon-warning-sign"></i> Login failed.  Please try again.</div>
