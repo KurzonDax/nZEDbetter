@@ -27,8 +27,8 @@
                             <li><a id="groupMulti-toggleBackfill" class="pointer">Toggle Backfill</a></li>
                             <li class="divider"></li>
                             <li><a id="group-Delete" class="pointer">Delete Group(s)...</a></li>
-                            <li><a id="group-Reset" class="pointer">Reset Group(s)...<span style="float: right; font-size: 15px; color: darkred;"><i class="icon-exclamation-sign"></i></span></a></li>
-                            <li><a id="group-Purge" class="pointer">Purge Group(s)...<span style="float: right; font-size: 15px; color: darkred;"><i class="icon-warning-sign"></a></i></span></li>
+                            <li><a id="group-Reset" class="pointer">Reset Group(s)...<span style="float: right; font-size: 15px; color: darkred;" class="clearfix"><i class="icon-exclamation-sign"></i></span></a></li>
+                            <li><a id="group-Purge" class="pointer">Purge Group(s)...<span style="float: right; font-size: 15px; color: darkred;"><i class="icon-warning-sign" class="clearfix"></a></i></span></li>
                         </ul>
                     </div>
                 </form>
@@ -127,26 +127,60 @@
                 </thead>
                 <tbody>
                 {foreach from=$grouplist item=group}
-                    <tr id="grouprow-{$group.ID}" class="{cycle values=",alt"}">
-                        <td style="width:26px;text-align:center;white-space:nowrap;">
-                            <input id="chk-{$group.ID}" type="checkbox" class="group_check" value="{$result.guid}">
-                        </td>
-                        <td id="name-{$group.name|replace:".":"_"}">
-                            <div class="edit_name pointer group-name" id="{$group.ID}" >{$group.name|replace:"alt.binaries":"a.b"}</div>
-
-                            <br /><div class="tablehint edit_desc pointer" style="display: inline-block; margin-right: 20px;" id="{$group.ID}">{$group.description}</div>
-                        </td>
-                        <td class="less">{$group.first_record_postdate|timeago}</td>
-                        <td class="less">{$group.last_record_postdate|timeago}</td>
-                        <td class="less">{$group.last_updated|timeago} ago</td>
-                        <td class="less" id="group-{$group.ID}">{if $group.active=="1"}<a id="btnDeactivate-{$group.ID}" class="noredtext btn btn-deactivate btn-xs">Deactivate</a>{else}<a id="btnActivate-{$group.ID}" class="noredtext btn btn-activate btn-xs">Activate</a>{/if}</td>
-                        <td class="less" id="backfill-{$group.ID}">{if $group.backfill=="1"}<a id="btnBackfillDeactivate-{$group.ID}" class="noredtext btn btn-deactivate btn-xs">Deactivate</a>{else}<a id="btnBackfillActivate-{$group.ID}" class="noredtext btn btn-activate btn-xs">Activate</a>{/if}</td>
-                        <td class="less"><a href="{$smarty.const.WWW_TOP}/../browse?g={$group.name}" title="Browse {$group.name}" >{$group.num_releases}</a></td>
-                        <td class="less edit_files pointer" id="{$group.ID}">{if $group.minfilestoformrelease==""}0{else}{$group.minfilestoformrelease}{/if}</td>
-                        <td class="less edit_size pointer" id="{$group.ID}" >{if $group.minsizetoformrelease==""}0.00 MB{else}{$group.minsizetoformrelease|fsize_format:"MB"}{/if}</td>
-                        <td class="less edit_backfill pointer" id="{$group.ID}" >{$group.backfill_target}</td>
-                        {* <td class="less" id="groupdel-{$group.ID}"><a title="Reset this group" href="javascript:ajax_group_reset({$group.ID})" class="group_reset">Reset</a> | <a href="javascript:ajax_group_delete({$group.ID})" class="group_delete">Delete</a> | <a href="javascript:ajax_group_purge({$group.ID})" class="group_purge" onclick="return confirm('Are you sure? This will delete all releases, binaries/parts in the selected group');" >Purge</a></td>*}
-                    </tr>
+                    {if $group.active == 6} {* Group is in the process of being deleted *}
+                        <tr id="disabled-{$group.ID}" class="{cycle values=",alt"}">
+                            <td style="width:26px;text-align:center;white-space:nowrap;">
+                                <input id="chk-{$group.ID}" type="checkbox" class="group_check" value="{$result.guid}">
+                            </td>
+                            <td id="name-{$group.name|replace:".":"_"}">
+                                <div class="disabled_notice" >Group currently being deleted.</div>
+                                <div class="edit_name pointer group-name" id="{$group.ID}" >{$group.name|replace:"alt.binaries":"a.b"}</div>
+                                <br />
+                                <div class="tablehint edit_desc pointer" style="display: inline-block; margin-right: 20px;" id="{$group.ID}">{$group.description}</div>
+                            </td>
+                    {elseif $group.active == 7} {* Group is in the process of being reset *}
+                        <tr id="disabled-{$group.ID}" class="{cycle values=",alt"}">
+                            <td style="width:26px;text-align:center;white-space:nowrap;">
+                                <input id="chk-{$group.ID}" type="checkbox" class="group_check" value="{$result.guid}">
+                            </td>
+                            <td id="name-{$group.name|replace:".":"_"}">
+                                <div class="disabled_notice" >Group currently being reset.</div>
+                                <div class="edit_name pointer group-name" id="{$group.ID}" >{$group.name|replace:"alt.binaries":"a.b"}</div>
+                                <br />
+                                <div class="tablehint edit_desc pointer" style="display: inline-block; margin-right: 20px;" id="{$group.ID}">{$group.description}</div>
+                            </td>
+                    {elseif $group.active == 8} {* Group is in the process of being purged *}
+                        <tr id="disabled-{$group.ID}" class="{cycle values=",alt"}">
+                            <td style="width:26px;text-align:center;white-space:nowrap;">
+                                <input id="chk-{$group.ID}" type="checkbox" class="group_check" value="{$result.guid}">
+                            </td>
+                            <td id="name-{$group.name|replace:".":"_"}">
+                                <div class="disabled_notice">Group currently being purged.</div>
+                                <div class="edit_name pointer group-name" id="{$group.ID}" >{$group.name|replace:"alt.binaries":"a.b"}</div>
+                                <br />
+                                <div class="tablehint edit_desc pointer" style="display: inline-block; margin-right: 20px;" id="{$group.ID}">{$group.description}</div>
+                            </td>
+                    {else} {* Just a normal group *}
+                        <tr id="grouprow-{$group.ID}" class="{cycle values=",alt"}">
+                            <td style="width:26px;text-align:center;white-space:nowrap;">
+                                <input id="chk-{$group.ID}" type="checkbox" class="group_check" value="{$result.guid}">
+                            </td>
+                            <td id="name-{$group.name|replace:".":"_"}">
+                                <div class="edit_name pointer group-name" id="{$group.ID}" >{$group.name|replace:"alt.binaries":"a.b"}</div>
+                                <br />
+                                <div class="tablehint edit_desc pointer" style="display: inline-block; margin-right: 20px;" id="{$group.ID}">{$group.description}</div>
+                            </td>
+                    {/if}
+                            <td class="less">{$group.first_record_postdate|timeago}</td>
+                            <td class="less">{$group.last_record_postdate|timeago}</td>
+                            <td class="less">{$group.last_updated|timeago} ago</td>
+                            <td class="less" id="group-{$group.ID}">{if $group.active=="1"}<a id="btnDeactivate-{$group.ID}" class="noredtext btn btn-deactivate btn-xs">Deactivate</a>{else}<a id="btnActivate-{$group.ID}" class="noredtext btn btn-activate btn-xs">Activate</a>{/if}</td>
+                            <td class="less" id="backfill-{$group.ID}">{if $group.backfill=="1"}<a id="btnBackfillDeactivate-{$group.ID}" class="noredtext btn btn-deactivate btn-xs">Deactivate</a>{else}<a id="btnBackfillActivate-{$group.ID}" class="noredtext btn btn-activate btn-xs">Activate</a>{/if}</td>
+                            <td class="less"><a href="{$smarty.const.WWW_TOP}/../browse?g={$group.name}" title="Browse {$group.name}" >{$group.num_releases}</a></td>
+                            <td class="less edit_files pointer" id="{$group.ID}">{if $group.minfilestoformrelease==""}0{else}{$group.minfilestoformrelease}{/if}</td>
+                            <td class="less edit_size pointer" id="{$group.ID}" >{if $group.minsizetoformrelease==""}0.00 MB{else}{$group.minsizetoformrelease|fsize_format:"MB"}{/if}</td>
+                            <td class="less edit_backfill pointer" id="{$group.ID}" >{$group.backfill_target}</td>
+                        </tr>
                 {/foreach}
                 </tbody>
             </table>
@@ -315,7 +349,7 @@
 
                                 <tr>
                                     <td><div class="pull-left">Backfill Days:</div><div class="pull-right">
-                                            <i id="popBulkBackfill" class="icon-question-sign table-help-icon-modal" style="color: #2B4E72; font-size: medium;" data-toggle="popover" data-title="Backfill Days"
+                                            <i id="popBulkBackfillDays" class="icon-question-sign table-help-icon-modal" style="color: #2B4E72; font-size: medium;" data-toggle="popover" data-title="Backfill Days"
                                                data-content="The Backfill Days setting determines how far back nZEDbetter will attempt to retrieve header information for the group. Beware
                                                 that extremely large values for Backfill days will result in many more releases being generated, at the expense of a much longer backfill process.
                                                 In addition, extremely large values can have a detrimental impact on performance if you
@@ -381,7 +415,7 @@
 
                                 <tr>
                                     <td><div class="pull-left">Enable Backfill for Groups:</div><div class="pull-right">
-                                            <i id="popBackfill" class="icon-question-sign table-help-icon-modal" style="color: #2B4E72; font-size: medium;" data-toggle="popover" data-title="Group Backfill"
+                                            <i id="popBulkBackfill" class="icon-question-sign table-help-icon-modal" style="color: #2B4E72; font-size: medium;" data-toggle="popover" data-title="Group Backfill"
                                                data-content="The Group Backfill setting determines whether or not nZEDbetter will attempt to retrieve past headers for this group.  Normally, this
                                                should be set to 'Yes'.  However, when you are first initializing your server, it is advised to not enable backfill immediately.  Instead, backfill for
                                                groups should only be enabled once all groups have been activated and their headers are caught up to present.  Setting this option to 'No' will prevent
@@ -421,11 +455,15 @@
             </div>
             <div class="modal-body">
                 <p class="warning-heading">Please confirm that you wish to delete the following groups.<br />
-                    <span style="font-size: 13px; color: #333; line-height: 2.5em">
-                        You will not be able to undo this operation. Note that this will only delete the group entry from the database.  This will not
-                        affect collections, binaries, parts, or releases that already exist in the database.
+                    <span style="font-size: 13px; color: #333;">
+                        You will not be able to undo this operation. Note that this will only delete the group entry from the database.  Optionally, you can
+                        delete collections, binaries, parts, and/or releases in the database associated with the groups.
                     </span>
                 </p>
+                <form ID="formDeleteGroups">
+                    <input type="checkbox" id="chkFormDeleteCollections" style="margin-bottom: 15px;"/><label class="danger" for="chkFormDeleteCollections"> Delete collections, binaries, and parts for each group</label><br />
+                    <input type="checkbox" id="chkFormDeleteReleases" style="margin-bottom: 15px;"/><label class="danger" for="chkFormDeleteReleases"> Delete releases for each group</label>
+                </form>
                 <p id="modalDeleteGroupsList"></p>
             </div> <!-- modal-body Final Tag -->
             <div class="modal-footer">
@@ -445,11 +483,14 @@
             <div class="modal-body">
                 <p class="warning-heading">Please confirm that you wish to reset the following groups.<br />
                     <span style="font-size: 13px; color: #333;">
-                        You will not be able to undo this operation.  Once you confirm this operation, all collections, binaries, and parts related to these
-                        groups will be deleted.  In addition, the First Post, Last Post, and Last Updated fields will be reset to null. You should only proceed
-                        if you truly wish to start over with the specified groups.<br /><strong>NOTE:</strong> Releases that already exist will remain in the database.
-                    </span>
+                        You will not be able to undo this operation.  Once you confirm this operation, the First Post, Last Post, and Last Updated fields for each group
+                        will be reset to null.  Optionally, all collections, binaries, and parts related to these groups will be deleted.  You should only proceed
+                        if you truly wish to start over with the specified groups.<br /><strong>NOTE:</strong> Releases that already exist will remain in the database.<br />
+                    </span><br />
                 </p>
+                <form ID="formResetGroups">
+                    <input type="checkbox" id="chkDeleteCollections" style="margin-bottom: 15px;"/><label class="danger" for="chkDeleteCollections"> Delete collections, binaries, and parts for each group</label>
+                </form>
                 <p id="modalResetGroupsList"></p>
             </div> <!-- modal-body Final Tag -->
             <div class="modal-footer">

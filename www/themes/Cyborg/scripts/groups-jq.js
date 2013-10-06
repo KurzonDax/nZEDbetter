@@ -6,6 +6,20 @@
  *
  */
 
+/* Grey out and disable elements for groups that are resetting or purging */
+$( document ).ready(function() {
+    $.each($("tr[id|='disabled']"), function () {
+        $(this).find(".group_check").attr("disabled", "disabled");
+        $(this).find("a").addClass("disabled").attr("disabled", "disabled").prop("disabled", true);
+        $(this).find("div, td").removeClass("edit_files edit_size edit_backfill edit_name edit_desc pointer").off('dblclick');
+        $(this).find("td").css("background-color", "#BBB");
+    });
+    if($("tr[id|='disabled']").length > 0) {
+        $("#group_list").prepend('<div id="dangerGroupsProcessing" class="alert-danger alert-pagetop">'+
+            '<b><i class="icon-warning-sign"></i> Alert!</b> Group(s) are currently processing either a reset or purge request.  It is recommended that you <a href="'+document.URL+'">refresh</a> the page periodically ' +
+            'to reflect the changes.  Until the process is completed, you will be unable to manage these groups.</div>');
+    }
+});
 jQuery(function($){
 
     <!-- **** Global Variables **** -->
@@ -254,6 +268,14 @@ jQuery(function($){
             return arrGroups;
         else
             return  $.param({id : arrGroups});
+    }
+
+    function disableCheckedItems() {
+        $.each($(".group_check:checked"), function () {
+            $(this).attr("disabled", "disabled").parent().parent().find("a").addClass("disabled").attr("disabled", "disabled").prop("disabled", true);
+            $(this).parent().parent().find("div, td").removeClass("edit_files edit_size edit_backfill edit_name edit_desc pointer").off('dblclick');
+            $(this).parent().parent().find("td").css("background-color", "#BBB");
+        });
     }
 
     function setButtons() {
@@ -539,7 +561,7 @@ jQuery(function($){
 
     $("a[id|='groupMulti']").on('click', function() {
         if ($(".group_check:checked").length == 0) {
-            alert("No groups selected to delete!");
+            alert("No groups selected to process!");
             return;
         }
         var action = $(this).attr('id').replace('groupMulti-','');
@@ -558,7 +580,14 @@ jQuery(function($){
                     setActiveLinks();
                 displayNotification(data);
             },
-            error: function(xhr,err,e) { alert( "Error in Toggle Active Status: " + err ); }
+            error   : function(xhr,err,e)
+            {
+                setButtons();
+                $(document).scrollTop(0);
+                $("#group_list").prepend('<div id="dangerGroupsMultiError" class="alert-danger alert-pagetop">'+
+                    '<b><i class="icon-warning-sign"></i> ERROR!</b> The following error occurred while attempting to to process your request:<br /> ' +
+                    err + '<br />You should <a href="'+document.URL+'">refresh</a> the page and attempt the operation again.</div>');
+            }
         });
     });
 
@@ -574,12 +603,14 @@ jQuery(function($){
 
     $("#group-Delete").click(function() {
         $("#modalDeleteGroupsList").html(getGroupList());
+        $("#formDeleteGroups").find("input[type='checkbox']").prop('checked', false);
         $("#modalDeleteGroups").css('margin-left',function(){ return (-($(this).width()/2)).toString()+"px"})
             .modal("show");
     });
 
     $("#group-Reset").click(function() {
         $("#modalResetGroupsList").html(getGroupList());
+        $("#chkDeleteCollections").prop('checked', false);
         $("#modalResetGroups").css('margin-left',function(){ return (-($(this).width()/2)).toString()+"px"})
             .modal("show");
     });
@@ -590,5 +621,139 @@ jQuery(function($){
             .modal("show");
     });
 
+    $("#btnConfirmDeleteGroups").click(function(){
+        if ($(".group_check:checked").length == 0) {
+            alert("No groups selected to delete!");
+            return;
+        }
+        var action = 'deleteGroups';
+        if ($("#chkFormDeleteCollections").prop('checked')==true) {
+            action = action + "&deleteCollections=1"
+        }
+        if ($("#chkFormDeleteReleases").prop('checked')==true) {
+            action = action + "&deleteReleases=1"
+        }
+        if(action.length>12){ // Only show alert if we're deleting collections or releases
+            $("#group_list").prepend('<div id="warningGroupsDeleteStart" class="alert-warning alert-pagetop">'+
+                '<b><i class="icon-warning-sign"></i> Warning!</b> Group(s) are in the process of being reset. Please <strong>DO NOT</strong> ' +
+                'refresh or leave this page until the process is complete.  This process may take some time to finish.</div>');
+        }
+        var rand_no = Math.random();
+        groupIDs = getCheckedIDs();
+        $.ajax({
+            url       : WWW_TOP + '/admin/ajax-group-ops.php',
+            data      : 'action='+action+'&rand=' + rand_no + '&' + groupIDs,
+            dataType  : "html",
+            type      : "POST",
+            success   : function(data)
+            {
+                $("#group_list").find("#warningGroupsDeleteStart").remove();
+                $.each($(".group_check:checked"), function() {
+                    $(this).parent().parent().remove();
+                });
+                setButtons();
+                displayNotification(data);
+            },
+            error   : function(xhr,err,e)
+            {
+                setButtons();
+                $(document).scrollTop(0);
+                $("#group_list").prepend('<div id="dangerGroupsDeleteError" class="alert-danger alert-pagetop">'+
+                    '<b><i class="icon-warning-sign"></i> ERROR!</b> The following error occurred while attempting to delete the groups:<br /> ' +
+                    err + '<br />You should <a href="'+document.URL+'">refresh</a> the page and attempt the operation again.</div>');
+            }
+        });
+
+    });
+
+    $("#btnConfirmResetGroups").click(function(){
+        if ($(".group_check:checked").length == 0) {
+            alert("No groups selected to reset!");
+            return;
+        }
+        disableCheckedItems();
+        $(document).scrollTop(0);
+        $("#group_list").prepend('<div id="warningGroupsResetStart" class="alert-warning alert-pagetop">'+
+            '<b><i class="icon-warning-sign"></i> Warning!</b> Group(s) are in the process of being reset. Please <strong>DO NOT</strong> ' +
+            'refresh or leave this page until the process is complete.</div>');
+        var action = 'resetGroups';
+        if($("#chkDeleteCollections").prop('checked')){
+            action = action + '&deleteCollections=1';
+            $("#warningGroupsResetStart").text().append(" This process may take some time to finish.");
+        }
+        var rand_no = Math.random();
+        groupIDs = getCheckedIDs();
+        $.ajax({
+            url       : WWW_TOP + '/admin/ajax-group-ops.php',
+            data      : 'action='+action+'&rand=' + rand_no + '&' + groupIDs,
+            dataType  : "html",
+            type      : "POST",
+            success   : function(data)
+            {
+                /*$.each($(".group_check:checked"), function () {
+                    $(this).prop('checked', false);
+                });*/
+                $("#group_list").find("#warningGroupsResetStart").remove();
+                setButtons();
+                $(document).scrollTop(0);
+                $("#group_list").prepend('<div id="successGroupsResetEnd" class="alert-success alert-pagetop">'+
+                    '<b><i class="icon-ok-sign"></i> Alert!</b> Group(s) have been reset. It is strongly recommended that you <a href="'+document.URL+'">refresh</a> the page ' +
+                    'to reflect the changes.</div>');
+                displayNotification(data);
+            },
+            error   : function(xhr,err,e)
+            {
+                $("#group_list").find("#warningGroupsResetStart").remove();
+                setButtons();
+                $(document).scrollTop(0);
+                $("#group_list").prepend('<div id="dangerGroupsResetError" class="alert-danger alert-pagetop">'+
+                    '<b><i class="icon-warning-sign"></i> ERROR!</b> The following error occurred while attempting to reset the groups:<br /> ' +
+                    err + '<br />You should <a href="'+document.URL+'">refresh</a> the page and attempt the operation again.</div>');
+            }
+        });
+    });
+
+    $("#btnConfirmPurgeGroups").click(function(){
+        if ($(".group_check:checked").length == 0) {
+            alert("No groups selected to purge!");
+            return;
+        }
+        $("#group_list").prepend('<div id="warningGroupsPurgeStart" class="alert-warning alert-pagetop">'+
+            '<b><i class="icon-warning-sign"></i> Warning!</b> Group(s) are in the process of being purged. Please <strong>DO NOT</strong> ' +
+            'refresh or leave this page until the process is complete. This process may take some time to finish.</div>');
+        disableCheckedItems();
+        var action = 'purgeGroups';
+        var rand_no = Math.random();
+        groupIDs = getCheckedIDs();
+        $.ajax({
+            url       : WWW_TOP + '/admin/ajax-group-ops.php',
+            data      : 'action='+action+'&rand=' + rand_no + '&' + groupIDs,
+            dataType  : "html",
+            type      : "POST",
+            success   : function(data)
+            {
+                /*$.each($(".group_check:checked"), function () {
+                    $(this).prop('checked', false);
+                });*/
+                $("#group_list").find("#warningGroupsPurgeStart").remove();
+                setButtons();
+                $(document).scrollTop(0);
+                $("#group_list").prepend('<div id="successGroupsPurgeEnd" class="alert-success alert-pagetop">' +
+                    '<b><i class="icon-ok-sign"></i> Alert!</b> Group(s) have been purged. It is strongly recommended that you <a href="'+document.URL+'">refresh</a> the page ' +
+                    'to reflect the changes.</div>');
+                displayNotification(data);
+            },
+            error   : function(xhr,err,e)
+            {
+                $("#group_list").find("#warningGroupsPurgeStart").remove();
+                setButtons();
+                $(document).scrollTop(0);
+                $("#group_list").prepend('<div id="dangerGroupsPurgetError" class="alert-danger alert-pagetop">'+
+                    '<b><i class="icon-warning-sign"></i> ERROR!</b> The following error occurred while attempting to purge the groups:<br /> ' +
+                    err + '<br />You should <a href="'+document.URL+'">refresh</a> the page and attempt the operation again.</div>');
+            }
+        });
+
+    });
 });
 

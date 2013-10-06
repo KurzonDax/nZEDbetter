@@ -2880,6 +2880,12 @@ input[type="number"] {
     margin-top: 10px;
 }
 
+.alert-pagetop {
+    margin-bottom: 15px;
+    font-size: large;
+    line-height: 1.4em;
+}
+
 #groupsearch .input-group {
     position: relative;
     display: inline-flex;
@@ -2936,4 +2942,42 @@ p.warning-heading {
     color: darkred;
     border-bottom: 1px solid darkgray;
     padding-bottom: 3px;
+    margin-bottom: 10px;
+}
+
+label.danger {
+    display: inline;
+    vertical-align: 2px;
+    font-weight: 500;
+    color: darkred;
+}
+
+#modalResetGroupsList, #modalPurgeGroupsList, #modalDeleteGroupsList {
+    margin-top: 10px;
+    border: 1px solid #AAA;
+    padding: 15px;
+    background-color: #F3F3F3;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: 4px 4px 6px #999;
+    -moz-box-shadow: 4px 4px 6px #999;
+    box-shadow: 4px 4px 6px #999;
+    color: #888888;
+    text-align: left;
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    column-count: 2;
+    -webkit-column-gap: 30px;
+    -moz-column-gap: 30px;
+    column-gap: 30px;
+    -webkit-column-rule: 1px solid #C0C0C0;
+    -moz-column-rule: 1px solid #C0C0C0;
+    column-rule: 1px solid #C0C0C0;
+}
+
+tr td div.disabled_notice {
+    font-weight: 600;
+    font-size: 14px;
+    color: darkred;
 }

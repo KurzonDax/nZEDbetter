@@ -2109,6 +2109,14 @@ class Releases
             if($echooutput)
                 echo "\n".$dupecount." cross-posted releases deleted.\n";
         }
+        // Following added to handle releases that need to be deleted due to purging groups
+        // in the Admin section of the website.  See comments in groups.php->purge function.
+        if ($echooutput)
+            echo "\nDeleting releases marked for purge by Admin...\n";
+        $rels = $db->query("SELECT ID FROM releases WHERE groupID=999999");
+        foreach ($rels as $rel)
+            $this->delete($rel["ID"]);
+
         If ($echooutput)
             echo "\nStage completed in ".$consoletools->convertTime(TIME() - $stage7).".\n";
 	}

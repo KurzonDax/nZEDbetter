@@ -246,21 +246,42 @@ class Groups
 		return $db->query("update groups set backfill_target=0, first_record=0, first_record_postdate=null, last_record=0, last_record_postdate=null, last_updated=null, active = 0");
 	}
 
-	public function purge($id)
+	public function purge($groupID)
 	{
-		$db = new DB();
+        if(empty($groupID) || $groupID===0 || $groupID=='')
+            return 'ERROR: (purge) No group ID provided.';
+        $db = new DB();
 		$releases = new Releases();
-		$binaries = new Binaries();
 
-		$this->reset($id);
+		$error = $this->deleteGroupCollections($groupID);
+        if($error != '')
+            return $error;
 
-		$rels = $db->query(sprintf("select ID from releases where groupID = %d", $id));
-		foreach ($rels as $rel)
+        if(!(is_array($groupID)))
+            $where = " groupID=".$groupID;
+        else
+        {
+            $inClause = '(';
+            foreach($groupID as $id)
+                $inClause .= $id.",";
+            $where = " groupID IN ".substr($inClause,0,-1).")";
+        }
+
+        // The following will not work when the tmux scripts are being run
+        // under a user other than www-data because the nzb directories were
+        // created by the tmux user and www-data does not have permissions to
+        // delete files from those directories.
+        /*
+         *  $rels = $db->query("SELECT ID FROM releases WHERE".$where);
+                foreach ($rels as $rel)
 			$releases->delete($rel["ID"]);
-
-		$cols = $db->query(sprintf("select ID from collections where groupID = %d", $id));
-		foreach ($cols as $col)
-			$binaries->delete($col["ID"]);
+         */
+        // As an interim solution, we'll set the groupID to 999999 and add
+        // a routine into stage7a in releases.php to check for these releases
+        // during the purge thread.  If any are found, we'll delete the release
+        // and associated database entries and nzb file then.
+        $db->query("UPDATE releases SET groupID=999999 WHERE".$where);
+		return 0;
 	}
 
 	public function purgeall()
@@ -279,6 +300,32 @@ class Groups
 		foreach ($cols as $col)
 			$binaries->delete($col["ID"]);
 	}
+
+    public function deleteGroupCollections($groupID)
+    {
+        if(empty($groupID) || $groupID===0 || $groupID=='')
+            return 'ERROR: (deleteGroupCollections) No group ID provided.';
+        if(!(is_array($groupID)))
+            $where = " groupID=".$groupID;
+        else
+        {
+            $inClause = '(';
+            foreach($groupID as $id)
+                $inClause .= $id.",";
+            $where = " groupID IN ".substr($inClause,0,-1).")";
+        }
+        $db = new DB();
+        $collections = $db->queryDirect("SELECT ID FROM collections WHERE".$where);
+        while($colRow = $db->fetchAssoc($collections))
+        {
+            $db->query("DELETE FROM binaries WHERE collectionID=".$colRow['ID']);
+            if($db->Error()){return $db->Error();}
+            $db->query("DELETE FROM parts WHERE collectionID=".$colRow['ID']);
+            if($db->Error()){return $db->Error();}
+        }
+        $db->query("DELETE FROM collections WHERE".$where);
+        return $db->Error();
+    }
 
 	public function update($group)
 	{
@@ -362,17 +409,20 @@ class Groups
 		return "Backfill for group ".$this->getByNameByID($id)." has been ".$status.".";
 	}
 
+
     /**
      * Multiple group actions.  Possible values for $action are:
      * allActive, allInactive, toggleActive, allBackfillActive,
      * allBackfillInactive, allBackfillToggle, deleteGroups,
      * and resetGroups
      *
-     * @param $groupIDs
-     * @param $action
+     * @param array $groupIDs
+     * @param string $action
+     * @param bool $deleteCollections
+     * @param bool $deleteReleases
      * @return string
      */
-    public function multiGroupAction($groupIDs, $action)
+    public function multiGroupAction($groupIDs, $action, $deleteCollections=false, $deleteReleases=false)
     {
         $db = new DB();
         $inClause = '(';
@@ -405,12 +455,46 @@ class Groups
                 $msg = "Selected groups backfill status has been toggled.";
                 break;
             case 'deleteGroups':
-                $sql = "DELETE groups FROM groups WHERE ID IN ".substr($inClause,0,-1).')';
+                $error = '';
                 $msg = "Selected groups have been DELETED";
+                if($deleteCollections)
+                {
+                    $db->query("UPDATE groups SET active = 6 WHERE ID IN ".substr($inClause,0,-1).')');
+                    $error = $this->deleteGroupCollections($groupIDs);
+                    if($error != '') {return 'ERROR: (deleteGroupCollections) '.$error;}
+                    $msg .= " (including collections)";
+                }
+                if($deleteReleases)
+                {
+                    $db->query("UPDATE groups SET active = 6 WHERE ID IN ".substr($inClause,0,-1).')');
+                    $db->query("UPDATE releases SET groupID=999999 WHERE groupID IN ".substr($inClause,0,-1).')');
+                    if($error != '') {return 'ERROR: (purge) '.$error;}
+                    $msg .= " (including releases)";
+                }
+                $sql = "DELETE groups FROM groups WHERE ID IN ".substr($inClause,0,-1).')';
+
                 break;
             case 'resetGroups':
-                $sql = "UPDATE groups SET backfill_target=0, first_record=0, first_record_postdate=null, last_record=0, last_record_postdate=null, active = 0, last_updated=null WHERE ID IN ".substr($inClause,0,-1).')';
-                $msg = "Selected groups have been RESET.";
+                $db->query("UPDATE groups SET active = 7 WHERE ID IN ".substr($inClause,0,-1).')');
+                $msg = "Selected groups have been RESET ";
+                if($deleteCollections)
+                {
+                    $error = $this->deleteGroupCollections($groupIDs);
+                    if($error != '') {return 'ERROR: (deleteGroupCollections) '.$error;}
+                    $msg .= " (including collections)";
+                }
+                $sql = "UPDATE groups SET first_record=0, first_record_postdate=null, last_record=0, last_record_postdate=null, active = 0, backfill = 0, last_updated=null WHERE ID IN ".substr($inClause,0,-1).')';
+                break;
+            case 'purgeGroups':
+                $db->query("UPDATE groups SET active = 8 WHERE ID IN ".substr($inClause,0,-1).')');
+                $error = $this->purge($groupIDs);
+                if($error === 0)
+                {
+                    $sql = "UPDATE groups SET first_record=0, first_record_postdate=null, last_record=0, last_record_postdate=null, active = 0, backfill = 0, last_updated=null WHERE ID IN ".substr($inClause,0,-1).')';
+                    $msg = "Selected groups have been PURGED.";
+                }
+                else
+                    return 'ERROR: (deleteGroupCollections) '.$error;
                 break;
             default:
                 return "ERROR IN multiGroupAction. Invalid action.";

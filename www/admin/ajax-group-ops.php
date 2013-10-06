@@ -143,8 +143,18 @@ else if(isset($_POST['action']) && !empty($_POST['action']) && !empty($_POST['id
 {
     foreach($_POST['id'] as $grpID)
         $groupIDs[] = $grpID;
-    print $group->multiGroupAction($groupIDs, $_POST['action']);
+
+    print $group->multiGroupAction($groupIDs, $_POST['action'], (isset($_POST['deleteCollections'])), (isset($_POST['deleteReleases'])));
     exit;
+}else if(isset($_POST['action']) && !empty($_POST['action']))
+{
+    // BELOW FOR TESTING ONLY.... NEEDS TO BE REMOVED
+    if($_POST['action'] == 'sleep')
+    {
+        sleep(5);
+        Print 'Sleep is done for group '.$_POST['group'];
+        exit;
+    }
 }
 
 if(isset($_POST["checkname"]) && $_POST['checkname'] !='')
@@ -159,3 +169,4 @@ if(isset($_POST["checkname"]) && $_POST['checkname'] !='')
         print '#!GROUP EXISTS';
     }
 }
+
