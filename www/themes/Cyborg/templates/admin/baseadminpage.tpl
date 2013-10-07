@@ -46,6 +46,7 @@
 <div id="topbar">
     <div class="container">
         <div id="top-nav">
+            <a href="../index.php"><i class="icon-home"></i> Return to Main Site</a>
             <ul class="pull-right">
                 <li><i class="icon-user"></i> Logged in as {$username}</li>
                 <li><a href="{$smarty.const.WWW_TOP}/../logout">Logout</a></li>
@@ -55,7 +56,7 @@
 </div>
 
 <div id="header">
-    <a href="./index.php" class="logo">Admin Area</a>
+    <a href="../index.php" class="logo">Admin Area</a>
 
     <div class="nav-collapse">
         <ul id="main-nav" class="nav pull-right">
