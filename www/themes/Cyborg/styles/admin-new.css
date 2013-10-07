@@ -2285,14 +2285,25 @@ Layout: Main Nav
     right: 100%;
 }
 #main-nav .caret {
-    margin-top: 8px;
-    margin-left: .25em;
+    margin-left: .75em;
     border-top-color: #FFF;
-    opacity: 0.65;
     filter: alpha(opacity=65);
 }
 #main-nav .active .dropdown-toggle .caret {
     border-top-color: #1d354d;
+}
+
+.caret {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 2px;
+    vertical-align: middle;
+    border-top: 7px solid #000;
+    border-right: 4px solid rgba(0, 0, 0, 0);
+    border-bottom: 0 dotted;
+    border-left: 4px solid rgba(0, 0, 0, 0);
+    content: "";
 }
 /*------------------------------------------------------------------
 

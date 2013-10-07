@@ -57,9 +57,9 @@
 
 <div id="header">
     <a href="../index.php" class="logo">Admin Area</a>
-
-    <div class="nav-collapse">
-        <ul id="main-nav" class="nav pull-right">
+    {* <div class="nav-collapse"> *}
+    <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul id="main-nav" class="nav navbar-nav pull-right">
             <li class="nav-icon">
                 <a href="./index.php">
                     <i class="icon-home"></i>
@@ -67,51 +67,51 @@
                 </a>
             </li>
 
-            <li class="dropdown active">
-                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <i class="icon-cog"></i>
-                    <span>Settings</span>
+                    Settings
                     <b class="caret"></b>
                 </a>
 
                 <ul class="dropdown-menu">
-                    <li><a href="./site-edit.php">Site Settings</a></li>
-                    <li><a href="./tmux-edit.php">Script Settings</a></li>
-                    <li><a href="./group-list.php">News Groups</a></li>
-                    <li><a href="./category-list.php">Categories</a></li>
-                    <li><a href="./binaryblacklist-list.php">Blacklists</a></li>
+                    <li><a href="site-edit.php">Site Settings</a></li>
+                    <li><a href="tmux-edit.php">Script Settings</a></li>
+                    <li><a href="group-list.php">Newsgroups</a></li>
+                    <li><a href="category-list.php">Categories</a></li>
+                    <li><a href="binaryblacklist-list.php">Blacklists</a></li>
                 </ul>
             </li>
 
             <li class="dropdown">
-                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <i class="icon-group"></i>
                     <span>Users and Roles</span>
                     <b class="caret"></b>
                 </a>
 
                 <ul class="dropdown-menu">
-                    <li><a href="./role-list.php">Roles</a></li>
-                    <li><a href="./user-list.php">Users</a></li>
+                    <li><a href="role-list.php">Roles</a></li>
+                    <li><a href="user-list.php">Users</a></li>
                 </ul>
             </li>
 
             <li class="dropdown">
-                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <i class="icon-sitemap"></i>
                     <span>Content</span>
                     <b class="caret"></b>
                 </a>
 
                 <ul class="dropdown-menu">
-                    <li><a href="./menu-list.php">Menu Items</a></li>
-                    <li><a href="./content-list.php">Content Pages</a></li>
+                    <li><a href="menu-list.php">Menu Items</a></li>
+                    <li><a href="content-list.php">Content Pages</a></li>
                 </ul>
             </li>
         </ul>
 
     </div>
-    <!-- end #menu -->
+   <!-- end #menu -->
 </div>
 <div id="masthead">
 
