@@ -118,22 +118,22 @@
                     </tr>
                 {/if}
 
-                {if $boo}
+                {if $book}
                     <tr>
                         <th style="vertical-align:top">Book Info:</th>
-                        <td><strong>{$boo.title|escape:"htmlall"}{if $boo.publishdate != "0000-00-00 00:00:00"} ({$boo.publishdate|date_format:"%Y"}){/if}</strong><br>
-                            {if $boo.author != ""}<strong>Author:</strong> {$boo.author|escape:"htmlall"}<br>{/if}
-                            {if $boo.genre != "null"}<strong>Genre:</strong> {$boo.genre|escape:"htmlall"}<br>{/if}
-                            {if $boo.publisher != ""}<strong>Publisher:</strong> {$boo.publisher|escape:"htmlall"}<br>{/if}
-                            {if $boo.publishdate != ""}<strong>Released:</strong> {$boo.publishdate|date_format}<br>{/if}
-                            {if $boo.pages != ""}<strong>Pages:</strong> {$boo.pages|escape:"htmlall"}<br>{/if}
-                            {if $boo.salesrank != ""}<strong>Amazon Rank:</strong> {$boo.salesrank|escape:"htmlall"}<br>{/if}
-                            {if $boo.asin != ""}<strong>ASIN:</strong> {$boo.asin|escape:"htmlall"}<br>{/if}
-                            {if $boo.isbn != ""}<strong>ISBN:</strong> {$boo.isbn|escape:"htmlall"}<br>{/if}
-                            {if $boo.ean != ""}<strong>EAN:</strong> {$boo.ean|escape:"htmlall"}<br>{/if}
-                            {if $boo.overview != "null"}<strong>Overview:</strong> {$boo.overview|escape:"htmlall"}{/if}
+                        <td><strong>{$book.title|escape:"htmlall"}{if $book.publishdate != "0000-00-00 00:00:00"} ({$book.publishdate|date_format:"%Y"}){/if}</strong><br>
+                            {if $book.author != ""}<strong>Author:</strong> {$book.author|escape:"htmlall"}<br>{/if}
+                            {if $book.genre != "null"}<strong>Genre:</strong> {$book.genre|escape:"htmlall"}<br>{/if}
+                            {if $book.publisher != ""}<strong>Publisher:</strong> {$book.publisher|escape:"htmlall"}<br>{/if}
+                            {if $book.publishdate != ""}<strong>Released:</strong> {$book.publishdate|date_format}<br>{/if}
+                            {if $book.pages != ""}<strong>Pages:</strong> {$book.pages|escape:"htmlall"}<br>{/if}
+                            {if $book.salesrank != ""}<strong>Amazon Rank:</strong> {$book.salesrank|escape:"htmlall"}<br>{/if}
+                            {if $book.asin != ""}<strong>ASIN:</strong> {$book.asin|escape:"htmlall"}<br>{/if}
+                            {if $book.isbn != ""}<strong>ISBN:</strong> {$book.isbn|escape:"htmlall"}<br>{/if}
+                            {if $book.ean != ""}<strong>EAN:</strong> {$book.ean|escape:"htmlall"}<br>{/if}
+                            {if $book.overview != "null"}<strong>Overview:</strong> {$book.overview|escape:"htmlall"}{/if}
                             <div style="margin-top:10px;">
-                                <a class="label" target="_blank" href="{$site->dereferrer_link}{$boo.url}/" title="View book at Amazon">Amazon</a>
+                                <a class="label" target="_blank" href="{$site->dereferrer_link}{$book.url}/" title="View book at Amazon">Amazon</a>
                             </div>
                         </td>
                     </tr>

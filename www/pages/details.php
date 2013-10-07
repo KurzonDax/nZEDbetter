@@ -122,7 +122,7 @@ if (isset($_GET["id"]))
 	$page->smarty->assign('anidb',$AniDBAPIArray);
 	$page->smarty->assign('music',$mus);
 	$page->smarty->assign('con',$con);
-	$page->smarty->assign('boo',$boo);
+	$page->smarty->assign('book',$boo);
 	$page->smarty->assign('comments',$comments);
 	$page->smarty->assign('similars',$similars);
 	$page->smarty->assign('searchname',$releases->getSimilarName($data['searchname']));
