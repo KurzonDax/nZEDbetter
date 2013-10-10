@@ -1,0 +1,377 @@
+!!!!!!!!IMPORTANT!!!!!!!!
+These instructions are the result of a lot of blood, sweat and tears, not to mention a ton of
+research on the web.  A couple of things to note:
+	1. In the end, the web-site portion of your server that you would view with a browser will
+		probbaly not work correctly.  I think the problem is either in the ngnix config or
+		maybe a permission issue.  I just haven't messed with tracking it down.  The search
+		API will still work just fine though, which is what counts for nZEDbetter.
+
+	2. You don't need much horsepower for this thing.  I'm running it as a VM with 4GB RAM and 
+		two processor cores dedicated to it.  The hard disk space runs around 20GB or so.
+
+	3. At some point in the near future, I'll put a better copy of these instructions on the
+		nZEDbetter wiki (nzedbetter.com).
+
+	4. Lastly, if you want to have a GUI for your server, LXDE is an ok choice.  It's a little
+		buggy, but basic functionality is there.
+
+Start with fresh install of Ubuntu 12.04 SERVER
+
+sudo su   <----- IMPORTANT
+apt-get install postgresql postgresql-server-dev-all postgresql-contrib libpq-dev git-core \
+	memcached build-essential libxml2-dev libpq-dev libexpat1-dev libdb-dev libicu-dev nginx perl
+cd /opt
+git clone git://github.com/metabrainz/musicbrainz-server.git musicbrainz
+cd musicbrainz
+cp lib/DBDefs.pm.sample lib/DBDefs.pm
+
+<Edit DBDefs.pm>
+nano lib/DBDefs.pm
+
+<Edit the following lines.  Most will be commented out with a #.  Remove the #>
+<Change the myserver.com to whatever.  I just used "localhost">
+sub REPLICATION_TYPE { RT_SLAVE }
+sub WEB_SERVER                { "myserver.com" }
+sub DB_STAGING_SERVER { 0 }
+sub CATALYST_DEBUG { 0 }
+sub DEVELOPMENT_SERVER { 0 }
+sub EMAIL_BUGS { 'myemail@myserver.com' }
+
+<Create cpanfile>
+nano cpanfile
+
+<Paste the following into the blank file>
+requires 'Algorithm::Diff';
+requires 'Algorithm::Merge';
+requires 'Authen::Passphrase';
+requires 'CGI::Expand';
+requires 'CSS::Minifier';
+requires 'Cache::Memcached';
+requires 'Cache::Memcached::Fast';
+requires 'Cache::Memory';
+requires 'Captcha::reCAPTCHA';
+requires 'Catalyst::Action::RenderView'               => '0.09';
+requires 'Catalyst::Authentication::Credential::HTTP' => '1.009';
+requires 'Catalyst::Plugin::Authentication'           => '0.10011';
+requires 'Catalyst::Plugin::Cache';
+requires 'Catalyst::Plugin::Cache::HTTP';
+requires 'Catalyst::Plugin::ErrorCatcher';
+requires 'Catalyst::Plugin::I18N'                     => '0.09';
+requires 'Catalyst::Plugin::StackTrace';
+requires 'Catalyst::Plugin::Unicode::Encoding'        => '1.2';
+requires 'Catalyst::Runtime'                          => '5.90007';
+requires 'Catalyst::View::TT'                         => '0.29';
+requires 'Class::MOP';
+requires 'Clone';
+requires 'Cwd';
+requires 'DBD::Pg'                                    => '2.11.8';
+requires 'DBI'                                        => '1.607';
+requires 'DBIx::Connector';
+requires 'Data::Compare';
+requires 'Data::Dumper::Concise';
+requires 'Data::OptList';
+requires 'Data::Page'                                 => '2.01';
+requires 'Data::UUID::MT'                             => '0.004';
+requires 'Date::Calc'                                 => '5.8';
+requires 'DateTime::Format::Duration'                 => '1.03';
+requires 'DateTime::Format::ISO8601';
+requires 'DateTime::Format::Natural'                  => '0.96';
+requires 'DateTime::Format::Pg'                       => '0.16004';
+requires 'DateTime::TimeZone';
+requires 'Digest::HMAC_SHA1'                          => '1.03';
+requires 'Digest::MD5'                                => '2.36';
+requires 'Digest::MD5::File';
+requires 'Digest::SHA1'                               => '2.110';
+requires 'Email::Address';
+requires 'Email::MIME';
+requires 'Email::MIME::Creator';
+requires 'Email::Sender';
+requires 'Email::Valid';
+requires 'Encode::Detect'                             => '1.01';
+requires 'Exception::Class'                           => '1.29';
+requires 'FCGI';
+requires 'FCGI::ProcManager';
+requires 'File::Spec';
+requires 'GnuPG'                                      => '0.17';
+requires 'HTML::FormHandler'                          => '0.40013';
+requires 'HTML::Tiny'                                 => '1.05';
+requires 'HTML::TreeBuilder::XPath';
+requires 'Hash::Merge';
+requires 'IO::All';
+requires 'JSON'                                       => '2.14';
+requires 'JSON::XS'                                   => '2.27';
+requires 'Javascript::Closure';
+requires 'List::AllUtils';
+requires 'List::MoreUtils'                            => '0.22';
+requires 'List::UtilsBy'                              => '0.06';
+requires 'Locale::Messages';
+requires 'Locale::PO';
+requires 'Log::Dispatch';
+requires 'MRO::Compat'                                => '0.10';
+requires 'Math::Random::Secure';
+requires 'Method::Signatures::Simple';
+requires 'Module::Pluggable'                          => '3.9';
+requires 'Moose'                                      => '2.0402';
+requires 'MooseX::ABC'                                => '0.05';
+requires 'MooseX::Clone';
+requires 'MooseX::Getopt';
+requires 'MooseX::MethodAttributes'                   => '0.24';
+requires 'MooseX::Role::Parameterized'                => '0.16';
+requires 'MooseX::Runnable';
+requires 'MooseX::Singleton';
+requires 'MooseX::Types'                              => '0.16';
+requires 'MooseX::Types::Structured'                  => '0.24';
+requires 'MooseX::Types::URI'                         => '0.03';
+requires 'Net::Amazon::AWSSign';
+requires 'Net::Amazon::S3::Policy'                    => '0.1.2';
+requires 'Net::CoverArtArchive';
+requires 'Package::Stash'                             => '0.29';
+requires 'Plack::Handler::FCGI';
+requires 'Plack::Middleware::Debug';
+requires 'REST::Utils'                                => '0.4';
+requires 'Readonly'                                   => '1.03';
+requires 'Redis'                                      => '1.961';
+requires 'Set::Scalar';
+requires 'Statistics::Basic'                          => '1.6602';
+requires 'String::CamelCase';
+requires 'String::ShellQuote'                         => '1.030';
+requires 'String::TT'                                 => '0.03';
+requires 'Sys::Hostname';
+requires 'Template::Plugin::Class';
+requires 'Template::Plugin::JavaScript';
+requires 'Template::Plugin::Map';
+requires 'Template::Plugin::Math';
+requires 'Text::MicroTemplate';
+requires 'Text::Trim'                                 => '1.02';
+requires 'Text::Unaccent';
+requires 'Text::WikiFormat'                           => '0.80';
+requires 'Throwable';
+requires 'Time::Duration';
+requires 'TryCatch';
+requires 'URI'                                        => '1.50';
+requires 'Unicode::ICU::Collator';
+requires 'XML::Generator';
+requires 'XML::Parser::Lite'                          => '0.714';
+requires 'XML::RSS::Parser::Lite'                     => '0.10';
+requires 'XML::SemanticDiff'                          => '1.0000';
+requires 'XML::Simple'                                => '2.14';
+requires 'XML::XPath';
+
+<Install Carton>
+cpan Carton
+
+NOTE: For me, everything did not install the first time through, so i had to run 'cpan Carton' a second time>
+
+<Install the PERL packages needed by MusicBrainz>
+carton install --deployment; carton install; carton install --deployment
+NOTE: you may see a couple of errors here.
+
+<Build Postgres libraries required by MusicBrainz>
+
+https://github.com/metabrainz/postgresql-musicbrainz-unaccent.git
+cd postgresql-musicbrainz-unaccent && make && make install; cd ..
+git clone https://github.com/metabrainz/postgresql-musicbrainz-collate.git
+cd postgresql-musicbrainz-collate && make && make install; cd ..
+
+<Modify Postgres Authentication>
+mv /etc/postgresql/9.1/main/pg_hba.conf /etc/postgresql/9.1/main/pg_hba.backup
+nano /etc/postgresql/9.1/main/pg_hba.conf
+
+Paste the following line and save:
+local   all    all    trust
+
+Restart Postgres:
+service postgresql restart
+
+<Download the latest dumps>
+mkdir dumps
+
+ftp://ftp.musicbrainz.org/pub/musicbrainz/data/fullexport
+choose whatever the most recent folder is, and download the following to /opt/musicbrainz/dumps:
+mbdump-cover-art-archive.tar.bz2
+mbdump-cdstubs.tar.bz2
+mbdump-derived.tar.bz2
+mbdump-documentation.tar.bz2
+mbdump-editor.tar.bz2
+mbdump-stats.tar.bz2
+mbdump.tar.bz2
+
+<Create users and databases>
+
+su - postgres
+(you may need to create a password for postgres, if so, use passwd postgres)
+createuser -d -a -P musicbrainz
+usermod -a -G musicbrainz musicbrainz
+createdb musicbrainz_db
+exit
+
+<Build the database and import data>
+carton exec -- ./admin/InitDb.pl -- --createdb --import /opt/musicbrainz/dumps/mbdump*.tar.bz2 --echo
+
+<Configure ngnix>
+mv /etc/nginx/nginx.conf /etc/nginx/nginx.backup
+nano /etc/nginx/nginx.conf
+
+Paste the following into the blank file:
+user www-data;
+worker_processes 2;
+pid /var/run/nginx.pid;
+
+events {
+        worker_connections  1024;
+        multi_accept on;
+        use epoll;
+}
+
+http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+
+        access_log /var/log/nginx/access.log;
+        error_log /var/log/nginx/error.log;
+
+        tcp_nodelay                     on;
+        sendfile                        on;
+        tcp_nopush                      on;
+        keepalive_timeout               10;
+
+        client_max_body_size            20M;
+        client_header_buffer_size       128k;
+        client_body_buffer_size         512k;
+        large_client_header_buffers     4 16k;
+
+        proxy_buffering                 on;
+        proxy_buffer_size               4k;
+        proxy_buffers                   4 32k;
+        proxy_busy_buffers_size         64k;
+        proxy_temp_file_write_size      64k;
+
+        fastcgi_buffers                 256 4k;
+        fastcgi_read_timeout            5m;
+
+        gzip on;
+        gzip_min_length 10240;
+        gzip_proxied expired no-cache no-store private auth;
+        gzip_types text/plain text/css text/xml text/javascript application/x-javascript 
+
+application/xml;
+
+        include /etc/nginx/conf.d/*.conf;
+        include /etc/nginx/sites-enabled/*;
+}
+
+<Create new site for nginx>
+nano /etc/nginx/sites-available/001-musicbrainz
+
+Paste the following in to the file:
+server {
+    listen 0.0.0.0:5000;
+    server_name musicbrainz;
+
+    access_log  /var/log/nginx/001-musicbrainz.access.log;
+    error_log   /var/log/nginx/001-musicbrainz.error.log info;
+
+    location /static/ {
+        root /opt/musicbrainz/root;
+        expires 24h;
+    }
+
+    location ~* ^/static/.*\.js$ {
+        root /opt/musicbrainz/root;
+        expires max;
+        charset utf-8;
+    }
+
+    location = /favicon.ico {
+        root /opt/musicbrainz/root;
+        expires 7d;
+    }
+
+    location = /robots.txt {
+        root /opt/musicbrainz/root;
+        default_type text/plain;
+        try_files $uri $uri.staging
+        expires 1h;
+    }
+
+    location / {
+        set $script "";
+        set $path_info $uri;
+
+        fastcgi_pass 127.0.0.1:55901;
+
+        fastcgi_param  HTTPS            $http_x_mb_https;
+        fastcgi_param  SCRIPT_NAME      $script;
+        fastcgi_param  PATH_INFO        $path_info;
+        fastcgi_param  QUERY_STRING     $query_string;
+        fastcgi_param  REQUEST_METHOD   $request_method;
+        fastcgi_param  CONTENT_TYPE     $content_type;
+        fastcgi_param  CONTENT_LENGTH   $content_length;
+        fastcgi_param  REQUEST_URI      $request_uri;
+        fastcgi_param  SERVER_PROTOCOL  $server_protocol;
+        fastcgi_param  REMOTE_ADDR      $remote_addr;
+        fastcgi_param  REMOTE_PORT      $remote_port;
+        fastcgi_param  SERVER_ADDR      $server_addr;
+        fastcgi_param  SERVER_PORT      $server_port;
+        fastcgi_param  SERVER_NAME      $server_name;
+
+
+        fastcgi_param  REMOTE_ADDR        $http_x_mb_remote_addr;
+        fastcgi_param  REMOTE_PORT        $remote_port;
+        fastcgi_param  SERVER_ADDR        $server_addr;
+        fastcgi_param  SERVER_PORT        $server_port;
+        fastcgi_param  SERVER_NAME        $server_name;
+    }
+
+    include /etc/nginx/mbserver-rewrites.conf;
+}
+
+<Add the new site to nginx>
+ln -s /etc/nginx/sites-available/001-musicbrainz /etc/nginx/sites-enabled/
+ln -s /opt/musicbrainz/admin/nginx/mbserver-rewrites.conf /etc/nginx/
+rm /etc/nginx/sites-enabled/default
+
+<Change ownerhsip of MusicBrainz directory>
+chown -R musicbrainz:musicbrainz /opt/musicbrainz 
+
+<Create script to launch musicbrainz>
+nano /opt/musicbrainz/startmb.sh
+
+Paste the following in to the blank file:
+
+#!/bin/bash
+echo 'MusicBrainz Starting...' >/var/log/musicbrainz.log
+exec 2>&1
+set -e
+cd /opt/musicbrainz
+umask 022
+su musicbrainz -c "carton exec -- plackup -Ilib -s FCGI -E deployment --port 55901 --nproc 10 --pid fcgi.pid --keep-stderr=1 >/var/log/musicbrainz.log 2>&1" &
+
+Make the script executable:
+
+chmod +x /opt/musicbrainz/startmb.sh
+
+Create logfile:
+
+touch /var/log/musicbrainz.log
+chown musicbrainz /var/log/musicbrainz.log
+
+<Restart nginx and start MusicBrainz>
+service nginx restart
+/opt/musicbrainz/startmb.sh
+
+
+Optionally you can also have MusicBrainz start automatically with your server by adding the line...
+
+/opt/musicbrainz/startmb.sh
+
+... into /etc/rc.local before the exit 0 line.
+
+<Setup crontab to get updates automatically>
+crontab -e
+(you may need to select an editor here)
+Add the following line to the end of the text file that comes up:
+0       *       *       *       *       /opt/musicbrainz/admin/cron/slave.sh
+
+And that's it. You can now test if it's working by going to your domain name followed by :5000 in your web browser, for example http://myserver.com:5000 (or http://<ip address>:5000)
+You may see an error about common.css.  If so, don't worry about it.  The search api will still function.
