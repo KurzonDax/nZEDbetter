@@ -9,16 +9,40 @@ sheer number of changes I've made to the original code, scripts, and database sc
 
 **THIS IS A WORK IN PROGRESS, AND IS IN NO WAY, SHAPE, OR FORM STABLE AT PRESENT.**  
 
-Feel free to clone it and have a look at the changes made.  Currently, they nearly all involve the
-binaries.php and releases.php files, as I'm working to improve the overall performance of 
-the retrieving and inserting new items in to the database.  I'm also doing a ton of experimentation
-with MySQL to establish baselines, and then profiling performance based on the changes I am
-making.  The goal of the project as a whole is to optimize performance on generally available 
-commodity hardware, and under virtual environments.  
+## 10/15/2013 - UPDATE
+Well, here it is, my first milestone, and I've missed my goals.  Got slammed at my day job
+and just didn't have enough time to put in to it the last couple of weeks.  Well, that and
+I got side-tracked on redoing the newsgroups part of the Admin section and couldn't put that
+down until I completed it.  I was also using it as a test bed for some ideas for the front-end.
+
+To see screenshots of the new newsgroups section, look at https://github.com/KurzonDax/nZEDbetter/issues/29
+
+My next major goals are to get the Install piece updated so that it installs the changes I've
+made to the database schema, and fix a couple of minor bugs I think I moticed.  After that,
+you should be able to clone the project and it will actually be usable.  I expect that doing
+the Install piece will take a few days to complete.
+
+From there, I'm going to launch back in to the MusicBrainz integration and try to get that knocked
+out.  That's going to take some time to do, maybe a couple of weeks.
+
+## HELP!!
+I need some help.  I freely admit that I'm a github newb and would rather be coding than learning
+how to use it properly.  That being said, I really would like to move this repo to be a true fork
+of the original nZEDb project.  The catch is, I don't want to lose my history.  I've done some
+research and it seems doable, but I didn't really find a consistent method.  Anyone have any ideas?
+If so, please create an issue in the Issues section with your thoughts on the best way to go about it.
+I will forever be in your debt.
+
+---
 
 ## Latest Changes 
 Some of the things I've added most recently:  
-	* Moved the collection/binary/parts purging to a separate process from the Update Releases.  
+    * Admin seciton has a new look.  It isn't complete yet, but the groups administration section is done.
+    * Some minor bug fixes with the front end templates
+    * Added optional ability to capture Amazon rating for books, console, and music.
+    * Auto-suggestions for Authors, Genres, and Publishers in eBook search (soon to be added to search fields in Console, Music, and maybe movies also)
+    * Ability to filter search results based on Amazon customer ratings
+	* Moved the collection/binary/parts purging to a separate process from the Update Releases.
 	* Some major purging functions (like old releases, parts out of retention, etc.) now happen only on a user selectable schedule.  
 	* Drastic changes to the movie identification process. Should see much less mismatched movies when browsing the database.  
 	* A number of fixes to the part repair process, including ability to run the part repair process manually.  
