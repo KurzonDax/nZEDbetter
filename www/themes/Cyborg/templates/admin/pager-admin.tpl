@@ -1,6 +1,8 @@
-{assign var="pages" value=($pagertotalitems/$pageritemsperpage)|round}
+{math equation="ceil(x/y)" x=$pagertotalitems y=$pageritemsperpage assign='pages'}
 {assign var="currentpage" value=($pageroffset+$pageritemsperpage)/$pageritemsperpage}
-{assign var="upperhalfwaypoint" value=((($pages-$currentpage)/2)|round)+$currentpage}
+{math equation="floor(((x-y)/2)+y)" x=$pages y=$currentpage assign='upperhalfwaypoint'}
+
+
 
 {if $pages > 1}
     <!-- <div class="pagination" style="max-width='500px'; margin: 0px 0px -8px 0px;"> -->
@@ -20,7 +22,7 @@
 
         {if ($currentpage+1) < ($pages-1) && ($currentpage+2) < $upperhalfwaypoint}<li class="disabled"><a href="javascript:;">...</a></li>{/if}
 
-        {if $upperhalfwaypoint != $pages && $upperhalfwaypoint != ($currentpage+1)}<li><a href="{$pagerquerybase}{$upperhalfwaypoint*$pageritemsperpage}{$pagerquerysuffix}">{$upperhalfwaypoint}</a></li>{/if}
+        {if $upperhalfwaypoint != $pages && $upperhalfwaypoint != ($currentpage+1)}<li><a href="{$pagerquerybase}{($upperhalfwaypoint-1)*$pageritemsperpage}{$pagerquerysuffix}">{$upperhalfwaypoint}</a></li>{/if}
 
         {if ($upperhalfwaypoint+1) < $pages}<li class="disabled"><a>...</a></li>{/if}
 
@@ -33,16 +35,5 @@
 {/if}
 
 {*
-<div class="pagination">
-<ul>
-<li><a href="javascript:;">Prev</a></li>
-<li class="active">
-<a href="javascript:;">1</a>
-</li>
-<li><a href="javascript:;">2</a></li>
-<li><a href="javascript:;">3</a></li>
-<li><a href="javascript:;">4</a></li>
-<li><a href="javascript:;">Next</a></li>
-</ul>
-</div>
+
 *}

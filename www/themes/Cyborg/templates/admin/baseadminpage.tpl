@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="{$smarty.const.WWW_TOP}/../themes/{$site->style}/styles/admin.css" MEDIA="screen">
     <link rel="stylesheet" href="{$smarty.const.WWW_TOP}/../themes/{$site->style}/styles/plugins/tabs.css" TYPE="text/css" MEDIA="screen">
     <link rel="stylesheet" href="{$smarty.const.WWW_TOP}/../themes/{$site->style}/styles/plugins/jquery.pnotify.default.css" TYPE="text/css" MEDIA="all">
+    <link rel="stylesheet" href="{$smarty.const.WWW_TOP}/../themes/{$site->style}/styles/plugins/redmond.datepick.css" TYPE="text/css" MEDIA="all">
     <link rel="stylesheet" href="{$smarty.const.WWW_TOP}/../themes/{$site->style}/styles/admin-new.css" TYPE="text/css" MEDIA="screen">
     <link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/../themes/{$site->style}/images/favicon.ico">
 
@@ -37,7 +38,9 @@
     <script type="text/javascript" src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/jquery.multifile.js"></script>
     <script type="text/javascript" src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/plugins/tabber.js"></script>
     <script type="text/javascript" src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/plugins/jquery.pnotify.js"></script>
-
+    <script type="text/javascript" src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/plugins/jquery.datepick.min.js"></script>
+    <script type="text/javascript" src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/plugins/jquery.datepick.ext.min.js"></script>
+    <script type="text/javascript" src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/plugins/bootstrap-select.min.js"></script>
     <script>var WWW_TOP = "{$smarty.const.WWW_TOP}/..";</script>
 
     {$page->head}
@@ -80,6 +83,7 @@
                     <li><a href="group-list.php">Newsgroups</a></li>
                     <li><a href="category-list.php">Categories</a></li>
                     <li><a href="binaryblacklist-list.php">Blacklists</a></li>
+                    <li><a id="itemUpdateNewsgroups" class="pointer" data-toggle="modal" data-target="#modalUpdateNewsgroups">Update NNTP List</a></li>
                 </ul>
             </li>
 
@@ -151,19 +155,57 @@
 
 </div>
 <!-- end #page -->
-{*{literal}
-<script type="text/javascript">
+<div class="modal fade" id="modalUpdateNewsgroups">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Update NNTP Newsgroups</h3>
+            </div>
+            <div class="modal-body">
+                <p class="warning-heading">The server needs to download updated newsgroups<br />
+                </p>
+                <p style="border-bottom: 1px solid #999">
+                    <span style="font-size: 13px; color: #333;">
+                        The server needs to download an updated copy of the newsgroups hosted by your Usenet Service Provider.  This only needs to happen one time.  If, however,
+                        you wish to update the list in the future, just click the Update NNTP List button on the toolbar.  Please wait while this process completes...
+                    </span>
+                </p>
+                <p id="modalUpdateNewsGroupsStatus" class="hidden"></p>
+            </div> <!-- modal-body Final Tag -->
+            <div class="modal-footer hidden">
+                <a href="javascript:;" class="btn btn-tertiary" data-dismiss="modal">Close</a>
+            </div>
+        </div> <!-- modal content -->
+    </div> <!-- modal dialog -->
+</div> <!-- modal main tag -->
+{literal}
+    <script>
+        $("#itemUpdateNewsgroups").click( function() {
+            $("#modalUpdateNewsgroups").find('.modal-footer').addClass('hidden');
+            $("#modalUpdateNewsGroupsStatus").addClass('hidden').html('');
+            $("#modalUpdateNewsgroups").css('margin-left',function(){ return (-($(this).width()/2)).toString()+"px"})
+                    .modal("show");
+            $.ajax({
+                url       : WWW_TOP + '/admin/ajax-group-ops.php',
+                data      : "action=getnewsgroups",
+                dataType  : "html",
+                type      : "POST",
+                success   : function(data)
+                {
+                    $("#modalUpdateNewsGroupsStatus").append(data);
+                    $("#modalUpdateNewsgroups").find('.modal-footer').removeClass('hidden');
+                    $("#modalUpdateNewsGroupsStatus").removeClass('hidden');
+                },
+                error   : function(xhr,err,e)
+                {
+                    // Need to add code here
+                    $(document).scrollTop(0);
+                }
+            });
 
-    /* Since we specified manualStartup=true, tabber will not run after
-     the onload event. Instead let's run it now, to prevent any delay
-     while images load.
-     */
-
-    tabberAutomatic(tabberOptions);
-
-</script>
-{/literal}*}
-
+        });
+    </script>
+{/literal}
 
 {if $site->google_analytics_acc != ''}
 {literal}

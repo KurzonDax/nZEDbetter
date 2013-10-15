@@ -13,6 +13,7 @@ if (isset($_REQUEST['groupname']) && !empty($_REQUEST['groupname']))
 	$gname = $_REQUEST['groupname'];
 
 $groupcount = $groups->getCount($gname);
+$totalGroups = $groups->getCount();
 
 $offset = isset($_REQUEST["offset"]) ? $_REQUEST["offset"] : 0;
 $groupname = (isset($_REQUEST['groupname']) && !empty($_REQUEST['groupname'])) ? $_REQUEST['groupname'] : '';
@@ -21,6 +22,7 @@ $page->smarty->assign('groupname',$groupname);
 $page->smarty->assign('pagertotalitems',$groupcount);
 $page->smarty->assign('pageroffset',$offset);
 $page->smarty->assign('pageritemsperpage',ITEMS_PER_PAGE);
+$page->smarty->assign('totalgroups', $totalGroups);
 
 $groupsearch = ($gname != "") ? 'groupname='.$gname.'&amp;' : '';
 $page->smarty->assign('pagerquerybase', WWW_TOP."/group-list.php?".$groupsearch."offset=");
@@ -31,7 +33,7 @@ $grouplist = $groups->getRange($offset, ITEMS_PER_PAGE, $gname);
 
 $page->smarty->assign('grouplist',$grouplist);	
 
-$page->title = "News Groups";
+$page->title = "Newsgroups";
 
 $page->content = $page->smarty->fetch('group-list.tpl');
 $page->render();

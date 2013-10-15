@@ -20,6 +20,67 @@ class Groups
 							) rel ON rel.groupID = groups.ID ORDER BY groups.name");
 	}
 
+    public function advancedGroupSearch($searchString, $orderBy = null, $offset = 0, $itemsPerPage = 50)
+    {
+        $db = new DB();
+        $orderByClause = $this->getOrderBy($orderBy);
+        $sql = "SELECT groups.*, COALESCE(rel.num, 0) AS num_releases
+							FROM groups
+							LEFT OUTER JOIN
+							(SELECT groupID, COUNT(ID) AS num FROM releases group by groupID) rel ON rel.groupID = groups.ID
+							WHERE 1=1 ".$searchString.$orderByClause;
+        $returnObject = [];
+        $returnObject['resultSet'] = $db->queryDirect($sql." LIMIT ".$offset.",".$itemsPerPage);
+        $returnObject['resultCount'] = $db->getNumRows($db->queryDirect($sql));
+
+        file_put_contents(WWW_DIR."lib/logging/group-search.log",$sql."\n-------------------------------------------\n", FILE_APPEND);
+        return $returnObject;
+    }
+    
+    public function getOrderBy($orderBy) {
+        
+        $orderBy = explode('_',$orderBy);
+        
+        switch ($orderBy[0])
+        {
+            case 'name':
+                return ' ORDER BY name '.$orderBy[1];
+                break;
+            case 'description':
+                return ' ORDER BY description '.$orderBy[1];
+                break;
+            case 'firstPost':
+                return ' ORDER BY first_record_postdate '.$orderBy[1];
+                break;
+            case 'lastPost':
+                return ' ORDER BY last_record_postdate '.$orderBy[1];
+                break;
+            case 'lastUpdated':
+                return ' ORDER BY last_updated '.$orderBy[1];
+                break;
+            case 'active':
+                return ' ORDER BY active '.$orderBy[1];
+                break;
+            case 'backfill':
+                return ' ORDER BY backfill '.$orderBy[1];
+                break;
+            case 'releases':
+                return ' ORDER BY num_releases '.$orderBy[1];
+                break;
+            case 'minFiles':
+                return ' ORDER BY minfilestoformrelease '.$orderBy[1];
+                break;
+            case 'minSize':
+                return ' ORDER BY minsizetoformrelease '.$orderBy[1];
+                break;
+            case 'backfillDays':
+                return ' ORDER BY backfill_target '.$orderBy[1];
+                break;
+            default:
+                return ' ORDER BY name ASC';
+        }
+    }
+    
     public function getAllNames()
     {
         $db = new DB();
@@ -105,7 +166,15 @@ class Groups
 		$db->queryOneRow(sprintf("UPDATE groups SET backfill = 0 WHERE name = %s", $db->escapeString($name)));
 	}
 
-	public function getCount($groupname="")
+    public function getTotalCount()
+    {
+        $db = new DB();
+        $res = $db->queryOneRow("SELECT count(*) AS num FROM groups");
+
+        return $res['num'];
+    }
+
+    public function getCount($groupname="")
 	{
 		$db = new DB();
 
@@ -210,6 +279,8 @@ class Groups
 	public function add($group)
 	{
 		$db = new DB();
+        $newGroup = new clsGroup();
+        $newGroup->name = $group['name'];
 
 		if ($group["minfilestoformrelease"] == "" || $group["minfilestoformrelease"] == "0")
 			$minfiles = '0';
@@ -223,10 +294,38 @@ class Groups
 
 		$first = (isset($group["first_record"]) ? $group["first_record"] : "0");
 		$last = (isset($group["last_record"]) ? $group["last_record"] : "0");
-
-		$sql = sprintf("insert into groups (name, description, first_record, last_record, last_updated, active, minfilestoformrelease, minsizetoformrelease) values (%s, %s, %s, %s, null, %d, %s, %s) ",$db->escapeString($group["name"]), $db->escapeString($group["description"]), $db->escapeString($first), $db->escapeString($last), $group["active"], $minfiles, $minsizetoformrelease);
-		return $db->queryInsert($sql);
+        $checkExisting = $db->queryOneRow("SELECT ID, name FROM groups WHERE name = ".$db->escapeString($group['name']));
+        if($checkExisting && $group['updateExisting']=='false')
+        {
+            $newGroup->status = clsGroup::ERROR_GROUP_EXISTS;
+            $newGroup->id = 0;
+        }
+        elseif($checkExisting && $group['updateExisting']=='true')
+        {
+            $sql = sprintf("UPDATE groups SET name=%s, description=%s, active=%s, minfilestoformrelease=%s, minsizetoformrelease=%s, backfill_target=%s, backfill=%s WHERE ID=%s",
+                $db->escapeString($group["name"]), $db->escapeString($group["description"]), $group["active"], $minfiles, $minsizetoformrelease, $db->escapeString($group['backfill_target']), $db->escapeString($group['backfill']), $db->escapeString($checkExisting['ID']));
+            $db->query($sql);
+            if($db->getAffectedRows()>0)
+            {
+            $newGroup->status = clsGroup::GROUP_UPDATED;
+            $newGroup->id = $checkExisting['ID'];
+            }
+            else
+            {
+                $newGroup->status = clsGroup::ERROR_GROUP_NOT_UPDATED;
+                $newGroup->id = $checkExisting['ID'];
+            }
+        }
+        else
+        {
+		$sql = sprintf("INSERT INTO groups (name, description, first_record, last_record, last_updated, active, minfilestoformrelease, minsizetoformrelease, backfill_target, backfill) values (%s, %s, %s, %s, null, %d, %s, %s, %s, %s) ",
+            $db->escapeString($group["name"]), $db->escapeString($group["description"]), $db->escapeString($first), $db->escapeString($last), $group["active"], $minfiles, $minsizetoformrelease, $db->escapeString($group['backfill_target']), $db->escapeString($group['backfill']));
+        $newGroup->id = $db->queryInsert($sql);
+        $newGroup->status = clsGroup::GROUP_CREATED;
+        }
+        return $newGroup;
 	}
+
 
 	public function delete($id)
 	{
@@ -347,45 +446,57 @@ class Groups
 	//
 	// update the list of newsgroups and return an array of messages.
 	//
-	function addBulk($groupList, $active = 1)
+    /**
+     * @param array $groupList
+     * @return array(clsGroup)
+     *
+     */
+    function addBulk($groupList=array())
 	{
-		$ret = array();
-
+        $groupArr = array();
 		if ($groupList == "")
 		{
-			$ret[] = "No group list provided.";
+			$groupArr[] = "No group list provided.";
 		}
 		else
 		{
-			$db = new DB();
-			$nntp = new Nntp();
-			$nntp->doConnect();
-			$groups = $nntp->getGroups();
-			$nntp->doQuit();
+			$groupsFile = WWW_DIR."/admin/newsgroups.txt";
+            if(!file_exists($groupsFile))
+                $this->updateNNTPnewgroups();
+            $groups = array();
+            $handle = @fopen($groupsFile, "r");
+            if ($handle) {
+                while (($buffer = fgets($handle, 4096)) !== false) {
+                   $groups[] = explode(" ", $buffer);
+                }
+                if (!feof($handle)) {
+                    $groupArr[]= "Error: unexpected fgets() fail";
+                    return $groupArr;
+                }
+                fclose($handle);
+            }
+            // $regfilter = "/(" . str_replace (array ('.','*'), array ('\.','.*?'), trim($groupList['groupName'][0])) . ")$/i";
 
-			$regfilter = "/(" . str_replace (array ('.','*'), array ('\.','.*?'), trim($groupList)) . ")$/";
-            echo $regfilter;
-			foreach($groups AS $group)
+            $regfilter = "/(" .preg_replace('/(\w)\.(\w)/i', '$1\\.$2', trim($groupList['groupName'][0])). ")$/i";
+
+            foreach($groups AS $group)
 			{
-				if (preg_match ($regfilter, $group['group']) > 0)
+				if (preg_match ($regfilter, $group[0]) > 0)
 				{
-					$res = $db->queryOneRow(sprintf("SELECT ID FROM groups WHERE name = %s ", $db->escapeString($group['group'])));
-					if($res)
-					{
-
-						$db->query(sprintf("UPDATE groups SET active = %d where ID = %d", $active, $res["ID"]));
-						$ret[] = array ('group' => $group['group'], 'msg' => 'Updated');
-					}
-					else
-					{
-						$desc = "";
-						$db->queryInsert(sprintf("INSERT INTO groups (name, description, active, minfilestoformrelease, minsizetoformrelease) VALUES (%s, %s, %d, 0, 0)", $db->escapeString($group['group']), $db->escapeString($desc), $active));
-						$ret[] = array ('group' => $group['group'], 'msg' => 'Created');
-					}
+                    $newGroup = [];
+                    $newGroup['name'] = $group[0];
+                    $newGroup['description'] = $groupList['description'];
+                    $newGroup['backfill_target'] = $groupList['backfillTarget'];
+                    $newGroup['minfilestoformrelease'] = $groupList['minFiles'];
+                    $newGroup['minsizetoformrelease'] = $groupList['minSize'];
+                    $newGroup['active'] = $groupList['active'];
+                    $newGroup['backfill'] = $groupList['backfill'];
+                    $newGroup['updateExisting'] = $groupList['updateExisting'];
+                    $groupArr[] = $this->add($newGroup);
 				}
 			}
 		}
-		return $ret;
+		return $groupArr;
 	}
 
     /**
@@ -505,4 +616,45 @@ class Groups
         return $msg;
     }
 
+    public function updateNNTPnewgroups ()
+    {
+        try
+        {
+            $nntp = new Nntp();
+
+            $nntp->doConnect();
+            ob_start();
+            $groups = $nntp->getGroups();
+            $crap = ob_get_contents();      // Had to do this, and the the ob_clean statement, to completely prevent the Received XXXX... output
+            ob_clean();
+            ob_end_clean();
+
+            $nntp->doQuit();
+
+            $groupFile = WWW_DIR."/admin/newsgroups.txt";
+            if(file_exists($groupFile))
+                unlink($groupFile);
+
+            foreach($groups as $group)
+                file_put_contents($groupFile,implode(' ',$group)."\n", FILE_APPEND);
+            return number_format(count($groups))." Groups Received";
+        }
+        catch (Exception $e)
+        {
+            return "#! ".$e;
+        }
+    }
+}
+
+class clsGroup {
+
+    const ERROR_GROUP_EXISTS = '#!GROUP EXISTS';
+    const ERROR_GROUP_NOT_INSERTED = '#!GROUP NOT CREATED';
+    const ERROR_GROUP_NOT_UPDATED = '#!ERROR UPDATING GROUP';
+    const GROUP_CREATED = 'Created';
+    const GROUP_UPDATED = 'Updated';
+
+    public $id = '';
+    public $name = '';
+    public $status = '';
 }

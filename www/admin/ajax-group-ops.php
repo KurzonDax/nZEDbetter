@@ -135,7 +135,6 @@ if(isset($_POST['action']) && $_POST['action']=='edit')
             $status = isset($_POST['backfill_status']) ? (int)$_POST['backfill_status'] : 0;
             print $group->updateBackfillStatus($groupID, $status);
         }
-
     }
     exit;
 }
@@ -148,13 +147,56 @@ else if(isset($_POST['action']) && !empty($_POST['action']) && !empty($_POST['id
     exit;
 }else if(isset($_POST['action']) && !empty($_POST['action']))
 {
-    // BELOW FOR TESTING ONLY.... NEEDS TO BE REMOVED
-    if($_POST['action'] == 'sleep')
-    {
-        sleep(5);
-        Print 'Sleep is done for group '.$_POST['group'];
+    if($_POST['action']=='addgroup') {
+        $newGroup = [];
+        $newGroup['name'] = $_POST['groupName'];
+        $newGroup['description'] = $_POST['description'];
+        $newGroup['backfill_target'] = $_POST['backfillTarget'];
+        $newGroup['minfilestoformrelease'] = $_POST['minFiles'];
+        $newGroup['minsizetoformrelease'] = $_POST['minSize'];
+        $newGroup['active'] = $_POST['active'];
+        $newGroup['backfill'] = $_POST['backfill'];
+
+        print json_encode($group->add($newGroup));
         exit;
     }
+
+    if($_POST['action']=='bulkadd' && $_POST['regexList']=='0') // List is plain list
+    {
+        // We create an array of groups (clsGroup) added/updated
+        // by repeatedly calling the $group->add function which
+        // now returns a clsGroup object
+        $groupArr = [];
+        foreach($_POST['groupName'] as $name)
+        {
+            $newGroup = [];
+            $newGroup['name'] = $name;
+            $newGroup['description'] = $_POST['description'];
+            $newGroup['backfill_target'] = $_POST['backfillTarget'];
+            $newGroup['minfilestoformrelease'] = $_POST['minFiles'];
+            $newGroup['minsizetoformrelease'] = $_POST['minSize'];
+            $newGroup['active'] = $_POST['active'];
+            $newGroup['backfill'] = $_POST['backfill'];
+            $newGroup['updateExisting'] = $_POST['updateExisting'];
+            $groupArr[] = $group->add($newGroup);
+        }
+
+        // print json_encode($groupArr);
+
+        exit;
+    }
+    elseif ($_POST['action']=='bulkadd' && $_POST['regexList']=='1') // List is Regex
+    {
+        // We will call the bulkAdd function with the groupname field as the
+        // regex for the $groupList param.  bulkAdd will return an array of clsGroup
+        print json_encode($group->addBulk($_POST));
+    }
+
+    if($_POST['action']=='getnewsgroups')
+    {
+        print $group->updateNNTPnewgroups();
+    }
+
 }
 
 if(isset($_POST["checkname"]) && $_POST['checkname'] !='')

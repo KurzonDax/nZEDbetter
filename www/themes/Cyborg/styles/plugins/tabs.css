@@ -57,6 +57,8 @@ ul.tabbernav li a {
     border-color: #7DA64B #7DA64B #567233;
     filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
     text-decoration: none;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
 }
 
 ul.tabbernav li a:link { color: #FFF; }
@@ -83,6 +85,9 @@ ul.tabbernav li.tabberactive a
     background-image: none;
     color: #555;
     font-weight: 600;
+    -webkit-box-shadow: 2px -1px 3px #BBBABA;
+    -moz-box-shadow: 2px -1px 3px #BBBABA;
+    box-shadow: 2px -1px 3px #BBBABA;
 }
 
 ul.tabbernav li.tabberactive a:hover
