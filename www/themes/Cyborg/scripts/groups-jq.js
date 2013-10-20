@@ -194,10 +194,14 @@ jQuery(function($){
             type      : "POST",
             success   : function(data)
             {
-                if(data.indexOf('backfill')>0)
+                /*if(data.indexOf('backfill')>0)
                     setBackfillLinks();
                 else
-                    setActiveLinks();
+                    setActiveLinks();*/
+                if(action=='allActive' || action == 'allInactive')
+                    setAllActiveLinks(action);
+                else if(action=='allBackfillActive' || action=='allBackfillInactive')
+                    setAllBackfillLinks(action);
                 displayNotification(data);
             },
             error   : function(xhr,err,e)
@@ -1261,6 +1265,47 @@ jQuery(function($){
         });
     };
 
+    function setAllActiveLinks(action, obj) {
+        var objArr = [];
+        (typeof obj !== 'undefined') ? objArr.push(obj) : objArr = $(".group_check:checked");
+        $.each(objArr, function () {
+            groupID = $(this).attr("id").replace("chk-","");
+            if(action == 'allActive'){
+                if($('#group-list-table').find("#btnActivate-"+groupID).length>0){
+                    $('td#group-' + groupID).html('<a id="btnDeactivate-'+ groupID +'" class="noredtext btn btn-deactivate btn-xs">Deactivate</a>');
+                    $('a#btnDeactivate-'+groupID).on('click', function() {
+                        ajax_group_status(groupID, 0);});
+                }
+            } else if(action =='allInactive') {
+                if($('#group-list-table').find("#btnDeactivate-"+groupID).length>0){
+                    $('td#group-' + groupID).html('<a id="btnActivate-'+ groupID +'" class="noredtext btn btn-activate btn-xs">Activate</a>');
+                    $('a#btnActivate-'+groupID).on('click', function() {
+                        ajax_group_status(groupID, 1);});
+                }
+            }
+        });
+    };
+
+    function setAllBackfillLinks(action, obj) {
+        var objArr = [];
+        (typeof obj !== 'undefined') ? objArr.push(obj) : objArr = $(".group_check:checked");
+        $.each(objArr, function () {
+            groupID = $(this).attr("id").replace("chk-","");
+            if(action == 'allBackfillActive'){
+                if($('#group-list-table').find("#btnBackfillActivate-"+groupID).length>0){
+                    $('td#backfill-' + groupID).html('<a id="btnBackfillDeactivate-'+ groupID +'" class="noredtext btn btn-deactivate btn-xs">Deactivate</a>');
+                    $('a#btnBackfillDeactivate-'+groupID).on('click', function() {
+                        ajax_backfill_status(groupID, 0);});
+                }
+            } else if(action =='allBackfillInactive') {
+                if($('#group-list-table').find("#btnBackfillDeactivate-"+groupID).length>0){
+                    $('td#backfill-' + groupID).html('<a id="btnBackfillActivate-'+ groupID +'" class="noredtext btn btn-activate btn-xs">Activate</a>');
+                    $('a#btnBackfillActivate-'+groupID).on('click', function() {
+                        ajax_backfill_status(groupID, 1);});
+                }
+            }
+        });
+    };
     function displayNotification(text, title, type, icon ) {
         title = typeof title !== 'undefined' ? title : 'Group Change Successful';
         type = typeof type !== 'undefined' ? type : 'success';
