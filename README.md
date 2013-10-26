@@ -3,11 +3,11 @@ Please visit the official nZEDbetter Wiki at http://nzedbetter.org
 There isn't a lot there right now, but I am logging most major changes as
 they are introduced on the main page.
 
-# Important:
-This is psuedo-fork of the original nZEDb project.  I decided not to truly fork it because of the 
-sheer number of changes I've made to the original code, scripts, and database schema.  
+---
+### Important:
 
 **THIS IS A WORK IN PROGRESS, AND IS IN NO WAY, SHAPE, OR FORM STABLE AT PRESENT.**  
+---
 
 ### 10/26 Update
 Uhhg... So here't the deal:
@@ -47,9 +47,9 @@ Some of the things I've added most recently:
 - Includes ability now to set a separate retention time for hashed releases
 * Improved the NZB import process to ensure that once an NZB is imported from a directory, it won't be imported again if you need to stop and restart the import process.  
 * Ability to limit the number of inital posts retrieved for a group when using the date option for new groups.  
-- This is handy for extremely prolific groups like alt.binaries.boneless
+    This is handy for extremely prolific groups like alt.binaries.boneless
 * Option to automatically initiate a new group by the "posts" value, IF there aren't any posts within the number of days specified for new groups.  
-- Good for groups that you want to index, but don't update that often.
+    Good for groups that you want to index, but don't see updates that often.
 * Numerous other bug fixes and improvements  
 
 ### Info
