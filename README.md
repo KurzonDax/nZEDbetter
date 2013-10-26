@@ -16,11 +16,11 @@ Over the last three weeks, my day job has been unrelenting, causing me to put in
 To see screenshots of the new newsgroups section, look at https://github.com/KurzonDax/nZEDbetter/issues/29
 
 My next major tasks are outlined below:
-[ ] Finish MusicBrainz Integrtion (2-3 weeks to complete)
-[ ] Test with Ubuntu 13.10, Apache 2.4, and PHP 5.5 (2 weeks to fully test)
-[ ] Get this repo moved so it's an actual fork of @nZEDb (see help request below)
-[ ] Develop Sphinx integration (unknown dev time, probably a month)
-[ ] Update search options on web front-end (1-2 weeks)
+- [ ] Finish MusicBrainz Integrtion (2-3 weeks to complete)
+- [ ] Test with Ubuntu 13.10, Apache 2.4, and PHP 5.5 (2 weeks to fully test)
+- [ ] Get this repo moved so it's an actual fork of @nZEDb (see help request below)
+- [ ] Develop Sphinx integration (unknown dev time, probably a month)
+- [ ] Update search options on web front-end (1-2 weeks)
 
 ### HELP!!
 I need some help.  I freely admit that I'm a github newb and would rather be coding than learning
