@@ -267,7 +267,7 @@ class Users
 
 	public function isValidUsername($uname)
 	{
-		return preg_match("/^[a-z][a-z0-9]{2,}$/i", $uname);
+		return preg_match("/^[a-z][a-z0-9]{4,}$/i", strtolower($uname));
 	}
 
 	public function isValidPassword($pass)

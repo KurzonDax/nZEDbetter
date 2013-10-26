@@ -34,3 +34,8 @@ define('THEMES_DIR', WWW_TOP.'themes');
 // number of results per page
 //
 define("ITEMS_PER_PAGE", "50");
+
+//
+// project root
+//
+define('PROJ_ROOT', realpath(dirname(__FILE__)).'/../');

@@ -60,6 +60,7 @@ class Install {
 	public $dbCreateCheck;
 
 	public $nntpCheck;
+    public $nntpCheck_A;
 	public $adminCheck;
 	public $nzbPathCheck;
 

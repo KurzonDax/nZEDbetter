@@ -1,7 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DBNavigator.Project.ConnectionManager">
-    <connections />
+    <connections>
+      <connection driver-library="C:\Program Files (x86)\MySQL\MySQL Connector J\mysql-connector-java-5.1.26-bin.jar" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://192.168.1.150:3306" active="true" os-authentication="false" id="e53b2191-09b5-40bc-865f-bd9105051b0a" name="UbuntuServer" description="Ubuntu Server Percona" database-type="MYSQL" user="root" password="biteme69">
+        <details>
+          <charset value="UTF-8" />
+          <auto-commit value="false" />
+          <environment-type value="development" />
+          <idle-time-to-disconnect value="30" />
+        </details>
+        <object-filters>
+          <object-type-filter use-master-settings="true">
+            <object-type name="SCHEMA" enabled="true" />
+            <object-type name="USER" enabled="true" />
+            <object-type name="ROLE" enabled="true" />
+            <object-type name="PRIVILEGE" enabled="true" />
+            <object-type name="CHARSET" enabled="true" />
+            <object-type name="TABLE" enabled="true" />
+            <object-type name="VIEW" enabled="true" />
+            <object-type name="MATERIALIZED VIEW" enabled="true" />
+            <object-type name="NESTED TABLE" enabled="true" />
+            <object-type name="COLUMN" enabled="true" />
+            <object-type name="INDEX" enabled="true" />
+            <object-type name="CONSTRAINT" enabled="true" />
+            <object-type name="TRIGGER" enabled="true" />
+            <object-type name="SYNONYM" enabled="true" />
+            <object-type name="SEQUENCE" enabled="true" />
+            <object-type name="PROCEDURE" enabled="true" />
+            <object-type name="FUNCTION" enabled="true" />
+            <object-type name="PACKAGE" enabled="true" />
+            <object-type name="TYPE" enabled="true" />
+            <object-type name="TYPE ATTRIBUTE" enabled="true" />
+            <object-type name="ARGUMENT" enabled="true" />
+            <object-type name="DIMENSION" enabled="true" />
+            <object-type name="CLUSTER" enabled="true" />
+            <object-type name="DBLINK" enabled="true" />
+          </object-type-filter>
+          <object-name-filters />
+        </object-filters>
+      </connection>
+    </connections>
   </component>
   <component name="DBNavigator.Project.DataEditorManager">
     <record-view-column-sorting-type value="BY_INDEX" />
@@ -340,7 +378,7 @@
       <general>
         <statement-postfix value="/" />
         <lookup-ddl-files value="true" />
-        <create-ddl-files value="false" />
+        <create-ddl-files value="true" />
       </general>
     </ddl-file-settings>
   </component>

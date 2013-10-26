@@ -1,0 +1,116 @@
+.alert-dismissable .close {
+    position: absolute;
+    top: 55px;
+    right: 55px;
+    color: inherit;
+}
+
+.alert-danger, .alert-success, .alert-warning {
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 3px 3px 5px #AAA;
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+
+.icon-alert-big {
+    float: left;
+    margin-right: 10px;
+    padding: 5px;
+    position: relative;
+    top: 0px;
+}
+
+.icon-alert-medium {
+    float: left;
+    margin-right: 10px;
+    padding: 5px 5px 15px;
+    position: relative;
+    top: 0px;
+}
+
+.warn {
+    color: darkgoldenrod;
+    font-weight: 600;
+}
+
+.success {
+    color: #089708;
+    font-weight: 600;
+}
+
+.error {
+    color: crimson;
+    font-weight: 600;
+}
+
+.well {
+    padding: 8px;
+    color: #ED143D;
+    margin-bottom: 0;
+}
+
+.well > p {
+    color: darkslateblue;
+    line-height: 1.5em;
+}
+
+.table-form td {
+    padding: 5px 10px;
+}
+
+.table-form tr td:first-of-type {
+    padding: 5px 10px;
+    width: 25%;
+}
+
+input[type="radio"] {
+    display: inline-block;
+    margin: 5px;
+}
+
+input[type='text'] {
+    width: 100%;
+    padding-left: 5px;
+}
+
+input[type='password'] {
+    display: inline-block;
+    margin-right: 15px;
+    width: 60%;
+}
+
+.wizard > .content > .body input[type='text'].invalid,
+.wizard > .content > .body input[type='password'].invalid
+{
+    background-color: #FFA9A9;
+    border: outset 2px #E44242;
+}
+
+.wizard > .content > .body input[type='text'].normal {
+    background-color: #FFF;
+}
+
+#btnsubmitForm {
+    background-color: #8BAD61;
+
+}
+
+#btnsubmitForm:hover {
+    background-color: #5E793D;
+}
+
+#btnsubmitForm.disabled {
+    background: #eee;
+    color: #aaa;
+}
+
+a.disabled, li.disabled {
+    cursor: not-allowed;
+}
+
+.passStrengthify {
+    position: relative;
+    display: inline-block;
+    top: -5px;
+}
