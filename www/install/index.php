@@ -181,7 +181,7 @@ $nzbpath = realpath(__DIR__.'/../..').'/nzbfiles/';
                                     </tr>
                                     <tr>
                                         <td><label for="db">Database Name:</label></td>
-                                        <td><input type="text" name="db" id="db" value="nzedbetterTest" /></td>
+                                        <td><input type="text" name="db" id="db" value="nzedbetter" /></td>
                                     </tr>
                                 </table>
 
