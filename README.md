@@ -6,7 +6,7 @@ they are introduced on the main page.
 ---
 ### Important:
 
-**THIS IS A WORK IN PROGRESS, AND IS IN NO WAY, SHAPE, OR FORM STABLE AT PRESENT.**  
+*THIS IS A WORK IN PROGRESS, AND IS IN NO WAY, SHAPE, OR FORM STABLE AT PRESENT.*
 ---
 
 ### 10/26 Update
