@@ -24,7 +24,7 @@ class DB
             // into changing that later.
 			if (defined("DB_SOCKET"))
 			{
-                DB::$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+                DB::$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, DB_SOCKET);
 			}
 			else
 			{

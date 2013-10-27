@@ -115,7 +115,7 @@ function step_1($page, $cfg){
     $cfg->pearCheck = class_exists('System');
     if (!$cfg->pearCheck) { $cfg->error = true; }
 
-    $cfg->schemaCheck = is_readable($cfg->DB_DIR.'/schema.sql');
+    $cfg->schemaCheck = is_readable($cfg->DB_DIR.'/nzedbetter.sql');
     if ($cfg->schemaCheck === false) { $cfg->error = true; }
 
 // Dont set error = true for these as we only want to display a warning
