@@ -90,7 +90,7 @@ class NZB
         }
         try
          {
-                $tempfile = "/var/www/nZEDb/nzbfiles/tmpunrar/".$relguid.".nzb.gz";
+                $tempfile = PROJ_ROOT."/nzbfiles/tmpunrar/".$relguid.".nzb.gz";
                 $fp = gzopen($tempfile, 'w6');
                 if (!$fp)
                 {
