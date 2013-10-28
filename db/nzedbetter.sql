@@ -11678,9 +11678,6 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
 
-INSERT INTO `users` (`ID`, `username`, `email`, `password`, `role`, `host`, `grabs`, `rsstoken`, `createddate`, `resetguid`, `lastlogin`, `apiaccess`, `invites`, `invitedby`, `movieview`, `musicview`, `consoleview`, `bookview`, `saburl`, `sabapikey`, `sabapikeytype`, `sabpriority`, `userseed`) VALUES
-(1, 'randy', 'randy@thewilliscrew.org', '04ae04f737aed3de0ff65a9e1259c6096fb84729KSZT', 2, '', 0, 'bae5effe13200c7ad0fbffe507c80e7f', '2013-10-26 23:08:32', NULL, '2013-10-27 00:02:52', NULL, 1, NULL, 1, 1, 1, 1, NULL, NULL, NULL, NULL, 'cce2690c4e1602d8453e6924230e624d');
-
 DROP TABLE IF EXISTS `userseries`;
 CREATE TABLE IF NOT EXISTS `userseries` (
   `ID` int(16) unsigned NOT NULL AUTO_INCREMENT,
