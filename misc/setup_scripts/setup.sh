@@ -39,11 +39,13 @@ sudo sed -i 's/mysql\.default_socket =$/mysql\.default_socket=\/var\/lib\/mysql\
 sudo sed -i 's/mysqli\.default_socket =$/mysqli\.default_socket=\/var\/lib\/mysql\/mysql\.sock/' /etc/php5/cli/php.ini
 sudo sed -i 's/max_execution_time = 30$/max_execution_time = 120/' /etc/php5/cli/php.ini
 sudo sed -i 's/memory_limit = 128M$/memory_limit = 1024M/' /etc/php5/cli/php.ini
+sudo sed -i 's/error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT/error_reporting = E_COMPILE_ERROR/' /etc/php5/cli/php.ini
 sudo sed -i 's/pdo_mysql\.default_socket=$/pdo_mysql\.default_socket=\/var\/lib\/mysql\/mysql\.sock/' /etc/php5/apache2/php.ini
 sudo sed -i 's/mysql\.default_socket =$/mysql\.default_socket=\/var\/lib\/mysql\/mysql\.sock/' /etc/php5/apache2/php.ini
 sudo sed -i 's/mysqli\.default_socket =$/mysqli\.default_socket=\/var\/lib\/mysql\/mysql\.sock/' /etc/php5/apache2/php.ini
 sudo sed -i 's/max_execution_time = 30$/max_execution_time = 120/' /etc/php5/apache2/php.ini
 sudo sed -i 's/memory_limit = 128M$/memory_limit = 1024M/' /etc/php5/apache2/php.ini
+sudo sed -i 's/error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT/error_reporting = E_COMPILE_ERROR/' /etc/php5/apache2/php.ini
 cd ~/Downloads
 wget https://innotop.googlecode.com/files/innotop-1.9.1.tar.gz
 tar -xvzf innotop-1.9.1.tar.gz
@@ -62,7 +64,7 @@ wget http://mediaarea.net/download/binary/libzen0/0.4.29/libzen0_0.4.29-1_amd64.
 wget http://mediaarea.net/download/binary/libmediainfo0/0.7.64/libmediainfo0_0.7.64-1_amd64.xUbuntu_13.04.deb
 wget http://mediaarea.net/download/binary/mediainfo/0.7.64/mediainfo_0.7.64-1_amd64.Debian_7.0.deb
 sudo dpkg -i libzen0_0.4.29-1_amd64.xUbuntu_13.04.deb
-sudo dpkg -i ibmediainfo0_0.7.64-1_amd64.xUbuntu_13.04.deb
+sudo dpkg -i libmediainfo0_0.7.64-1_amd64.xUbuntu_13.04.deb
 sudo dpkg -i mediainfo_0.7.64-1_amd64.Debian_7.0.deb
 sudo apt-get -f -y install
 mkdir ~/ffmpeg_sources
@@ -126,6 +128,7 @@ make install
 make distclean
 hash -r
 sudo cp /var/www/nZEDbetter/misc/update_scripts/nix_scripts/tmux/powerline/powerline/themes/default.sh /var/www/nZEDbetter/misc/update_scripts/nix_scripts/tmux/powerline/powerline/themes/tmux.sh
+sudo apt-get -y autoremove
 echo "export PATH=$HOME/bin:$PATH" >> ~/.bashrc
 echo 'alias tmux-dir="cd /var/www/nZEDbetter/misc/update_scripts/nix_scripts/tmux"' >> ~/.bash_aliases
 echo 'alias www-dir="cd /var/www/nZEDbetter/www"' >> ~/.bash_aliases

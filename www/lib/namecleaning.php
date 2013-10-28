@@ -132,7 +132,7 @@ class nameCleaning
 	
 	public function releaseCleanerHelper($subject)
 	{
-		$debug = true;
+		$debug = false;
         if($debug)
             echo "Start - ".$subject."\n";
 		//File and part count.
