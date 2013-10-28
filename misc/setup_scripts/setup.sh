@@ -58,12 +58,12 @@ sudo a2ensite nZEDbetter
 sudo a2dissite 000-default.conf
 sudo service apache2 reload
 cd ~/Downloads
-wget http://mediaarea.net/download/binary/libzen0/0.4.29/libzen0_0.4.29-1_i386.xUbuntu_13.04.deb
-wget http://mediaarea.net/download/binary/libmediainfo0/0.7.64/libmediainfo0_0.7.64-1_i386.xUbuntu_13.04.deb
-wget http://mediaarea.net/download/binary/mediainfo/0.7.64/mediainfo_0.7.64-1_i386.Debian_7.0.deb
-sudo dpkg -i libzen0_0.4.29-1_i386.xUbuntu_13.04.deb
-sudo dpkg -i libmediainfo0_0.7.64-1_i386.xUbuntu_13.04.deb
-sudo dpkg -i mediainfo_0.7.64-1_i386.Debian_7.0.deb
+wget http://mediaarea.net/download/binary/libzen0/0.4.29/libzen0_0.4.29-1_amd64.xUbuntu_13.04.deb
+wget http://mediaarea.net/download/binary/libmediainfo0/0.7.64/libmediainfo0_0.7.64-1_amd64.xUbuntu_13.04.deb
+wget http://mediaarea.net/download/binary/mediainfo/0.7.64/mediainfo_0.7.64-1_amd64.Debian_7.0.deb
+sudo dpkg -i libzen0_0.4.29-1_amd64.xUbuntu_13.04.deb
+sudo dpkg -i ibmediainfo0_0.7.64-1_amd64.xUbuntu_13.04.deb
+sudo dpkg -i mediainfo_0.7.64-1_amd64.Debian_7.0.deb
 sudo apt-get -f -y install
 mkdir ~/ffmpeg_sources
 cd ~/ffmpeg_sources
