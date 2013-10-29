@@ -15,10 +15,19 @@ var order_by = 'name_ASC';
 
 jQuery(function($){
 
+    $(window).load(function() {
+        $("#footer").pinFooter('absolute');
+    });
+
+    $(window).resize(function() {
+        $("#footer").pinFooter('absolute');
+    });
 
     $( document ).ready(function() {
         addLinkHandlers();
         setDates();
+        getGroupStats();
+
     });
 
     $('.selectpicker').each(function() {
@@ -198,9 +207,9 @@ jQuery(function($){
                     setBackfillLinks();
                 else
                     setActiveLinks();*/
-                if(action=='allActive' || action == 'allInactive')
+                if(action=='allActive' || action == 'allInactive' || action == 'toggleActive')
                     setAllActiveLinks(action);
-                else if(action=='allBackfillActive' || action=='allBackfillInactive')
+                else if(action=='allBackfillActive' || action=='allBackfillInactive' || action == 'toggleBackfill')
                     setAllBackfillLinks(action);
                 displayNotification(data);
             },
@@ -1190,6 +1199,7 @@ jQuery(function($){
                 {
                     setActiveLinks($("#chk-"+id));
                     displayNotification(data);
+                    getGroupStats();
                 },
                 error: function(xhr,err,e) { alert( "Error in ajax_group_status: " + err ); }
             });
@@ -1221,6 +1231,7 @@ jQuery(function($){
                 {
                     setBackfillLinks($("#chk-"+id));
                     displayNotification(data);
+                    getGroupStats();
                 },
                 error: function(xhr,err,e) { alert( "Error in ajax_backfill_status: " + err ); }
             });
@@ -1246,6 +1257,7 @@ jQuery(function($){
                     ajax_group_status(groupID, 1);});
             }
         });
+        getGroupStats();
     };
 
     function setBackfillLinks(obj) {
@@ -1263,6 +1275,7 @@ jQuery(function($){
                     ajax_backfill_status(groupID, 1);});
             }
         });
+        getGroupStats();
     };
 
     function setAllActiveLinks(action, obj) {
@@ -1282,8 +1295,19 @@ jQuery(function($){
                     $('a#btnActivate-'+groupID).on('click', function() {
                         ajax_group_status(groupID, 1);});
                 }
+            } else if(action == 'toggleActive') {
+                if($('#group-list-table').find("#btnDeactivate-"+groupID).length>0){
+                    $('td#group-' + groupID).html('<a id="btnActivate-'+ groupID +'" class="noredtext btn btn-activate btn-xs">Activate</a>');
+                    $('a#btnActivate-'+groupID).on('click', function() {
+                        ajax_group_status(groupID, 1);});
+                } else {
+                    $('td#group-' + groupID).html('<a id="btnDeactivate-'+ groupID +'" class="noredtext btn btn-deactivate btn-xs">Deactivate</a>');
+                    $('a#btnDeactivate-'+groupID).on('click', function() {
+                        ajax_group_status(groupID, 0);});
+                }
             }
         });
+        getGroupStats();
     };
 
     function setAllBackfillLinks(action, obj) {
@@ -1303,8 +1327,19 @@ jQuery(function($){
                     $('a#btnBackfillActivate-'+groupID).on('click', function() {
                         ajax_backfill_status(groupID, 1);});
                 }
+            } else if(action == 'toggleBackfill') {
+                if($('#group-list-table').find("#btnBackfillDeactivate-"+groupID).length>0){
+                    $('td#backfill-' + groupID).html('<a id="btnBackfillActivate-'+ groupID +'" class="noredtext btn btn-activate btn-xs">Activate</a>');
+                    $('a#btnBackfillActivate-'+groupID).on('click', function() {
+                        ajax_backfill_status(groupID, 1);});
+                } else {
+                    $('td#backfill-' + groupID).html('<a id="btnBackfillDeactivate-'+ groupID +'" class="noredtext btn btn-deactivate btn-xs">Deactivate</a>');
+                    $('a#btnBackfillDeactivate-'+groupID).on('click', function() {
+                        ajax_backfill_status(groupID, 0);});
+                }
             }
         });
+        getGroupStats();
     };
     function displayNotification(text, title, type, icon ) {
         title = typeof title !== 'undefined' ? title : 'Group Change Successful';
@@ -1421,5 +1456,95 @@ jQuery(function($){
 
     };
 
+    function getGroupStats()
+    {
+        $.post('ajax-group-ops.php','action=getGroupStats')
+            .done(function(data) {
+                var results = $.parseJSON(data);
+                $("#totalGroups").html(results['totalGroups']);
+                $("#activeGroups").html(results['activeGroups']);
+                $("#inactiveGroups").html(results['inactiveGroups']);
+                $("#backfillGroups").html(results['backfillGroups']);
+                $("#inactiveBackfillGroups").html(results['inactiveBackfillGroups']);
+                $("#notUpdated").html(results['notUpdated']);
+            })
+    }
+
 });
 
+(function($) {
+    // plugin definition
+    $.fn.pinFooter = function(options) {
+        // Get the height of the footer and window + window width
+        var wH = $(window).height();
+        var wW = getWindowWidth();
+        var fH = $(this).outerHeight(true);
+        var bH = $("body").outerHeight(true);
+        var mB = parseInt($("body").css("margin-bottom"));
+
+        if (options == 'relative') {
+            if (bH > getWindowHeight()) {
+                $(this).css("position","absolute");
+                $(this).css("width",wW + "px");
+                $(this).css("top",bH - fH + "px");
+                $("body").css("overflow-x","hidden");
+            } else {
+                $(this).css("position","fixed");
+                $(this).css("width",wW + "px");
+                $(this).css("top",wH - fH + "px");
+            }
+        } else { // Pinned option
+            // Set CSS attributes for positioning footer
+            $(this).css("position","fixed");
+            $(this).css("width",wW + "px");
+            $(this).css("top",wH - fH + "px");
+            $("body").css("height",(bH + mB) + "px");
+        }
+    };
+
+    // private function for debugging
+    function debug($obj) {
+        if (window.console && window.console.log) {
+            window.console.log('Window Width: ' + $(window).width());
+            window.console.log('Window Height: ' + $(window).height());
+        }
+    };
+
+    // Dependable function to get Window Height
+    function getWindowHeight() {
+        var windowHeight = 0;
+        if (typeof(window.innerHeight) == 'number') {
+            windowHeight = window.innerHeight;
+        }
+        else {
+            if (document.documentElement && document.documentElement.clientHeight) {
+                windowHeight = document.documentElement.clientHeight;
+            }
+            else {
+                if (document.body && document.body.clientHeight) {
+                    windowHeight = document.body.clientHeight;
+                }
+            }
+        }
+        return windowHeight;
+    };
+
+    // Dependable function to get Window Width
+    function getWindowWidth() {
+        var windowWidth = 0;
+        if (typeof(window.innerWidth) == 'number') {
+            windowWidth = window.innerWidth;
+        }
+        else {
+            if (document.documentElement && document.documentElement.clientWidth) {
+                windowWidth = document.documentElement.clientWidth;
+            }
+            else {
+                if (document.body && document.body.clientWidth) {
+                    windowWidth = document.body.clientWidth;
+                }
+            }
+        }
+        return windowWidth;
+    };
+})(jQuery);

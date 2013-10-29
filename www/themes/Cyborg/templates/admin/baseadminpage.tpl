@@ -224,5 +224,25 @@
         /* ]]> */
     </script>
 {/literal}{/if}
+
+{if $page->title == "Newsgroups"}
+<div id="footer">
+    <div id="footer-contents" class="center">
+        <table class="table-footer">
+            <tr>
+                <td class="footer-label">Total Groups:</td><td id="totalGroups" class="footer-data"></td>
+                <td class="footer-label">Active:</td><td id="activeGroups" class="footer-data"></td>
+                <td class="footer-label">Backfill:</td><td id="backfillGroups" class="footer-data"></td>
+            </tr>
+            <tr>
+                <td class="footer-label">Not Updated:</td><td id="notUpdated" class="footer-data"></td>
+                <td class="footer-label">Inactive:</td><td id="inactiveGroups" class="footer-data"></td>
+                <td class="footer-label">Not Backfilling:</td><td id="inactiveBackfillGroups" class="footer-data"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+{/if}
 </body>
+
 </html>
