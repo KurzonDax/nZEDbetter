@@ -1,16 +1,18 @@
 Please visit the official nZEDbetter Wiki at http://nzedbetter.org
 
-There isn't a lot there right now, but I am logging most major changes as
-they are introduced on the main page.
-
 ---
-### Important:
+#### 10/28 Update:
+The changes to the Install pages are done.  We now have an actual wizard that walks you through the initial configuration.  Even more helpful though is a new install shell script that I put together over the weekend.  The purpose of it is to streamline the download, installation, and configuration of all required components necessary to run nZEDbetter.  This includes Percona, Apache, PHP, and necessary modules.  It also clones nZEDbetter, creates the Apache virtual host file, updates php.ini, and a few other odds and ends.
 
-THIS IS A WORK IN PROGRESS, AND IS IN NO WAY, SHAPE, OR FORM STABLE AT PRESENT.
+**In short, you can go from a base install of Ubuntu to a fully configured indexer in about 20 minutes.**
 
----
+For more information on downloading the setup script, head over to http://nzedbetter.org/index.php?title=Installation and look at section 2.2, "Do You Want To Do This the Easy Way or the Hard Way?".
 
-### 10/26 Update
+Remember, this is still 'alpha' software.  I am aware of a few bugs that exist, but it should be pretty much fully functional.  However, all new features haven't been implemented yet.
+
+If you do run across any bugs or problems, don't hesitate to open a new issue here: https://github.com/KurzonDax/nZEDbetter/issues
+
+#### 10/26 Update:
 Uhhg... So here't the deal:
 Over the last three weeks, my day job has been unrelenting, causing me to put in close to 60 hours a week.  In addiiton, I picked up the flu somewhere along the way which put me out of commission for several days.  This has resulted in being way behind on where I wanted to be with the nZEDbetter project by now.  However, I do have the new installation wizard completed and the new database schema done.  This means that I can have a working build that can be installed by Monday, October 28th.  Unfortunately, some features aren't ready yet.  This includes the MusicBrainz and Sphinx integrations.  On the positive side, I'm building up a new development environment to begin testing against Ubuntu 13.10, Apache 2.4, and PHP 5.5.  Also, Percona has moved v5.6 to GA (meaning it's no longe beta), so if you had concerns about using an unreleased DB, worry no more.
 
@@ -22,6 +24,8 @@ My next major tasks are outlined below:
 - [ ] Get this repo moved so it's an actual fork of @nZEDb (see help request below)
 - [ ] Develop Sphinx integration (unknown dev time, probably a month)
 - [ ] Update search options on web front-end (1-2 weeks)
+
+---
 
 ### HELP!!
 I need some help.  I freely admit that I'm a github newb and would rather be coding than learning
