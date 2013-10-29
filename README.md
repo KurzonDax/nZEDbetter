@@ -2,7 +2,10 @@ Please visit the official nZEDbetter Wiki at http://nzedbetter.org
 
 ---
 #### 10/28 Update:
-The changes to the Install pages are done.  We now have an actual wizard that walks you through the initial configuration.  Even more helpful though is a new install shell script that I put together over the weekend.  The purpose of it is to streamline the download, installation, and configuration of all required components necessary to run nZEDbetter.  This includes Percona, Apache, PHP, and necessary modules.  It also clones nZEDbetter, creates the Apache virtual host file, updates php.ini, and a few other odds and ends.  '''In short, you can go from a base install of Ubuntu to a fully configured indexer in about 20 minutes.'''
+The changes to the Install pages are done.  We now have an actual wizard that walks you through the initial configuration.  Even more helpful though is a new install shell script that I put together over the weekend.  The purpose of it is to streamline the download, installation, and configuration of all required components necessary to run nZEDbetter.  This includes Percona, Apache, PHP, and necessary modules.  It also clones nZEDbetter, creates the Apache virtual host file, updates php.ini, and a few other odds and ends.
+
+**In short, you can go from a base install of Ubuntu to a fully configured indexer in about 20 minutes.**
+
 For more information on downloading the setup script, head over to http://nzedbetter.org/index.php?title=Installation and look at section 2.2, "Do You Want To Do This the Easy Way or the Hard Way?".
 
 Remember, this is still 'alpha' software.  I am aware of a few bugs that exist, but it should be pretty much fully functional.  However, all new features haven't been implemented yet.
