@@ -1,6 +1,3 @@
- 
-<h1>{$page->title}</h1>
-
 <div style="float:right;">
 
 	<form name="usersearch" action="">
