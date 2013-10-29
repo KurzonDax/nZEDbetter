@@ -197,6 +197,24 @@ else if(isset($_POST['action']) && !empty($_POST['action']) && !empty($_POST['id
         print $group->updateNNTPnewgroups();
     }
 
+    if($_POST['action']=='getGroupStats')
+    {
+        $db = new DB();
+        $return = [];
+        $result = $db->queryOneRow("SELECT COUNT(*) as num FROM groups");
+        $return['totalGroups'] = $result['num'];
+        $result = $db->queryOneRow("SELECT COUNT(*) as num FROM groups WHERE active=1");
+        $return['activeGroups'] = $result['num'];
+        $return['inactiveGroups'] = $return['totalGroups'] - $return['activeGroups'];
+        $result = $db->queryOneRow("SELECT COUNT(*) as num FROM groups WHERE backfill=1");
+        $return['backfillGroups'] = $result['num'];
+        $return['inactiveBackfillGroups'] = $return['totalGroups'] - $return['backfillGroups'];
+        $result = $db->queryOneRow("SELECT COUNT(*) as num FROM groups WHERE last_updated IS NULL");
+        $return['notUpdated'] = $result['num'];
+        print json_encode($return);
+    }
+
+
 }
 
 if(isset($_POST["checkname"]) && $_POST['checkname'] !='')
