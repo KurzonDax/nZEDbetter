@@ -36,7 +36,7 @@ $page->smarty->assign('pagerquerysuffix', "#results");
 
 $pager = $page->smarty->fetch("pager.tpl");
 $page->smarty->assign('pager', $pager);
-
+$browseCatName = '';
 $section = '';
 if ($category == -1 && $grp == "")
 	$page->smarty->assign("catname","All");			
