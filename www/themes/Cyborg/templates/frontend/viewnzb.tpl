@@ -17,7 +17,7 @@
             {if $rage && $release.rageID > 0 && $rage.imgdata != ""}<img class="shadow img-thumbnail" style="vertical-align:top; box-shadow: 8px 8px 5px #555;" src="{$smarty.const.WWW_TOP}/getimage?type=tvrage&amp;id={$rage.ID}" alt="{$rage.releasetitle|escape:"htmlall"}">{/if}
             {*src="{$smarty.const.WWW_TOP}/getimage?type=tvrage&amp;id={$rage.ID}" alt="{$rage.releasetitle|escape:"htmlall"}"*}
 
-            {if $movie && $release.rageID < 0 && $movie.cover == 1}<img class="shadow img-thumbnail" style="vertical-align:top; box-shadow: 8px 8px 5px #555;" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbID}-cover.jpg" alt="{$rage.releasetitle|escape:"htmlall"}">{/if}
+            {if $movie && $release.rageID < 0 && $movie.cover == 1}<img class="shadow img-thumbnail" style="vertical-align:top; box-shadow: 8px 8px 5px #555;" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbID}-cover.jpg" alt="{$movie.title|escape:"htmlall"}">{/if}
             {*{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbID}-cover.jpg" alt="{$movie.title|escape:"htmlall"}"*}
 
             {if $anidb && $release.anidbID > 0 && $anidb.picture != ""}<img class="shadow img-thumbnail" style="vertical-align:top; box-shadow: 8px 8px 5px #555;" src="{$smarty.const.WWW_TOP}/covers/anime/{$anidb.anidbID}.jpg" alt="{$rage.releasetitle|escape:"htmlall"}">{/if}

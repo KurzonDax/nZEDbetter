@@ -92,6 +92,7 @@
         </thead>
         <tbody>
         {foreach from=$results item=result}
+            {$result.imdbID = $result.imdbID|string_format:"%07d"}
             <tr>
                 <td style="vertical-align: top"><center>
                         <div class="movcover">
