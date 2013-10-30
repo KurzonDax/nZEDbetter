@@ -1372,18 +1372,6 @@ jQuery(function($){
     };
 
     function timeAgo(dateString, showAgo) {
-
-        dateString = dateString.replace(/\s/,'T'); //Had to do this because IE is fucking retarded
-        var rightNow = new Date();
-        var then = new Date(dateString);
-
-    /* if ($.browser.msie) {
-        // IE can't parse these crazy Ruby dates
-        then = Date.parse(dateString.replace(/( \+)/, ' UTC$1'));
-    } */
-        var ago = (typeof showAgo != 'undefined' && showAgo == true) ? ' ago' : ''; 
-        var diff = rightNow - then;
-
         var second = 1000,
             minute = second * 60,
             hour = minute * 60,
@@ -1392,6 +1380,20 @@ jQuery(function($){
             halfyear = day * 183,
             month = day * 30,
             year = day * 365;
+
+        dateString = dateString.replace(/\s/,'T'); //Had to do this because IE is fucking retarded
+        var rightNow = new Date();
+        var then = new Date(dateString);
+        var offset = new Date().getTimezoneOffset() * minute;  //For simplicity, we're going to assume server is same timezone as local browser
+
+    /* if ($.browser.msie) {
+        // IE can't parse these crazy Ruby dates
+        then = Date.parse(dateString.replace(/( \+)/, ' UTC$1'));
+    } */
+        var ago = (typeof showAgo != 'undefined' && showAgo == true) ? ' ago' : ''; 
+        var diff = rightNow - then - offset;
+        // console.log("rightnow = "+rightNow+"  then = "+then+" offset = "+offset);
+
         if (isNaN(diff) || diff < 0)
             return "n/a"; // return blank string if unknown
         if (diff < second * 2)
