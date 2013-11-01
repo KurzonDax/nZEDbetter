@@ -97,7 +97,7 @@
                 <td style="vertical-align: top"><center>
                         <div class="movcover">
                             <a target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbID}/" name="name{$result.imdbID}" title="View movie info" class="modal_imdb thumbnail" rel="movie" >
-                                <img class="shadow" style="margin: 3px 0;" src="{$smarty.const.WWW_TOP}/covers/movies/{if $result.cover == 1}{$result.imdbID}-cover.jpg{else}no-cover.movie.jpg{/if}" width="160" border="0" alt="{$result.title|escape:"htmlall"}">
+                                <img class="shadow" style="margin: 3px 0;" src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbID}-cover.jpg{else}{$smarty.const.WWW_TOP}/themes/{$site->style}/images/movie-no-cover.jpg{/if}" width="160" border="0" alt="{$result.title|escape:"htmlall"}">
                             </a>
                             <div class="relextra" style="margin-top: 10px;"><center>
                                     <span class="label label-inverse"><a target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbID}/" name="name{$result.imdbID}" title="View movie info" class="modal_imdb" rel="movie" >Cover</a></span>
