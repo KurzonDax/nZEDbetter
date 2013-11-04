@@ -91,9 +91,9 @@ if (isset($os) && $os == "unix")
 
 	$patchpath = preg_replace('/\/misc\/testing\/DB_scripts/i', '/db/patches/', FS_ROOT);
 	sort($patches);
-    echo "\nPreparing to apply SQL patched.  WARNING: This process may take quite a while to complete,";
+    echo "\nPreparing to apply SQL patched.  \033[1;31mWARNING: This process may take quite a while to complete,";
     echo "\ndepending on the size of your database and the number/type of patches to be applied.\n";
-    echo "\nPlease be patient, and do not start the tmux scripts, or restart the database during";
+    echo "\n\033[1;31mPlease be patient, and do not start the tmux scripts, or restart the database during";
     echo "\nthe patching process.\n";
 	foreach($patches as $patch)
 	{
@@ -107,7 +107,7 @@ if (isset($os) && $os == "unix")
 			{
 				if (ltrim($patchnumber['1'],'0') > $currentversion)
 				{
-                    echo "Applying patch ".$patch."\n";
+                    echo "Applying patch v".$patchnumber['1']."\n";
                     SplitSQL($filepath);
 					$patched++;
 				}
