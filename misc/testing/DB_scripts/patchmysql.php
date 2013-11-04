@@ -71,6 +71,9 @@ if (isset($os) && $os == "unix")
 	$s = new Sites();
 	$site = $s->get();
 	$currentversion = $site->sqlpatch;
+    if(!preg_match('/v/', $currentversion))
+        $currentversion = 'v0001';
+    $currentversion = preg_replace('/v0*','',$currentversion);
 	$patched = 0;
 	$patches = array();
 
@@ -88,6 +91,10 @@ if (isset($os) && $os == "unix")
 
 	$patchpath = preg_replace('/\/misc\/testing\/DB_scripts/i', '/db/patches/', FS_ROOT);
 	sort($patches);
+    echo "\nPreparing to apply SQL patched.  WARNING: This process may take quite a while to complete,";
+    echo "\ndepending on the size of your database and the number/type of patches to be applied.\n";
+    echo "\nPlease be patient, and do not start the tmux scripts, or restart the database during";
+    echo "\nthe patching process.\n";
 	foreach($patches as $patch)
 	{
 		if (preg_match('/\.sql$/i', $patch))
@@ -95,52 +102,13 @@ if (isset($os) && $os == "unix")
 			$filepath = $patchpath.$patch;
 			$file = fopen($filepath, "r");
 			$patch = fread($file, filesize($filepath));
-			if (preg_match('/UPDATE `site` set `value` = \'(\d{1,})\' where `setting` = \'sqlpatch\'/i', $patch, $patchnumber))
-			{
-				if ($patchnumber['1'] > $currentversion)
-				{
-					SplitSQL($filepath);
-					$patched++;
-				}
-			}
-		}
-	}
-}
-else if (isset($os) && $os == "windows")
-{
-	$s = new Sites();
-	$site = $s->get();
-	$currentversion = $site->sqlpatch;
-	$patched = 0;
-	$patches = array();
 
-	// Open the patch folder.
-	if (!isset($argv[1]))
-		exit("You must suply the directory to the patches.\n");
-	if ($handle = @opendir($argv[1])) 
-	{
-		while (false !== ($patch = readdir($handle))) 
-		{
-			$patches[] = $patch;
-		}
-		closedir($handle);
-	}
-	else
-		exit("ERROR: Have you changed the path to the patches folder, or do you have the right permissions?\n");
-
-	sort($patches);
-	foreach($patches as $patch)
-	{
-		if (preg_match('/\.sql$/i', $patch))
-		{
-			$filepath = $argv[1].$patch;
-			$file = fopen($filepath, "r");
-			$patch = fread($file, filesize($filepath));
-			if (preg_match('/UPDATE `site` set `value` = \'(\d{1,})\' where `setting` = \'sqlpatch\'/i', $patch, $patchnumber))
+			if (preg_match('/UPDATE `site` set `value` = \'v(\d{4})\' where `setting` = \'sqlpatch\'/i', $patch, $patchnumber))
 			{
-				if ($patchnumber['1'] > $currentversion)
+				if (ltrim($patchnumber['1'],'0') > $currentversion)
 				{
-					SplitSQL($filepath);
+                    echo "Applying patch ".$patch."\n";
+                    SplitSQL($filepath);
 					$patched++;
 				}
 			}
@@ -148,10 +116,10 @@ else if (isset($os) && $os == "windows")
 	}
 }
 else
-	exit("ERROR: Unable to determine OS\n");
+	exit("ERROR: It does not appear that you are running nZEDbetter on Linux.\nWindows operating systems are not supported.\n");
 
 if ($patched > 0)
-	exit($patched." patch(es) applied. Now you need to delete the files inside of the www/lib/smarty/templates_c folder.\n");
+	exit("\n".$patched." patch(es) applied.\n");
 if ($patched == 0)
 	exit("Nothing to patch, you are already on patch version ".$currentversion.".\n");
 
