@@ -440,6 +440,7 @@ class Binaries
 						$this->message[$subject]['CollectionHash'] = sha1($cleansubject.$msg['From'].$groupArr['ID'].$filecnt[6]);
 						$this->message[$subject]['MaxFiles'] = (int)$filecnt[6];
 						$this->message[$subject]['File'] = (int)$filecnt[2];
+                        $this->message[$subject]['originalSubject'] = $msg['Subject'];
 						
 					}
 
@@ -545,19 +546,20 @@ class Binaries
                             // TODO: Clean up the 'From' field
                             // $from = preg_replace('/[\u007B-\uFEFC]|[\uFF5B-\uFFFD]/',"",$db->escapeString($data['From']));
                             $data['From'] = $namecleaning->cleanUnicode($data['From']);
-                            $csql = sprintf("INSERT INTO collections (subject, fromname, date, xref, groupID, totalFiles, collectionhash, dateadded, filesize) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %s, %s, now(), %d) ON DUPLICATE KEY UPDATE filecheck=1, dateadded=now(), filesize=filesize+%d", $db->escapeString($subject), $db->escapeString($data['From']), $db->escapeString($data['Date']), $db->escapeString($data['Xref']), $groupArr['ID'], $db->escapeString($data['MaxFiles']), $db->escapeString($collectionHash), $partSizeTotal, $partSizeTotal);
+                            $csql = sprintf("INSERT INTO collections (subject, fromname, date, xref, groupID, totalFiles, collectionhash, dateadded, filesize) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %s, %s, now(), %d) ON DUPLICATE KEY UPDATE filecheck=1, dateadded=now(), filesize=filesize+%d",
+                                $db->escapeString($subject), $db->escapeString($data['From']), $db->escapeString($data['Date']), $db->escapeString($data['Xref']), $groupArr['ID'], $db->escapeString($data['MaxFiles']), $db->escapeString($collectionHash), $partSizeTotal, $partSizeTotal);
 							$colInsertResult = $db->queryInsert($csql);
                             $colsInserted = $db->getAffectedRows();
                             // Must perform a DB Commit here so we don't get screwed up collections due to multiple threads updating the same group
                             // Strange behavior from getAffectedRows... If no new row was added because of a non-unique hash, getAffectedRows returns a value of 2
                             // If a new row was added, then it returns a value of 1
-                            if($colsInserted==1)  $db->Commit();
-                            $collectionrow = $db->queryOneRow("SELECT ID FROM collections WHERE collectionhash=".$db->escapeString($collectionHash));
+                            if($colsInserted>0)  $db->Commit();
+                            $collectionrow = $db->queryOneRow("SELECT collectionhash, ID FROM collections WHERE collectionhash=".$db->escapeString($collectionHash));
 
                             if(!$collectionrow)
                             {
                                 echo "\033[1;31m\nWARNING: Error occurred inserting collection. Collection hash: ".$db->escapeString($collectionHash)."\033[0;37m\n";
-                                file_put_contents(WWW_DIR."/lib/logging/collections_insert.log","-----------------\n".date("H:i:s A")." Result ID: ".$colInsertResult." Group: ".$groupArr['ID']." Hash: ".$collectionHash." Subject: ".$db->escapeString($subject)."\n".$csql."\n", FILE_APPEND);
+                                file_put_contents(WWW_DIR."/lib/logging/collections_insert.log","-----------------\n".date("H:i:s A")." Result ID: ".$colInsertResult." Group: ".$groupArr['ID']." Hash: ".$collectionHash." Subject: ".$db->escapeString($subject)."\n".$csql."\n".$db->Error()."\n", FILE_APPEND);
                                 $db->Commit();
                                 break;
                             }
@@ -568,7 +570,7 @@ class Binaries
                             }
 						}
 
-						$binaryHash = md5($subject.$data['From'].$groupArr['ID']);
+						$binaryHash = md5($subject.$data['From'].$groupArr['ID'].$data['File'].$data['date']);
 
 						if ($lastBinaryHash == $binaryHash)
                         {
@@ -577,20 +579,23 @@ class Binaries
                         }
                         else
 						{
-							$lastBinaryHash = $binaryHash;
+							$binaryPostDate = $data['Date'];
+                            $lastBinaryHash = $binaryHash;
                             if(strlen($subject)>254)
                                 $subject = substr($db->escapeString($subject),0,254);
                             $subject = $namecleaning->cleanUnicode($subject);
-                            $bsql = sprintf("INSERT INTO binaries (binaryhash, name, collectionID, totalParts, filenumber, binarySize, partsInDB) VALUES (%s, %s, %d, %s, %s, %d, %d) ON DUPLICATE KEY UPDATE partcheck=0, binarySize=binarySize+%d, partsInDB=partsInDB+%d", $db->escapeString($binaryHash), $db->escapeString($subject), $collectionID, $db->escapeString($data['MaxParts']), $db->escapeString(round($data['File'])), $partSizeTotal, $partCountTotal, $partSizeTotal, $partCountTotal);
+                            $bsql = sprintf("INSERT INTO binaries (binaryhash, name, collectionID, totalParts, filenumber, binarySize, partsInDB, postDate, originalSubject) VALUES (%s, %s, %d, %s, %s, %d, %d, FROM_UNIXTIME(%s), %s) ON DUPLICATE KEY UPDATE partcheck=0, binarySize=binarySize+%d, partsInDB=partsInDB+%d",
+                                $db->escapeString($binaryHash), $db->escapeString($subject), $collectionID, $db->escapeString($data['MaxParts']), $db->escapeString(round($data['File'])), $partSizeTotal, $partCountTotal,$binaryPostDate, $db->escapeString($data['originalSubject']), $partSizeTotal, $partCountTotal );
 							$binInsertResult = $db->queryInsert($bsql);
-                            $binsInserted = $db->getAffectedRows();
+                            $sqlError = $db->Error();
+                            // $binsInserted = $db->getAffectedRows();
                             // Have to do a database Commit here so we don't get duplicate binaries due to running multiple threads
-                            if ($binsInserted==1) $db->Commit();
-                            $binaryRow = $db->queryOneRow(sprintf("SELECT ID FROM binaries WHERE binaryhash = %s", $db->escapeString($binaryHash)));
+                            $db->Commit();
+                            $binaryRow = $db->queryOneRow(sprintf("SELECT binaryhash, ID FROM binaries WHERE binaryhash = %s", $db->escapeString($binaryHash)));
                             if(!$binaryRow)
                             {
                                 echo "\033[1;31m\nWARNING: Error occurred inserting binary. Binary hash: ".$db->escapeString($binaryHash)."\033[0;37m\n";
-                                file_put_contents(WWW_DIR."/lib/logging/binaries_insert.log","-----------------\n".date("H:i:s A")." Result ID: ".$binInsertResult." Group: ".$groupArr['ID']." Hash: ".$binaryHash." Subject: ".$db->escapeString($subject)."\n".$bsql."\n", FILE_APPEND);
+                                file_put_contents(WWW_DIR."/lib/logging/binaries_insert.log","-----------------\n".date("H:i:s A")." Result ID: ".$binInsertResult." Group: ".$groupArr['ID']." Hash: ".$binaryHash." Subject: ".$db->escapeString($subject)."\n".$bsql."\n".$sqlError."\n", FILE_APPEND);
                                 $db->Commit();
                                 break;
                             }
@@ -598,6 +603,8 @@ class Binaries
                             {
                                 $binaryID = $binaryRow["ID"];
                                 $lastBinaryID = $binaryID;
+                                $db->query("UPDATE collections SET oldestBinary=(SELECT MIN(postDate) FROM binaries WHERE collectionID=".$collectionID."), newestBinary=(SELECT MAX(postDate) FROM binaries WHERE collectionID=".$collectionID.") WHERE ID=".$collectionID);
+
                             }
 						}
 
@@ -608,18 +615,20 @@ class Binaries
 							$pNumber = $partdata['number'];
 							$pPartNumber = round($partdata['part']);
 							$pSize = $partdata['size'];
-                            $partHash = sha1($pMessageID.$groupArr['name']);
+                            $partHash = sha1($pMessageID.$groupArr['name'].$pNumber);
                             $partGroupID = $groupArr['ID'];
+                            // $partPostDate = $data['Date'];
 
 							$maxnum = ($partdata['number'] > $maxnum) ? $partdata['number'] : $maxnum;
 
-                            $pSQL = sprintf("INSERT IGNORE INTO parts (binaryID, number, messageID, partnumber, size, collectionID, parthash, groupID) VALUES (%d, %d, %s, %d, %d, %d, %s, %d)",$pBinaryID , $pNumber, $db->escapeString($pMessageID), $pPartNumber, $pSize, $collectionID, $db->escapeString($partHash), $partGroupID);
+                            $pSQL = sprintf("INSERT IGNORE INTO parts (binaryID, number, messageID, partnumber, size, collectionID, parthash, groupID) VALUES (%d, %d, %s, %d, %d, %d, %s, %d)",
+                                $pBinaryID , $pNumber, $db->escapeString($pMessageID), $pPartNumber, $pSize, $collectionID, $db->escapeString($partHash), $partGroupID);
                             // $partInsertResult = $db->queryDirect($pSQL);
 
                             if (!$insPartsStmt->execute())
                             {
                                 $msgsnotinserted[] = $partdata['number'];
-                                file_put_contents(WWW_DIR."/lib/logging/parts_insert.log","---------------------------\n".$pSQL."\n", FILE_APPEND);
+                                file_put_contents(WWW_DIR."/lib/logging/parts_insert.log","---------------------------\n".$pSQL."\n".$db->Error()."\n", FILE_APPEND);
                             }
                             else
                             {

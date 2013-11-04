@@ -2039,7 +2039,7 @@ class Releases
             $partsDeleted = 0;
             // Using thread ID to mark the collections to delete will allow us to multi-thread this function in the future if desired.
             $threadID = $db->queryOneRow("SELECT connection_ID() as thread_ID");
-            if($threadID<1000)
+            if($threadID['thread_ID']<1000)
                 $threadID['thread_ID'] += 1000;
             // I suppose it's possible for the thread ID to grow to above 11 digits if
             // the system was up long enough.  Not sure how big Percona/MySql allows
@@ -2151,6 +2151,8 @@ class Releases
 
             // Using thread ID to mark the collections to delete will allow us to multi-thread this function in the future if desired.
             $threadID = $db->queryOneRow("SELECT connection_ID() as thread_ID");
+            if($threadID['thread_ID']<1000)
+                $threadID['thread_ID'] += 1000;
             if ($echooutput)
                 echo "Using thread ID ".$threadID['thread_ID']." to mark collections.";
             $db->query("UPDATE collections SET filecheck=".$threadID['thread_ID']." WHERE filecheck IN (0,1) AND dateadded < (now() - interval ".$this->site->partretentionhours." hour)");
@@ -2471,7 +2473,99 @@ class Releases
 		return $releasesAdded;
 	}
 
-	// This resets collections, useful when the namecleaning class's collectioncleaner function changes.
+    public function checkDeadCollections($maxAge = 6, $echooutput = true)
+    {
+        $db = new DB();
+
+        $consoletools = new ConsoleTools();
+        $n = "\n";
+
+        // Delete old releases and finished collections.
+        if ($echooutput)
+            echo $n."\033[1;33m[".date("H:i:s A")."] Checking For Dead Collections.\033[0m".$n;
+        $stageStart = TIME();
+        if($maxAge<1)
+            $maxAge=6;
+        $loopTime = microtime(true);
+        $colsDeleted = 0;
+        $binsDeleted = 0;
+        $partsDeleted = 0;
+        $colsQueued = 0;
+        // Using thread ID to mark the collections to delete will allow us to multi-thread this function in the future if desired.
+        $threadID = $db->queryOneRow("SELECT connection_ID() as thread_ID");
+        if($threadID['thread_ID']<1000)
+            $threadID['thread_ID'] += 1000;
+        // I suppose it's possible for the thread ID to grow to above 11 digits if
+        // the system was up long enough.  Not sure how big Percona/MySql allows
+        // the thread counter to grow.
+        // TODO: Fix opp error below
+        // if($threadID>99999999999)
+        //    $threadID -= 9999999999;
+        if ($echooutput)
+            echo "Using thread ID ".$threadID['thread_ID']." to mark collections.\n";
+        $db->query("UPDATE collections AS c LEFT JOIN groups AS g ON c.groupID = g.ID SET c.filecheck=".$threadID['thread_ID']." WHERE (c.oldestBinary > g.first_record_postdate + INTERVAL ".$maxAge." HOUR) AND (c.newestBinary < g.last_record_postdate - INTERVAL ".$maxAge." HOUR)");
+        $completeCols = $db->queryDirect("SELECT ID, groupID, totalFiles FROM collections WHERE filecheck=".$threadID['thread_ID']);
+        $colsTotal = $db->getNumRows($completeCols);
+        if($colsTotal == 0 || $colsTotal == false)
+        {
+            echo "\n No collections to remove right now.  Exiting stage.\n";
+            return false;
+        }
+        $colsChecked = 0;
+        $db->setAutoCommit(false);
+        while ($currentCol=$db->fetchAssoc($completeCols))
+        {
+            $colsChecked++;
+            if ($echooutput)
+                $consoletools->overWrite("Processing collection ".$consoletools->percentString($colsChecked,$colsTotal));
+            $compQuery = $db->queryOneRow("SELECT SUM(totalParts) AS total, SUM(partsInDB) AS partsDownloaded, COUNT(*) AS totalBinaries FROM binaries WHERE collectionID=".$currentCol['ID']);
+            if(($compQuery['totalBinaries']/$currentCol['totalFiles'])*100 > $this->completion && ($compQuery['partsDownloaded']/$compQuery['total'])*100 > $this->completion)
+            {
+                $db->query("UPDATE collections SET filecheck=25 WHERE ID=".$currentCol['ID']);
+                $colsQueued++;
+            }
+            else
+            {
+                $colsDeleted++;
+                $db->queryDirect("DELETE 8732 FROM parts WHERE collectionID=".$currentCol['ID']);
+                $partsDeleted += $db->getAffectedRows();
+                $db->query("UPDATE groups SET partsInDB=partsInDB-".$partsDeleted." WHERE ID=".$currentCol['groupID']);
+
+                $db->queryDirect("DELETE binaries FROM binaries WHERE collectionID=".$currentCol['ID']);
+                $binsDeleted += $db->getAffectedRows();
+            }
+        }
+        $db->Commit();
+
+        $db->queryDirect("DELETE collections FROM collections WHERE filecheck=".$threadID['thread_ID']);
+
+        $db->Commit();
+        $db->setAutoCommit(true);
+        $loopTime = microtime(true) - $loopTime;
+        if ($colsDeleted>0)
+            $avgDeleteTime = $loopTime/$colsDeleted;
+        else
+            $avgDeleteTime = 0;
+        if ($echooutput)
+        {
+            echo "\n\n\033[00;36mCollections queued to be released: ".$colsQueued."\n";
+            echo "\nTotal Objects Removed:\n";
+            echo "Collections:  ".number_format($colsDeleted)."\n";
+            // echo "Affected rows: ".number_format($colsDeletedbyAffected)."\n";
+            echo "Binaries:     ".number_format($binsDeleted)."\n";
+            echo "Parts:        ".number_format($partsDeleted)."\n\n";
+            echo "Processing completed in ".number_format($loopTime, 2)." seconds.\n";
+            echo "Average per collection: ".number_format($avgDeleteTime,4)." seconds\n\033[00;37m";
+            // Adding sleep here to give MySQL time to purge changes to binlogs
+            sleep(5);
+        }
+
+        If ($echooutput)
+            echo "\nStage completed in ".$consoletools->convertTime(TIME() - $stageStart).".\n";
+        return true;
+    }
+
+    // This resets collections, useful when the namecleaning class's collectioncleaner function changes.
 	public function resetCollections()
 	{
 		$db = new DB();
