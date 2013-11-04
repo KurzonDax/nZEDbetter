@@ -6,6 +6,7 @@ require_once(WWW_DIR."lib/tmux.php");
 
 $db = new DB();
 $DIR = realpath(__DIR__.'/../../..');
+$misc_dir = MISC_DIR;
 $smarty = SMARTY_DIR."templates_c/";
 $dbname = DB_NAME;
 $restart = "false";
@@ -49,7 +50,7 @@ if(isset($argv[1]) && $argv[1] == "true")
 		$PHP = "php";
 
 	echo "Patching database - $dbname\n";
-	system("$PHP ${DIR}testing/DB_scripts/patchmysql.php");
+	system("$PHP ${misc_dir}testing/DB_scripts/patchmysql.php");
 	if ( $restart == "true" )
 	{
 		echo "Starting tmux scripts\n";
