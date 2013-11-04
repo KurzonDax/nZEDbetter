@@ -326,7 +326,7 @@ function release_flag ($x, $t)
 	if(preg_match('/(Cantonese)/i', $x))
 		$y = "tw";
 	if ($y !== "" && $t == "browse")
-		return '<img src="./themes/Default/images/flags/'.$y.'.png" />';
+		return '<img src="./themes/Cyborg/images/flags/'.$y.'.png" />';
 	else if ($t == "search")
 	{
 		if ($y == "")

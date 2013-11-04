@@ -184,15 +184,6 @@ $nzbpath = realpath(__DIR__.'/../..').'/nzbfiles/';
                                         <td><input type="text" name="db" id="db" value="nzedbetter" /></td>
                                     </tr>
                                 </table>
-
-                                <!-- <div style="padding-top:20px; text-align:center;">
-                                    <div>
-                                        The following error(s) were encountered:<br />
-                                        {if $cfg->dbConnCheck === false}<span class="error">&bull; Unable to connect to database</span><br />{/if}
-                                        {if $cfg->dbNameCheck === false}<span class="error">&bull; Unable to select database</span><br />{/if}
-                                        {if $cfg->dbCreateCheck === false}<span class="error">&bull; Unable to create database and data. Check permissions of your mysql user.</span><br />{/if}
-                                    </div>
-                                </div> -->
                             </form>
                         </div>
                     </section>
@@ -349,7 +340,7 @@ $nzbpath = realpath(__DIR__.'/../..').'/nzbfiles/';
                             ready to get started with the indexing process, we <strong>strongly</strong> recommend you follow the guidelines below:</p>
                             <ol>
                                 <li>
-                                    Do <strong>not</strong> activate all groups at once.  nZEDbetter comes preconfigured with over 300 groups that can be indexed.  However,
+                                    Do <strong>not</strong> activate all groups at once.  nZEDbetter comes preconfigured with over 350 groups that can be indexed.  However,
                                     it is not best to activate them all initially.  Instead, choose 20 or so that you would like to start with and activate those, but don't
                                     enable backfill immediately.
                                 </li>

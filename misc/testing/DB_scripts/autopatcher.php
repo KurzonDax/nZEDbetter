@@ -5,7 +5,7 @@ require_once(WWW_DIR."lib/framework/db.php");
 require_once(WWW_DIR."lib/tmux.php");
 
 $db = new DB();
-$DIR = MISC_DIR;
+$DIR = realpath(__DIR__.'/../../..');
 $smarty = SMARTY_DIR."templates_c/";
 $dbname = DB_NAME;
 $restart = "false";
@@ -24,7 +24,7 @@ if(isset($argv[1]) && $argv[1] == "true")
 	if ( $running == "TRUE" )
 	{
 		$db->query("update tmux set value = 'FALSE' where setting = 'RUNNING'");
-		$sleep = $delay;
+		$sleep = $delay * 2;
 		echo "Stopping tmux scripts and waiting $sleep seconds for all panes to shutdown\n";
 		sleep($sleep);
 		$restart = "true";
