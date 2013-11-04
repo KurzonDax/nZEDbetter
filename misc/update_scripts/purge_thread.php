@@ -23,6 +23,8 @@ $db = new DB();
 $releases = new Releases();
 
 $next_full_purge = $db->queryOneRow("SELECT VALUE AS next_purge FROM `tmux` WHERE SETTING = 'NEXT_FULL_PURGE'");
+$next_dead_check = $db->queryOneRow("SELECT VALUE AS next_dead_check FROM `tmux` WHERE SETTING = 'NEXT_DEAD_COLLECTION_CHECK'");
+$dead_hours = $db->queryOneRow("SELECT VALUE AS dead_hours FROM `tmux` WHERE SETTING = 'DEAD_COLLECTION_CHECK_HOURS'");
 
 $maxdeletions = $argv[1];
 
@@ -33,9 +35,18 @@ if($next_full_purge['next_purge'] == null)
 }
 else
     echo "\n Next full purge will be on ".date("M d H:i A", $next_full_purge['next_purge'])."\n";
-
+if($next_dead_check['next_dead_check']==0 || is_null($next_dead_check['next_dead_check']))
+{
+    setNextDeadCheck(false);
+}
 $timestart = TIME();
 $releases->processReleasesStage7a('', true, $maxdeletions);
+if ($next_dead_check['next_dead_check'] !=null && time() > $next_dead_check['next_dead_check'])
+{
+    echo "\n\033[01;31m[".date("H:i:s")."] Beginning dead collection check...\n\033[00;37m";
+    $releases->checkDeadCollections($dead_hours['dead_hours']);
+    setNextDeadCheck(true);
+}
 if ($next_full_purge['next_purge'] != null && time() > $next_full_purge['next_purge'])
 {
     echo "\n\033[01;31m[".date("H:i:s")."] Beginning full purge...\n\033[00;37m";
@@ -56,7 +67,18 @@ function setNextPurge($scheduled=true)
     $db->query("UPDATE tmux SET VALUE=".$timeNextPurge." WHERE SETTING='NEXT_FULL_PURGE'");
     sleep(45);
     if(!$scheduled)
-        echo "\n\033[01;33mNext full purge was not scheduled in database\nNow scheduled for ".date("M d H:i A", $timeNextPurge)."\n\033[00;37m";
+        echo "\n\033[01;33mNext full purge was not scheduled in database.\nNow scheduled for ".date("M d H:i A", $timeNextPurge)."\n\033[00;37m";
     else
         echo "\nNext full purge will be on ".date("M d H:i A", $timeNextPurge)."\n";
+}
+function setNextDeadCheck($scheduled=true)
+{
+    $db = new DB();
+    $timeNextCheck=(time()+3600); // Set for one hour from now
+    $db->query("UPDATE tmux SET VALUE=".$timeNextCheck." WHERE SETTING='NEXT_DEAD_COLLECTION_CHECK'");
+    sleep(45);
+    if(!$scheduled)
+        echo "\n\033[01;33mNext dead collection check was not scheduled in database.\nNow scheduled for ".date("M d H:i A", $timeNextCheck)."\n\033[00;37m";
+    else
+        echo "\nNext dead collection check will be at ".date("H:i A", $timeNextCheck)."\n";
 }

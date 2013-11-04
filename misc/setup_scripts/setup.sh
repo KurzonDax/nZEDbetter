@@ -39,13 +39,13 @@ sudo sed -i 's/mysql\.default_socket =$/mysql\.default_socket=\/var\/lib\/mysql\
 sudo sed -i 's/mysqli\.default_socket =$/mysqli\.default_socket=\/var\/lib\/mysql\/mysql\.sock/' /etc/php5/cli/php.ini
 sudo sed -i 's/max_execution_time = 30$/max_execution_time = 120/' /etc/php5/cli/php.ini
 sudo sed -i 's/memory_limit = 128M$/memory_limit = 1024M/' /etc/php5/cli/php.ini
-sudo sed -i 's/error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT/error_reporting = E_COMPILE_ERROR/' /etc/php5/cli/php.ini
+sudo sed -i 's/error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT/error_reporting = E_ERROR/' /etc/php5/cli/php.ini
 sudo sed -i 's/pdo_mysql\.default_socket=$/pdo_mysql\.default_socket=\/var\/lib\/mysql\/mysql\.sock/' /etc/php5/apache2/php.ini
 sudo sed -i 's/mysql\.default_socket =$/mysql\.default_socket=\/var\/lib\/mysql\/mysql\.sock/' /etc/php5/apache2/php.ini
 sudo sed -i 's/mysqli\.default_socket =$/mysqli\.default_socket=\/var\/lib\/mysql\/mysql\.sock/' /etc/php5/apache2/php.ini
 sudo sed -i 's/max_execution_time = 30$/max_execution_time = 120/' /etc/php5/apache2/php.ini
 sudo sed -i 's/memory_limit = 128M$/memory_limit = 1024M/' /etc/php5/apache2/php.ini
-sudo sed -i 's/error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT/error_reporting = E_COMPILE_ERROR/' /etc/php5/apache2/php.ini
+sudo sed -i 's/error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT/error_reporting = E_ERROR/' /etc/php5/apache2/php.ini
 cd ~/Downloads
 wget https://innotop.googlecode.com/files/innotop-1.9.1.tar.gz
 tar -xvzf innotop-1.9.1.tar.gz
