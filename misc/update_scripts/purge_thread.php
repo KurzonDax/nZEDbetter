@@ -35,13 +35,17 @@ if($next_full_purge['next_purge'] == null)
 }
 else
     echo "\n Next full purge will be on ".date("M d H:i A", $next_full_purge['next_purge'])."\n";
-if($next_dead_check['next_dead_check']==0 || is_null($next_dead_check['next_dead_check']))
+if(($next_dead_check['next_dead_check']==0 || is_null($next_dead_check['next_dead_check'])) && $dead_hours['dead_hours'] > 0)
 {
     setNextDeadCheck(false);
 }
+elseif($dead_hours['dead_hours']>0)
+    echo "\n Next stale collections purge will be at ".date("H:i A", $next_dead_check['next_dead_check'])."\n";
+else
+    echo "\n Stale collection purge has been disabled.\n";
 $timestart = TIME();
 $releases->processReleasesStage7a('', true, $maxdeletions);
-if ($next_dead_check['next_dead_check'] !=null && time() > $next_dead_check['next_dead_check'])
+if ($next_dead_check['next_dead_check'] !=null && time() > $next_dead_check['next_dead_check'] && $dead_hours['dead_hours'] > 0)
 {
     echo "\n\033[01;31m[".date("H:i:s")."] Beginning dead collection check...\n\033[00;37m";
     $releases->checkDeadCollections($dead_hours['dead_hours']);
