@@ -405,6 +405,20 @@
                 </div>
             </td>
         </tr>
+        <tr>
+            <td style="width:160px;"><label for="DEAD_COLLECTION_CHECK_HOURS">Stale Collection Window in Hours:</label></td>
+            <td>
+                <input id="DEAD_COLLECTION_CHECK_HOURS" name="DEAD_COLLECTION_CHECK_HOURS" class="tiny" type="text" value="{$ftmux->DEAD_COLLECTION_CHECK_HOURS}" />
+                <div class="hint">This setting determines how long a collection may go without being updated before considering it stale.<br />
+                    The window is based on the posted date and time of the last binary to be updated within the collection compared to date/time<br />
+                    of either the first or last post we have in the database for the newsgroup.  If the completeness of the collection is estimated<br />
+                    to be less than the required percent complete for the site (set in site settings), the collection, binaries, and parts will be<br />
+                    purged.  Otherwise, it will be queued to convert to a release.  The default is 6 hours.  A good range is usually 6-24 hours.<br />
+                    Set to 0 (zero) to disable the function completely.  This check requires that the purge thread be enabled.  Collectiones will<br />
+                    checked once an hour.
+                </div>
+            </td>
+        </tr>
     </table>
 </fieldset>
 </div>
