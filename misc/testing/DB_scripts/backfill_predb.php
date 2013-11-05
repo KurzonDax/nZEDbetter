@@ -31,7 +31,7 @@ if (isset($argv[1]) && is_numeric($argv[1]))
 	foreach (range($predbv["v"], $filenums) as $filenumber)
 	{
 		$filenump = str_pad($filenumber, 3, '0', STR_PAD_LEFT);
-		$gitfile = fopen("https://github.com/nZEDb/pre-info/raw/master/datafiles/data".$filenump.".gz", "rb");
+		$gitfile = fopen("https://github.com/KurzonDax/pre-info/raw/master/datafiles/data".$filenump.".gz", "rb");
 		if($gitfile)
 		{
 			$zippath = WWW_DIR."data".$filenump.".gz";
