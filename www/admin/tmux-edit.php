@@ -50,6 +50,6 @@ $page->smarty->assign('post_ids', array(0,1,2,3));
 $page->smarty->assign('post_names', array('Disabled', 'PostProcess Additional', 'PostProcess NFOs', 'All'));
 $page->smarty->assign('fix_crap_ids', array('Disabled', 'All', 'blacklist', 'executable', 'gibberish', 'hashed', 'installbin', 'passworded', 'passwordurl', 'sample', 'scr', 'short', 'size'));
 $page->smarty->assign('fix_crap_names', array('Disabled', 'All', 'blacklist', 'executable', 'gibberish', 'hashed', 'installbin', 'passworded', 'passwordurl', 'sample', 'scr', 'short', 'size'));
-
+$page->smarty->assign('crap_hours_values', array_merge( array('full'), range(1,24)));
 $page->content = $page->smarty->fetch('tmux-edit.tpl');
 $page->render();

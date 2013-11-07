@@ -115,6 +115,7 @@ $proc_tmux = "SELECT
 	( SELECT VALUE FROM `tmux` WHERE SETTING = 'RUN_PURGE_THREAD' ) AS run_purge_thread,
 	( SELECT VALUE FROM `tmux` WHERE SETTING = 'PURGE_MAX_COLS' ) AS purge_max_cols,
 	( SELECT VALUE FROM `tmux` WHERE SETTING = 'PURGE_SLEEP' ) AS purge_sleep,
+	( SELECT VALUE FROM `tmux` WHERE SETTING = 'REMOVE_CRAP_HOURS') AS remove_crap_hours,
 	( SELECT COUNT( * ) FROM groups WHERE active = 1 ) AS active_groups,
 	( SELECT COUNT( * ) FROM groups WHERE first_record IS NOT NULL and backfill = 1 and first_record_postdate != '2000-00-00 00:00:00' and (now() - interval backfill_target day) < first_record_postdate ) AS backfill_groups_days,
 	( SELECT COUNT( * ) FROM groups WHERE first_record IS NOT NULL and backfill = 1 and first_record_postdate != '2000-00-00 00:00:00' and (now() - interval datediff(curdate(),(SELECT VALUE FROM `site` WHERE SETTING = 'safebackfilldate')) day) < first_record_postdate) AS backfill_groups_date,
@@ -524,7 +525,8 @@ while( $i > 0 )
         else $cols_to_purge = 0;
     if ( @$proc_tmux_result[0]['stage2Backlog'] != NULL ) { $stage2backlog = $proc_tmux_result[0]['stage2Backlog']; }
         else $stage2backlog = 0;
-
+    if ( @$proc_tmux_result[0]['remove_crap_hours'] != NULL ) { $remove_crap_hours = $proc_tmux_result[0]['remove_crap_hours']; }
+        else $remove_crap_hours = 6;
 
 	//calculate releases difference
 	$releases_misc_diff = number_format( $releases_now - $releases_start );
@@ -811,7 +813,7 @@ while( $i > 0 )
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes1[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;${color}m\"; \
-					$_php ${DIR}testing/Release_scripts/removeCrapReleases.php true 2 $remove $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
+					$_php ${DIR}testing/Release_scripts/removeCrapReleases.php true $remove_crap_hours $remove $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
 		}
 		else
 		{
@@ -1208,7 +1210,6 @@ while( $i > 0 )
                 shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;${color}m\"; \
                         $_php ${DIR}update_scripts/purge_thread.php $purge_max_cols $log; date +\"%D %T\"; $_sleep $purge_sleep' 2>&1 1> /dev/null");
 
-                // $_php ${DIR}testing/Release_scripts/removeCrapReleases.php true 2 $remove $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
             }
             else
             {
