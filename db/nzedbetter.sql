@@ -1,12 +1,34 @@
+-- phpMyAdmin SQL Dump
+-- version 4.0.8
+-- http://www.phpmyadmin.net
+--
+-- Host: localhost:3306
+-- Generation Time: Nov 05, 2013 at 12:41 PM
+-- Server version: 5.6.14-62.0-log
+-- PHP Version: 5.5.5-1+debphp.org~saucy+1
+
+--
+-- nZEDbetter v0001
+--
 SET FOREIGN_KEY_CHECKS=0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
+
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
 
+--
+-- Database: `nzedbetterTest`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `anidb`
+--
 
 DROP TABLE IF EXISTS `anidb`;
 CREATE TABLE IF NOT EXISTS `anidb` (
@@ -31,6 +53,12 @@ CREATE TABLE IF NOT EXISTS `anidb` (
   UNIQUE KEY `anidbID` (`anidbID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `animetitles`
+--
+
 DROP TABLE IF EXISTS `animetitles`;
 CREATE TABLE IF NOT EXISTS `animetitles` (
   `anidbID` int(7) unsigned NOT NULL,
@@ -39,26 +67,40 @@ CREATE TABLE IF NOT EXISTS `animetitles` (
   UNIQUE KEY `title` (`title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `binaries`
+--
+
 DROP TABLE IF EXISTS `binaries`;
 CREATE TABLE IF NOT EXISTS `binaries` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `collectionID` int(11) unsigned NOT NULL DEFAULT '0',
+  `postDate` datetime DEFAULT NULL,
   `filenumber` int(10) unsigned NOT NULL DEFAULT '0',
   `totalParts` int(11) unsigned NOT NULL DEFAULT '0',
   `binaryhash` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
   `partcheck` int(11) unsigned NOT NULL DEFAULT '0',
-  `partsize` bigint(20) unsigned NOT NULL DEFAULT '0',
   `dateadd` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `binarySize` bigint(20) NOT NULL DEFAULT '0',
   `partsInDB` int(11) unsigned NOT NULL DEFAULT '0',
+  `originalSubject` varchar(400) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `binaryhash` (`binaryhash`),
   KEY `ix_binary_partcheck` (`partcheck`),
   KEY `filenumber` (`filenumber`),
   KEY `partsInDB` (`partsInDB`),
-  KEY `ix_collection_filenum` (`collectionID`,`filenumber`)
+  KEY `ix_collection_filenum` (`collectionID`,`filenumber`),
+  KEY `ix_colID_postDate` (`collectionID`,`postDate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `binaryblacklist`
+--
 
 DROP TABLE IF EXISTS `binaryblacklist`;
 CREATE TABLE IF NOT EXISTS `binaryblacklist` (
@@ -72,6 +114,10 @@ CREATE TABLE IF NOT EXISTS `binaryblacklist` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=100001 ;
 
+--
+-- Dumping data for table `binaryblacklist`
+--
+
 INSERT INTO `binaryblacklist` (`ID`, `groupname`, `regex`, `msgcol`, `optype`, `status`, `description`) VALUES
 (1, 'alt.binaries.*', '(brazilian|chinese|croatian|danish|deutsch|dutch|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|latin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)[\\)]?( \\-)?[ \\-\\.]((19|20)\\d\\d|(480|720|1080)(i|p)|3d|5\\.1|dts|ac3|truehd|(bd|dvd|hd|sat|vhs|web)\\.?rip|(bd.)?(h|x).?2?64|divx|xvid|bluray|svcd|board|custom|"|(d|h|p|s)d?v?tv|m?dvd(-|sc)?r|int(ernal)?|nzb|par2|\\b(((dc|ld|md|ml|dl|hr|se)[.])|(anime\\.)|(fs|ws)|dsr|pal|ntsc|iso|complete|cracked|ebook|extended|dirfix|festival|proper|game|limited|read.?nfo|real|rerip|repack|remastered|retail|samplefix|scan|screener|theatrical|uncut|unrated|incl|winall)\\b|doku|doc|dub|sub|\\(uncut\\))', 1, 1, 1, 'Blacklists non-english releases.'),
 (2, 'alt.binaries.*', '[ -.](bl|cz|de|es|fr|ger|heb|hu|hun|ita|ko|kor|nl|pl|se)[ -.]((19|20)\\d\\d|(480|720|1080)(i|p)|(bd|dvd.?|sat|vhs)?rip?|(bd|dl)mux|( -.)?(dub|sub)(ed|bed)?|complete|convert|(d|h|p|s)d?tv|dirfix|docu|dual|dvbs|dvdscr|eng|(h|x).?2?64|int(ernal)?|pal|proper|repack|xbox)', 1, 1, 1, 'Blacklists non-english abbreviated releases.'),
@@ -82,6 +128,12 @@ INSERT INTO `binaryblacklist` (`ID`, `groupname`, `regex`, `msgcol`, `optype`, `
 (8, 'alt.binaries.*', 'hdnectar|nzbcave', 1, 1, 1, 'Bad releases.'),
 (9, 'alt.binaries.*', 'Passworded', 1, 1, 1, 'Removes passworded releases.'),
 (100000, 'alt.binaries.*', 'Rowwendees', 1, 1, 1, 'Always a foreign language post');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bookinfo`
+--
 
 DROP TABLE IF EXISTS `bookinfo`;
 CREATE TABLE IF NOT EXISTS `bookinfo` (
@@ -109,6 +161,12 @@ CREATE TABLE IF NOT EXISTS `bookinfo` (
   KEY `publisher` (`publisher`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `category`
+--
+
 DROP TABLE IF EXISTS `category`;
 CREATE TABLE IF NOT EXISTS `category` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -121,6 +179,10 @@ CREATE TABLE IF NOT EXISTS `category` (
   PRIMARY KEY (`ID`),
   KEY `ix_category_status` (`status`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=8061 ;
+
+--
+-- Dumping data for table `category`
+--
 
 INSERT INTO `category` (`ID`, `title`, `parentID`, `status`, `description`, `disablepreview`, `minsize`) VALUES
 (1000, 'Console', NULL, 1, NULL, 0, 0),
@@ -186,6 +248,12 @@ INSERT INTO `category` (`ID`, `title`, `parentID`, `status`, `description`, `dis
 (8050, 'Other', 8000, 1, NULL, 0, 0),
 (8060, 'Foreign', 8000, 1, '', 0, 0);
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `collections`
+--
+
 DROP TABLE IF EXISTS `collections`;
 CREATE TABLE IF NOT EXISTS `collections` (
   `ID` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -193,6 +261,8 @@ CREATE TABLE IF NOT EXISTS `collections` (
   `fromname` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `date` datetime DEFAULT NULL,
   `xref` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `oldestBinary` datetime DEFAULT NULL,
+  `newestBinary` datetime DEFAULT NULL,
   `totalFiles` int(11) unsigned NOT NULL DEFAULT '0',
   `groupID` int(11) unsigned NOT NULL DEFAULT '0',
   `collectionhash` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
@@ -209,8 +279,16 @@ CREATE TABLE IF NOT EXISTS `collections` (
   KEY `filesize` (`filesize`),
   KEY `ix_totalFiles_filecheck` (`totalFiles`,`filecheck`),
   KEY `ix_filecheck_filesize` (`filecheck`,`filesize`),
-  KEY `ix_filesize_filecheck` (`filesize`,`filecheck`)
+  KEY `ix_filesize_filecheck` (`filesize`,`filecheck`),
+  KEY `oldestBinary` (`oldestBinary`),
+  KEY `newestBinary` (`newestBinary`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `consoleinfo`
+--
 
 DROP TABLE IF EXISTS `consoleinfo`;
 CREATE TABLE IF NOT EXISTS `consoleinfo` (
@@ -236,6 +314,12 @@ CREATE TABLE IF NOT EXISTS `consoleinfo` (
   KEY `customerRating` (`customerRating`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `content`
+--
+
 DROP TABLE IF EXISTS `content`;
 CREATE TABLE IF NOT EXISTS `content` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -252,10 +336,20 @@ CREATE TABLE IF NOT EXISTS `content` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
 
+--
+-- Dumping data for table `content`
+--
+
 INSERT INTO `content` (`id`, `title`, `url`, `body`, `metadescription`, `metakeywords`, `contenttype`, `showinmenu`, `status`, `ordinal`, `role`) VALUES
 (1, 'Welcome to nZEDbetter', '/', '<p>Since nZEDbetter is a fork of newznab, the API is compatible with sickbeard, couchpotato, etc...</p>', '', '', 3, 0, 1, 0, 0),
 (2, 'example content', '/great/seo/content/page/', '<p>this is an example content page</p>', '', '', 2, 1, 1, NULL, 0),
 (3, 'another example', '/another/great/seo/content/page/', '<p>this is another example content page</p>', '', '', 2, 1, 1, NULL, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `forumpost`
+--
 
 DROP TABLE IF EXISTS `forumpost`;
 CREATE TABLE IF NOT EXISTS `forumpost` (
@@ -277,6 +371,12 @@ CREATE TABLE IF NOT EXISTS `forumpost` (
   KEY `updateddate` (`updateddate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `genres`
+--
+
 DROP TABLE IF EXISTS `genres`;
 CREATE TABLE IF NOT EXISTS `genres` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -285,6 +385,10 @@ CREATE TABLE IF NOT EXISTS `genres` (
   `disabled` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=177 ;
+
+--
+-- Dumping data for table `genres`
+--
 
 INSERT INTO `genres` (`ID`, `title`, `type`, `disabled`) VALUES
 (1, 'Blues', 3000, 0),
@@ -464,6 +568,12 @@ INSERT INTO `genres` (`ID`, `title`, `type`, `disabled`) VALUES
 (175, 'Cards', 1000, 0),
 (176, 'Casino', 1000, 0);
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `groups`
+--
+
 DROP TABLE IF EXISTS `groups`;
 CREATE TABLE IF NOT EXISTS `groups` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -486,6 +596,10 @@ CREATE TABLE IF NOT EXISTS `groups` (
   KEY `active` (`active`),
   KEY `last_repair` (`last_repair`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=629 ;
+
+--
+-- Dumping data for table `groups`
+--
 
 INSERT INTO `groups` (`ID`, `name`, `backfill_target`, `first_record`, `first_record_postdate`, `last_record`, `last_record_postdate`, `last_updated`, `minfilestoformrelease`, `minsizetoformrelease`, `active`, `backfill`, `description`, `last_repair`, `partsInDB`) VALUES
 (1, 'alt.binaries.0day.stuffz', 0, 0, NULL, 0, NULL, NULL, 2, 0, 0, 0, 'This group contains mostly 0day software.', NULL, 0),
@@ -841,6 +955,12 @@ INSERT INTO `groups` (`ID`, `name`, `backfill_target`, `first_record`, `first_re
 (606, 'alt.binaries.games.ps3', 0, 0, NULL, 0, NULL, NULL, 0, 0, 0, 0, '', NULL, 0),
 (628, 'alt.binaries.echange-web', 0, 0, NULL, 0, NULL, NULL, 0, 26214400, 0, 0, 'Mostly foreign movies, TV, and some PC stuff', NULL, 0);
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hashednameRegex`
+--
+
 DROP TABLE IF EXISTS `hashednameRegex`;
 CREATE TABLE IF NOT EXISTS `hashednameRegex` (
   `ID` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -852,6 +972,10 @@ CREATE TABLE IF NOT EXISTS `hashednameRegex` (
   `dateUpdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=16 ;
+
+--
+-- Dumping data for table `hashednameRegex`
+--
 
 INSERT INTO `hashednameRegex` (`ID`, `Description`, `regexString`, `caseSensitive`, `backReferenceNum`, `dateAdded`, `dateUpdate`) VALUES
 (1, '22 or more alpha or numbers', '[a-z0-9]{22,}', 0, 0, '2013-08-29 23:23:24', '2013-08-30 13:22:03'),
@@ -869,6 +993,12 @@ INSERT INTO `hashednameRegex` (`ID`, `Description`, `regexString`, `caseSensitiv
 (14, 'The super-cool usenet-space-cowboys', '"[A-Za-z0-9_]{10}\\.(par|rar)\\d{0,2}" - .+<-> usenet-space-cowboys\\.info <-> powered by secretusenet\\.com', 0, 0, '2013-08-31 23:36:39', '2013-08-31 23:36:39'),
 (15, 'anzacs - Dvd', '^anzacs - Dvd \\d{1,3}', 0, 0, '2013-09-02 07:35:19', '2013-09-02 07:35:19');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `menu`
+--
+
 DROP TABLE IF EXISTS `menu`;
 CREATE TABLE IF NOT EXISTS `menu` (
   `ID` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -881,6 +1011,10 @@ CREATE TABLE IF NOT EXISTS `menu` (
   `menueval` varchar(2000) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=22 ;
+
+--
+-- Dumping data for table `menu`
+--
 
 INSERT INTO `menu` (`ID`, `href`, `title`, `newwindow`, `tooltip`, `role`, `ordinal`, `menueval`) VALUES
 (1, 'search', 'Advanced Search', 0, 'Search for releases.', 1, 10, ''),
@@ -904,6 +1038,12 @@ INSERT INTO `menu` (`ID`, `href`, `title`, `newwindow`, `tooltip`, `role`, `ordi
 (19, 'forum', 'Forum', 0, 'Browse Forum.', 1, 85, ''),
 (20, 'login', 'Login', 0, 'Login.', 0, 100, ''),
 (21, 'register', 'Register', 0, 'Register.', 0, 110, '');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `movieinfo`
+--
 
 DROP TABLE IF EXISTS `movieinfo`;
 CREATE TABLE IF NOT EXISTS `movieinfo` (
@@ -930,6 +1070,12 @@ CREATE TABLE IF NOT EXISTS `movieinfo` (
   KEY `updateddate` (`updateddate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `musicinfo`
+--
+
 DROP TABLE IF EXISTS `musicinfo`;
 CREATE TABLE IF NOT EXISTS `musicinfo` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -953,6 +1099,12 @@ CREATE TABLE IF NOT EXISTS `musicinfo` (
   KEY `customerRating` (`customerRating`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `nzbs`
+--
+
 DROP TABLE IF EXISTS `nzbs`;
 CREATE TABLE IF NOT EXISTS `nzbs` (
   `message_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
@@ -968,6 +1120,12 @@ CREATE TABLE IF NOT EXISTS `nzbs` (
   PRIMARY KEY (`message_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `partrepair`
+--
+
 DROP TABLE IF EXISTS `partrepair`;
 CREATE TABLE IF NOT EXISTS `partrepair` (
   `ID` int(16) unsigned NOT NULL AUTO_INCREMENT,
@@ -980,6 +1138,12 @@ CREATE TABLE IF NOT EXISTS `partrepair` (
   KEY `attempts` (`attempts`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `parts`
+--
+
 DROP TABLE IF EXISTS `parts`;
 CREATE TABLE IF NOT EXISTS `parts` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -991,15 +1155,20 @@ CREATE TABLE IF NOT EXISTS `parts` (
   `parthash` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `dateadd` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `collectionID` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `binarySize` bigint(20) NOT NULL DEFAULT '0',
-  `PartsInDB` int(10) NOT NULL DEFAULT '0',
   `groupID` int(8) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`ID`,`collectionID`,`binaryID`),
-  UNIQUE KEY `parthash` (`parthash`,`collectionID`,`binaryID`),
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `parthash` (`parthash`),
   KEY `ix_binID_partnum` (`binaryID`,`partnumber`),
-  KEY `ix_colID_size` (`collectionID`,`size`),
-  KEY `ix_groupID` (`groupID`)
+  KEY `ix_groupID` (`groupID`),
+  KEY `ix_binID_size` (`binaryID`,`size`),
+  KEY `collectionID` (`collectionID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `predb`
+--
 
 DROP TABLE IF EXISTS `predb`;
 CREATE TABLE IF NOT EXISTS `predb` (
@@ -1022,6 +1191,12 @@ CREATE TABLE IF NOT EXISTS `predb` (
   KEY `ix_predb_releaseID` (`releaseID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `releaseaudio`
+--
+
 DROP TABLE IF EXISTS `releaseaudio`;
 CREATE TABLE IF NOT EXISTS `releaseaudio` (
   `ID` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -1040,6 +1215,12 @@ CREATE TABLE IF NOT EXISTS `releaseaudio` (
   UNIQUE KEY `releaseID` (`releaseID`,`audioID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `releasecomment`
+--
+
 DROP TABLE IF EXISTS `releasecomment`;
 CREATE TABLE IF NOT EXISTS `releasecomment` (
   `ID` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -1053,12 +1234,24 @@ CREATE TABLE IF NOT EXISTS `releasecomment` (
   KEY `ix_releasecomment_userID` (`userID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `releaseextrafull`
+--
+
 DROP TABLE IF EXISTS `releaseextrafull`;
 CREATE TABLE IF NOT EXISTS `releaseextrafull` (
   `releaseID` int(11) unsigned NOT NULL,
   `mediainfo` text COLLATE utf8_unicode_ci,
   PRIMARY KEY (`releaseID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `releasefiles`
+--
 
 DROP TABLE IF EXISTS `releasefiles`;
 CREATE TABLE IF NOT EXISTS `releasefiles` (
@@ -1073,6 +1266,12 @@ CREATE TABLE IF NOT EXISTS `releasefiles` (
   KEY `ix_releasefiles_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `releasenfo`
+--
+
 DROP TABLE IF EXISTS `releasenfo`;
 CREATE TABLE IF NOT EXISTS `releasenfo` (
   `ID` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -1081,6 +1280,12 @@ CREATE TABLE IF NOT EXISTS `releasenfo` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `ix_releasenfo_releaseID` (`releaseID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `releases`
+--
 
 DROP TABLE IF EXISTS `releases`;
 CREATE TABLE IF NOT EXISTS `releases` (
@@ -1146,6 +1351,12 @@ CREATE TABLE IF NOT EXISTS `releases` (
   FULLTEXT KEY `searchname` (`searchname`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `releasesubs`
+--
+
 DROP TABLE IF EXISTS `releasesubs`;
 CREATE TABLE IF NOT EXISTS `releasesubs` (
   `ID` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -1155,6 +1366,12 @@ CREATE TABLE IF NOT EXISTS `releasesubs` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `releaseID` (`releaseID`,`subsID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `releasevideo`
+--
 
 DROP TABLE IF EXISTS `releasevideo`;
 CREATE TABLE IF NOT EXISTS `releasevideo` (
@@ -1172,6 +1389,12 @@ CREATE TABLE IF NOT EXISTS `releasevideo` (
   PRIMARY KEY (`releaseID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `searchnameRegex`
+--
+
 DROP TABLE IF EXISTS `searchnameRegex`;
 CREATE TABLE IF NOT EXISTS `searchnameRegex` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -1185,6 +1408,10 @@ CREATE TABLE IF NOT EXISTS `searchnameRegex` (
   PRIMARY KEY (`ID`),
   KEY `ix_use_for_collections` (`UseForCollections`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Regex strings to use to clean subjects up for release searchname field' AUTO_INCREMENT=72 ;
+
+--
+-- Dumping data for table `searchnameRegex`
+--
 
 INSERT INTO `searchnameRegex` (`ID`, `description`, `regexString`, `caseSensitive`, `backReferenceNum`, `UseForCollections`, `dateadd`, `dateUpdate`) VALUES
 (1, 'katanxya', '^katanxya "(katanxya\\d+)', 0, 1, 1, '0126-00-08 06:37:30', '0000-00-00 00:00:00'),
@@ -1259,6 +1486,12 @@ INSERT INTO `searchnameRegex` (`ID`, `description`, `regexString`, `caseSensitiv
 (70, 'Odd posts that have a bracket in the name', '^[a-z]+ post \\[\\d{1,3}\\/\\d{1,3}\\] - "(.+)\\]', 0, 1, 1, '2013-09-19 23:01:49', '2013-09-19 23:01:49'),
 (71, 'New v\\d ebooks', '^New v\\d "(.+)\\.(epub|mobi|pdf|pdb|rar|txt)"', 0, 1, 0, '2013-09-20 03:24:37', '2013-09-20 03:24:37');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `site`
+--
+
 DROP TABLE IF EXISTS `site`;
 CREATE TABLE IF NOT EXISTS `site` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -1268,6 +1501,10 @@ CREATE TABLE IF NOT EXISTS `site` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `setting` (`setting`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=126 ;
+
+--
+-- Dumping data for table `site`
+--
 
 INSERT INTO `site` (`ID`, `setting`, `value`, `updateddate`) VALUES
 (1, 'code', 'nZEDbetter', '2013-09-14 21:01:41'),
@@ -1379,7 +1616,7 @@ INSERT INTO `site` (`ID`, `setting`, `value`, `updateddate`) VALUES
 (107, 'request_url', 'http://predb_irc.nzedb.com/predb_irc.php?reqid=[REQUEST_ID]&group=[GROUP_NM]', '2013-08-07 00:42:55'),
 (108, 'lookup_reqids', '2', '2013-09-14 21:04:37'),
 (109, 'grabnzbthreads', '10', '2013-10-27 05:09:20'),
-(110, 'sqlpatch', '99', '2013-08-07 00:42:55'),
+(110, 'sqlpatch', 'v001', '2013-11-04 14:20:32'),
 (111, 'switchToPosts', '1', '2013-08-18 04:27:14'),
 (112, 'groupMaxMsgsPerLoop', '1000000', '2013-10-27 05:09:20'),
 (113, 'matchMoviesWithoutYear', 'FALSE', '2013-08-30 21:37:20'),
@@ -1396,6 +1633,12 @@ INSERT INTO `site` (`ID`, `setting`, `value`, `updateddate`) VALUES
 (124, 'music_search_MB', '0', '2013-10-27 05:09:20'),
 (125, 'useMinify', '0', '2013-09-25 01:17:32');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tmux`
+--
+
 DROP TABLE IF EXISTS `tmux`;
 CREATE TABLE IF NOT EXISTS `tmux` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -1404,7 +1647,11 @@ CREATE TABLE IF NOT EXISTS `tmux` (
   `updateddate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `setting` (`setting`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=71 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=73 ;
+
+--
+-- Dumping data for table `tmux`
+--
 
 INSERT INTO `tmux` (`ID`, `setting`, `value`, `updateddate`) VALUES
 (1, 'DEFRAG_CACHE', '900', '2013-08-07 00:42:55'),
@@ -1476,7 +1723,15 @@ INSERT INTO `tmux` (`ID`, `setting`, `value`, `updateddate`) VALUES
 (67, 'PURGE_SLEEP', '10', '2013-08-23 07:40:35'),
 (68, 'NEXT_FULL_PURGE', '1380259249', '2013-09-26 10:20:49'),
 (69, 'FULL_PURGE_FREQ', '24', '2013-08-20 07:35:05'),
-(70, 'FURIOUS_PURGE', 'TRUE', '2013-08-27 06:44:06');
+(70, 'FURIOUS_PURGE', 'TRUE', '2013-08-27 06:44:06'),
+(71, 'NEXT_DEAD_COLLECTION_CHECK', '0', '2013-11-04 14:03:17'),
+(72, 'DEAD_COLLECTION_CHECK_HOURS', '6', '2013-11-04 14:03:17');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tvrage`
+--
 
 DROP TABLE IF EXISTS `tvrage`;
 CREATE TABLE IF NOT EXISTS `tvrage` (
@@ -1496,6 +1751,10 @@ CREATE TABLE IF NOT EXISTS `tvrage` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `rageid` (`rageid`,`releasetitle`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=10025 ;
+
+--
+-- Dumping data for table `tvrage`
+--
 
 INSERT INTO `tvrage` (`id`, `rageid`, `tvdbid`, `releasetitle`, `description`, `genre`, `country`, `imgdata`, `createddate`, `prevdate`, `previnfo`, `nextdate`, `nextinfo`) VALUES
 (1, 6318, 70328, 'The Young and the Restless', NULL, NULL, NULL, NULL, '2013-10-26 23:07:20', NULL, NULL, NULL, NULL),
@@ -11545,6 +11804,12 @@ INSERT INTO `tvrage` (`id`, `rageid`, `tvdbid`, `releasetitle`, `description`, `
 (10023, 18274, 83099, 'Tess of the D''Urbervilles', NULL, NULL, NULL, NULL, '2013-10-26 23:07:20', NULL, NULL, NULL, NULL),
 (10024, 23238, 117731, 'Secret Girlfriend', NULL, NULL, NULL, NULL, '2013-10-26 23:07:20', NULL, NULL, NULL, NULL);
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tvrageepisodes`
+--
+
 DROP TABLE IF EXISTS `tvrageepisodes`;
 CREATE TABLE IF NOT EXISTS `tvrageepisodes` (
   `ID` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -11558,6 +11823,12 @@ CREATE TABLE IF NOT EXISTS `tvrageepisodes` (
   UNIQUE KEY `rageID` (`rageID`,`fullep`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `upcoming`
+--
+
 DROP TABLE IF EXISTS `upcoming`;
 CREATE TABLE IF NOT EXISTS `upcoming` (
   `ID` int(10) NOT NULL AUTO_INCREMENT,
@@ -11569,6 +11840,12 @@ CREATE TABLE IF NOT EXISTS `upcoming` (
   UNIQUE KEY `source` (`source`,`typeID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `usercart`
+--
+
 DROP TABLE IF EXISTS `usercart`;
 CREATE TABLE IF NOT EXISTS `usercart` (
   `ID` int(16) unsigned NOT NULL AUTO_INCREMENT,
@@ -11578,6 +11855,12 @@ CREATE TABLE IF NOT EXISTS `usercart` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `ix_usercart_userrelease` (`userID`,`releaseID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `userdownloads`
+--
 
 DROP TABLE IF EXISTS `userdownloads`;
 CREATE TABLE IF NOT EXISTS `userdownloads` (
@@ -11589,6 +11872,12 @@ CREATE TABLE IF NOT EXISTS `userdownloads` (
   KEY `timestamp` (`timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `userexcat`
+--
+
 DROP TABLE IF EXISTS `userexcat`;
 CREATE TABLE IF NOT EXISTS `userexcat` (
   `ID` int(16) unsigned NOT NULL AUTO_INCREMENT,
@@ -11599,6 +11888,12 @@ CREATE TABLE IF NOT EXISTS `userexcat` (
   UNIQUE KEY `ix_userexcat_usercat` (`userID`,`categoryID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `userinvite`
+--
+
 DROP TABLE IF EXISTS `userinvite`;
 CREATE TABLE IF NOT EXISTS `userinvite` (
   `ID` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -11607,6 +11902,12 @@ CREATE TABLE IF NOT EXISTS `userinvite` (
   `createddate` datetime NOT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `usermovies`
+--
 
 DROP TABLE IF EXISTS `usermovies`;
 CREATE TABLE IF NOT EXISTS `usermovies` (
@@ -11619,6 +11920,12 @@ CREATE TABLE IF NOT EXISTS `usermovies` (
   KEY `ix_usermovies_userID` (`userID`,`imdbID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `userrequests`
+--
+
 DROP TABLE IF EXISTS `userrequests`;
 CREATE TABLE IF NOT EXISTS `userrequests` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -11629,6 +11936,12 @@ CREATE TABLE IF NOT EXISTS `userrequests` (
   KEY `userID` (`userID`),
   KEY `timestamp` (`timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `userroles`
+--
 
 DROP TABLE IF EXISTS `userroles`;
 CREATE TABLE IF NOT EXISTS `userroles` (
@@ -11642,6 +11955,10 @@ CREATE TABLE IF NOT EXISTS `userroles` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=6 ;
 
+--
+-- Dumping data for table `userroles`
+--
+
 INSERT INTO `userroles` (`ID`, `name`, `apirequests`, `downloadrequests`, `defaultinvites`, `isdefault`, `canpreview`) VALUES
 (0, 'Guest', 0, 0, 0, 0, 0),
 (1, 'User', 10, 10, 1, 1, 0),
@@ -11649,6 +11966,12 @@ INSERT INTO `userroles` (`ID`, `name`, `apirequests`, `downloadrequests`, `defau
 (3, 'Disabled', 0, 0, 0, 0, 0),
 (4, 'Moderator', 1000, 1000, 1000, 0, 1),
 (5, 'Friend', 100, 100, 5, 0, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
 
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
@@ -11677,6 +12000,12 @@ CREATE TABLE IF NOT EXISTS `users` (
   `userseed` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `userseries`
+--
 
 DROP TABLE IF EXISTS `userseries`;
 CREATE TABLE IF NOT EXISTS `userseries` (
