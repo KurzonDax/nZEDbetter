@@ -457,6 +457,15 @@
         </tr>
 
         <tr>
+            <td><label for="FIX_CRAP">Hours to Scan:</label></td>
+            <td>
+                {html_options class="siteeditstyle" id="REMOVE_CRAP_HOURS" name='REMOVE_CRAP_HOURS' values=$crap_hours_values output=$crap_hours_values selected=$ftmux->REMOVE_CRAP_HOURS}
+                <div class="hint">Number of hours to scan back for crap releases.  This is based on the date/time the release was added to the database. Select 'full' to
+                check all releases on each scan.</div>
+            </td>
+        </tr>
+
+        <tr>
             <td style="width:160px;"><label for="CRAP_TIMER">Remove Crap Releases Sleep Timer:</label></td>
             <td>
                 <input id="CRAP_TIMER" name="CRAP_TIMER" class="tiny" type="text" value="{$ftmux->CRAP_TIMER}" />
