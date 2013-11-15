@@ -2067,7 +2067,7 @@ class Releases
 
                 $db->queryDirect("DELETE parts FROM parts WHERE collectionID=".$currentCol['ID']);
                 $partsDeleted += $db->getAffectedRows();
-                $db->query("UPDATE groups SET partsInDB=partsInDB-".$partsDeleted." WHERE ID=".$currentCol['groupID']);
+                // $db->query("UPDATE groups SET partsInDB=partsInDB-".$partsDeleted." WHERE ID=".$currentCol['groupID']);
 
                 $db->queryDirect("DELETE binaries FROM binaries WHERE collectionID=".$currentCol['ID']);
                 $binsDeleted += $db->getAffectedRows();
@@ -2169,7 +2169,7 @@ class Releases
 
                     $db->queryDirect("DELETE parts FROM parts WHERE collectionID=".$currentCol['ID']);
                     $partsDeleted += $db->getAffectedRows();
-                    $db->query("UPDATE groups SET partsInDB=partsInDB-".$partsDeleted." WHERE ID=".$currentCol['groupID']);
+                    // $db->query("UPDATE groups SET partsInDB=partsInDB-".$partsDeleted." WHERE ID=".$currentCol['groupID']);
 
                     $db->queryDirect("DELETE binaries FROM binaries WHERE collectionID=".$currentCol['ID']);
                     $binsDeleted += $db->getAffectedRows();
@@ -2529,7 +2529,7 @@ class Releases
                 $colsDeleted++;
                 $db->queryDirect("DELETE 8732 FROM parts WHERE collectionID=".$currentCol['ID']);
                 $partsDeleted += $db->getAffectedRows();
-                $db->query("UPDATE groups SET partsInDB=partsInDB-".$partsDeleted." WHERE ID=".$currentCol['groupID']);
+                // $db->query("UPDATE groups SET partsInDB=partsInDB-".$partsDeleted." WHERE ID=".$currentCol['groupID']);
 
                 $db->queryDirect("DELETE binaries FROM binaries WHERE collectionID=".$currentCol['ID']);
                 $binsDeleted += $db->getAffectedRows();

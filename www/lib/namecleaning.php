@@ -270,22 +270,23 @@ class nameCleaning
 
     public function musicCleaner($text)
     {
-        $newname = preg_replace('/ (\d{1,2} \d{1,2} )?(Bootleg|Boxset|Clean.+Version|Compiled by.+|\dCD|Digipak|DIRFIX|DVBS|FLAC|(Ltd )?(Deluxe|Limited|Special).+Edition|Promo|PROOF|Reissue|Remastered|REPACK|RETAIL(.+UK)?|SACD|Sampler|SAT|Summer.+Mag|UK.+Import|Deluxe.+Version|VINYL|WEB)/i', ' ', $text);
+
+        $newname = preg_replace('/ \d{3,4} ?kbps|(\d{1,2} \d{1,2} )?(Bootleg|Boxset|Clean.+Version|Compiled by.+|\d{1,2}CDs?|Digipak|DIRFIX|DVBS|FLAC|(Ltd )?(Deluxe|Limited|Special).+Edition|Promo|PROOF|Reissue|Remastered|REPACK|RETAIL(.+UK)?|SACD|Sampler|SAT|Summer.+Mag|UK.+Import|Deluxe.+Version|VINYL|WEB)/i', ' ', $text);
         $newname = preg_replace('/ ([a-z]+[0-9]+[a-z]+[0-9]+.+|[a-z]{2,}[0-9]{2,}?.+|3FM|B00[a-z0-9]+|BRC482012|H056|UXM1DW086|(4WCD|ATL|bigFM|CDP|DST|ERE|FIM|MBZZ|MSOne|MVRD|QEDCD|RNB|SBD|SFT|ZYX) \d.+)/i', ' ', $newname);
         $newname = preg_replace('/ (\d{1,2} \d{1,2} )?([A-Z])( ?$)|[0-9]{8,}| (CABLE|FREEWEB|LINE|MAG|MCD|YMRSMILES)/', ' ', $newname);
         $newname = preg_replace('/VA( |-)/', 'Various Artists ', $newname);
-        $newname = preg_replace('/ (\d{1,2} \d{1,2} )?(DAB|DE|DVBC|EP|FIX|IT|Jap|NL|PL|(Pure )?FM|SSL|VLS) /i', ' ', $newname);
-        $newname = preg_replace('/ (\d{1,2} \d{1,2} )?(CD(A|EP|M|R|S)?|QEDCD|SBD) /i', ' ', $newname);
-        $newname = trim(preg_replace('/\s\s+/', ' ', $newname));
+        $newname = preg_replace('/ (\d{1,2} \d{1,2} )?(DAB|DE|DVBC|EP|FIX|IT|Jap|NL|PL|(Pure )?FM|SSL|VLS) |\d{1,2} \d{1,2}$/i', ' ', $newname);
+        $newname = preg_replace('/ (\d{1,2} \d{1,2} )?(CD(A|EP|M|R|S)?|QEDCD|SBD) |Uploader Presents/i', ' ', $newname);
+
         $newname = trim(preg_replace('/ [a-z]{2}$| [a-z]{3} \d{2,}$|\d{5,} \d{5,}$/i', '', $newname));
         // Below tries to catch a lot of the crap that shows up before and after the title
         $newname = trim(preg_replace('/music$/i', '', $newname));
         $newname = trim(preg_replace('/_|\./', ' ', $newname));
-        $newname = trim(preg_replace('/download all our files with|illuminatenboard org|MP3|#a b|inner sanctum@EFNET|[a-z]{1,10}@EFNET|Gate [0-9]{1,2} [0-9]{2,12}|kere ws|[0-9]{3,12}|#altbin@EFNet|www Thunder News org|usenet of inferno us|TOWN|SEK9 FLAC Hip Hop|SEK9 FLAC [A-Za-z]{4,10}|powerd by getnzb com|Wildrose [0-9]{3,6}|DREAM OF USENET INFO|http dream of usenet info/', '', $newname));
-        $newname = trim(preg_replace('/ \( |CD FLAC|[A-Z]{3,12}| 0{2,4}| proof| dl| m3u|2Eleven|[A-Z]{1,8}[0-9]{1,3}|by Secretusenet|[0-9]{3}|DeVOiD|k4|[3-9][0-9]{2,}|FiH|LoKET|SPiEL|[A-Z]{3,}[0-9]{1,4}CD|flacme|nmr@VBR apex 00|12 Vinyl|[0-9]{2,3} kbps|CBR 00/', '', $newname));
-        $newname = trim(preg_replace('/-[A-Za-z]{3}-[0-9]{2}-[0-9]{2}-|--[0-9]{2}-[0-9]{2}|\w{2}-[A-Za-z]{2,3}-[0-9]{2}-[0-9]{2}|\d\d-\d\d-|-cd-|\(Proton Radio\)|\(Pure FM\)|-[A-Za-z]{2,3}-web-|-web-|\(Maxima FM\)|trtk|Complete Sun records singles/i', '', $newname));
+        $newname = trim(preg_replace('/download all our files with|illuminatenboard org|MP3|#a b|inner sanctum@EFNET|[a-z]{1,10}@EFNET|Gate [0-9]{1,2} [0-9]{2,12}|kere ws|#altbin@EFNet|www Thunder News org|usenet of inferno us|TOWN|SEK9 FLAC Hip Hop|SEK9 FLAC [A-Za-z]{4,10}|powerd by getnzb com|Wildrose [0-9]{3,6}|DREAM OF USENET INFO|http dream of usenet info/', '', $newname));
+        $newname = trim(preg_replace('/ \( |CD FLAC|[A-Z]{3,12}| 0{2,4}| proof| dl| m3u|2Eleven|[A-Z]{1,8}[0-9]{1,3}|by Secretusenet|[ \-_][0-9]{3}[ \-_]|DeVOiD|k4|FiH|LoKET|SPiEL|[A-Z]{3,}[0-9]{1,4}CD|flacme|nmr@VBR apex 00|12 Vinyl|[0-9]{2,3} kbps|CBR 00/', '', $newname));
+        $newname = trim(preg_replace('/-[A-Za-z]{3}-[0-9]{2}-[0-9]{2}-|--[0-9]{2}-[0-9]{2}|\w{2}-[A-Za-z]{2,3}-[0-9]{2}-[0-9]{2}|\d\d-\d\d-|-cd-|\(Proton Radio\)|\(Pure FM\)|-[A-Za-z]{2,3}-web-|-web-|\(Maxima FM\)|trtk|Complete Sun records singles|-FM-\d{1,2}-\d{1,2}/i', '', $newname));
         $newname = trim(preg_replace('/\($/', '', $newname));  // Get rid of extra trailing '(' that shows up for some reason
-
+        $newname = trim(preg_replace('/\s\s+/', ' ', $newname));
         // End crap trimming
         return $newname;
 

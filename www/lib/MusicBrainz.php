@@ -23,16 +23,16 @@ class MusicBrainz {
     function MusicBrainz()
     {
         $s = new Sites();
-        $s->get();
-        $this->MBserver = (!empty($s->musicBrainzServer)) ? $s->musicBrainzServer : "musicbrainz.org";
+        $site = $s->get();
+        $this->MBserver = (!empty($site->musicBrainzServer)) ? $site->musicBrainzServer : "musicbrainz.org";
 
     }
 
-    private function _makeSearchCall($searchFunction, $field = '' , $query = '')
+    private function _makeSearchCall($searchFunction, $field = '' , $query = '', $limit=10)
     {
 
 
-        $url = MusicBrainz::API_SCHEME.$this->MBserver.'/ws/'.MusicBrainz::API_VERSION.'/'.$searchFunction.'/?query='.($field='' ? '' : $field.':').rawurlencode($query)."&limit=2";
+        $url = MusicBrainz::API_SCHEME.$this->MBserver.'/ws/'.MusicBrainz::API_VERSION.'/'.$searchFunction.'/?query='.($field=='' ? '' : $field.':').rawurlencode($query)."&limit=".$limit;
 
         if(MusicBrainz::DEBUG_MODE)
             echo "\nURL: ".$url."\n";
@@ -46,17 +46,17 @@ class MusicBrainz {
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 
             $xml_response = curl_exec($ch);
-            if ($xml_response === False)
+            if ($xml_response === false)
             {
                 curl_close($ch);
-                return False;
+                return false;
             }
             else
             {
                 /* parse XML */
                 $parsed_xml = @simplexml_load_string($xml_response);
                 curl_close($ch);
-                return ($parsed_xml === False) ? False : $parsed_xml;
+                return ($parsed_xml === false) ? false :  json_decode(json_encode($parsed_xml), 1);
             }
         }
         else
@@ -109,7 +109,7 @@ class MusicBrainz {
 
     }
 
-    public function searchArtist($query, $field='artist')
+    public function searchArtist($query, $field='', $limit=10)
     {
         /*  FIELD       DESCRIPTION
          *  area		artist area
@@ -134,11 +134,11 @@ class MusicBrainz {
         if(empty($query) || is_null($query))
             return false;
         else
-            return $this->_makeSearchCall('artist', $field, $query);
+            return $this->_makeSearchCall('artist', $field, $query, $limit);
 
     }
 
-    public function searchCDstubs($query, $field='title')
+    public function searchCDstubs($query, $field='title',$limit=10)
     {
 
         /*
@@ -154,11 +154,11 @@ class MusicBrainz {
         if(empty($query) || is_null($query))
             return false;
         else
-            return $this->_makeSearchCall('cdstub', $field, $query);
+            return $this->_makeSearchCall('cdstub', $field, $query, $limit);
 
     }
 
-    public function searchLabel($query, $field='label')
+    public function searchLabel($query, $field='',$limit=10)
     {
 
         /*
@@ -185,11 +185,11 @@ class MusicBrainz {
         if(empty($query) || is_null($query))
             return false;
         else
-            return $this->_makeSearchCall('label', $field, $query);
+            return $this->_makeSearchCall('label', $field, $query, $limit);
 
     }
 
-    public function searchRecording($query1, $field1='recording', $query2='', $field2='artist')
+    public function searchRecording($query1, $field1='recording', $query2='', $field2='artist',$limit=10)
     {
 
         /*
@@ -232,11 +232,11 @@ class MusicBrainz {
         else
         {
             $query=$query1.(($query2 != '') ? " AND ".$field2.":".$query2 : '');
-            return $this->_makeSearchCall('recording', $field1, $query);
+            return $this->_makeSearchCall('recording', $field1, $query, $limit);
         }
     }
 
-    public function searchReleaseGroup($query, $field='releasegroup')
+    public function searchReleaseGroup($query, $field='releasegroup',$limit=10)
     {
         /*
          *
@@ -262,10 +262,10 @@ class MusicBrainz {
         if(empty($query) || is_null($query))
             return false;
         else
-            return $this->_makeSearchCall('release-group', $field, $query);
+            return $this->_makeSearchCall('release-group', $field, $query, $limit);
     }
 
-    public function searchRelease($query1, $field1='release', $query2='', $field2='artistname')
+    public function searchRelease($query1, $field1='release', $query2='', $field2='artistname',$limit=10)
     {
         /*
          *
@@ -310,11 +310,17 @@ class MusicBrainz {
         else
         {
             $query=$query1.(($query2 != '') ? " AND ".$field2.":".$query2 : '');
-            return $this->_makeSearchCall('release', $field1, $query);
+            return $this->_makeSearchCall('release', $field1, $query, $limit);
         }
     }
 
-    public function searchWork($query, $field='work')
+    /**
+     * @param $query
+     * @param string $field
+     * @param int $limit
+     * @return bool|mixed
+     */
+    public function searchWork($query, $field='work',$limit=10)
     {
         /*
          *
@@ -336,9 +342,11 @@ class MusicBrainz {
         if(empty($query) || is_null($query))
             return false;
         else
-            return $this->_makeSearchCall('work', $field, $query);
+            return $this->_makeSearchCall('work', $field, $query, $limit);
 
     }
+
+
 }
 
 class MBException extends Exception{}

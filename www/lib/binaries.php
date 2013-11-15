@@ -652,7 +652,7 @@ class Binaries
 					if ($this->DoPartRepair)
 						$this->addMissingParts($msgsnotinserted, $groupArr['ID']);
 				}
-                $db->query("UPDATE groups SET partsInDB=partsInDB+".$partsAdded." WHERE ID=".$groupArr['ID']);
+                // $db->query("UPDATE groups SET partsInDB=partsInDB+".$partsAdded." WHERE ID=".$groupArr['ID']);
 				$db->Commit();
 				$db->setAutoCommit(true);
 			}
