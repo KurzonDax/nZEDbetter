@@ -1,4 +1,16 @@
 #!/bin/bash
+sudo apt-get remove --purge --yes libreoffice*
+killall ubuntuone-login ubuntuone-preferences ubuntuone-syncdaemon
+sudo rm -rf ~/.local/share/ubuntuone
+rm -rf ~/.cache/ubuntuone
+rm -rf ~/.config/ubuntuone
+mv ~/Ubuntu\ One/ ~/UbuntuOne_old/``
+sudo apt-get remove --purge --yes ubuntuone-*
+sudo apt-get remove --purge --yes shotwell-*
+sudo apt-get remove --purge --yes empathy
+sudo apt-get remove --purge --yes thunderbird*
+sudo apt-get clean --yes
+sudo apt-get autoremove --yes
 sudo add-apt-repository ppa:ondrej/php5
 sudo apt-key adv --keyserver keys.gnupg.net --recv-keys 1C4CBDCDCD2EFD2A
 echo "deb http://repo.percona.com/apt raring main" | sudo tee -a /etc/apt/sources.list
