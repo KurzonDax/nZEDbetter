@@ -14,11 +14,12 @@ require_once(WWW_DIR."/lib/namecleaning.php");
  * 5 : Fixed with decrypt hashes.
  * 6 : Matched properly in namecleaning.php's releaseCleaner function.
  */
-
+define('THREAD_SLEEP', 100);
 
 class Namefixer
 {
-    	var $_releaseupdated = FALSE;
+    var $_releaseupdated = FALSE;
+
 
     function Namefixer()
     {
@@ -251,7 +252,7 @@ class Namefixer
                     else
                     {
                         $db = new DB();
-                        $db->queryDirect(sprintf("UPDATE releases set searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
+                        $db->queryDirect(sprintf('UPDATE `releases` set `searchname` = %s, categoryID = %d where ID = %d', $db->escapeString($newname), $determinedcat, $release["releaseID"]));
                     }
                 }
                 if ($echo == 2)
@@ -288,7 +289,7 @@ class Namefixer
     {
         $this->_releaseupdated = FALSE;
         $this->relid = 0;
-        
+        usleep(THREAD_SLEEP);
         echo "\n\nChecking filename: Category: \033[01;33m{$release['categoryID']}  {$release['releaseID']} ".$release['searchname']."\033[00;37m\n";
         // echo "\n".trim($release['textstring'])."\n\n";
         // sleep(3);
