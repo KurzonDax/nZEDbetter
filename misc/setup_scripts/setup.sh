@@ -141,6 +141,8 @@ echo -e '	1. Set the default time zone in /etc/php5/cli/php.ini'
 echo -e '	2. Set the default time zone in /etc/php5/apache2/php.ini'
 echo -e '	3. Create a my.cnf and save it in /etc/mysql/my.cnf'
 echo -e '	   Go to http://tools.percona.com to create a base my.cnf tailored to your hardware\n'
+echo -e '\nOnce you create a my.cnf file and save it, you will need to restart Percona.'
+echo -e '\nFrom a terminal window, type sqlstop && sqlstart'
 cd ~
 . .bashrc
 
