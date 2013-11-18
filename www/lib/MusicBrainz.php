@@ -189,7 +189,7 @@ class MusicBrainz {
 
     }
 
-    public function searchRecording($query1, $field1='recording', $query2='', $field2='artist',$limit=10)
+    public function searchRecording($query1, $field1='recording', $query2='', $field2='artist',$limit=30)
     {
 
         /*
