@@ -51,6 +51,7 @@
     <div class="container">
         <div id="top-nav">
             <a href="../index.php"><i class="icon-home"></i> Return to Main Site</a>
+            <span style="margin-left: 15px; color: darkgray;"> <i class="icon-code-fork"></i> Version {$version}</span>
             <ul class="pull-right">
                 <li><i class="icon-user"></i> Logged in as {$username}</li>
                 <li><a href="{$smarty.const.WWW_TOP}/../logout">Logout</a></li>
