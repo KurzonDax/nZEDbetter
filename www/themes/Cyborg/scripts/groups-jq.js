@@ -132,6 +132,9 @@ jQuery(function($){
         $("#advancedSearchActiveEither, #advancedSearchBackfillEither").prop('checked', true)
             .trigger('change').parent().addClass('active').siblings('label').removeClass('active');
         $("#order_by").val(submitData['ob']);  // Reset the order by field
+        $("#txtAdvancedSearch-Name").val($("#searchGroupName").val().trim()).prop('disabled', false);
+        $("#chkAdvancedSearch-Name").prop('checked', true);
+        $("#selAdvancedSearch-Name").val("LIKE").prop('disabled', false).selectpicker('refresh');
         ajaxSubmitSearchRequest(submitData, true);
     });
 
