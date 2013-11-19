@@ -2482,8 +2482,8 @@ class Releases
 
         // Delete old releases and finished collections.
         if ($echooutput)
-            echo $n."\033[1;33m[".date("H:i:s A")."] Checking For Dead Collections.\033[0m".$n;
-        $stageStart = TIME();
+            echo $n."\033[1;33m[".date("H:i:s A")."] Checking For Stale Collections.\033[0m".$n;
+        $stageStart = time();
         if($maxAge<1)
             $maxAge=6;
         $loopTime = microtime(true);
@@ -2508,7 +2508,7 @@ class Releases
         $colsTotal = $db->getNumRows($completeCols);
         if($colsTotal == 0 || $colsTotal == false)
         {
-            echo "\n No collections to remove right now.  Exiting stage.\n";
+            echo "\n No stale collections to remove right now.  Exiting stage.\n";
             return false;
         }
         $colsChecked = 0;
@@ -2527,7 +2527,7 @@ class Releases
             else
             {
                 $colsDeleted++;
-                $db->queryDirect("DELETE 8732 FROM parts WHERE collectionID=".$currentCol['ID']);
+                $db->queryDirect("DELETE parts FROM parts WHERE collectionID=".$currentCol['ID']);
                 $partsDeleted += $db->getAffectedRows();
                 // $db->query("UPDATE groups SET partsInDB=partsInDB-".$partsDeleted." WHERE ID=".$currentCol['groupID']);
 
@@ -2561,7 +2561,7 @@ class Releases
         }
 
         If ($echooutput)
-            echo "\nStage completed in ".$consoletools->convertTime(TIME() - $stageStart).".\n";
+            echo "\nStage completed in ".$consoletools->convertTime(time() - $stageStart).".\n";
         return true;
     }
 
