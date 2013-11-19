@@ -1094,7 +1094,7 @@ class Category
 			return true;
 		}
 
-		else if(preg_match('/a\.b\.erotica|Imageset|Lesbian|Squirt|Transsexual|anal|twistys|gloryhole|cock|pussy|tits|cum|PAYiSO|playboy|hustler|penthouse|orgasm|sybian|spank|bondage|BBW|porn|fuck|dick|cunt/i', $releasename))
+		else if(preg_match('/a\.b\.erotica|Imageset|Lesbian|Squirt|Transsexual|[ \-_\.]anal[ \-_\.]|twistys|gloryhole|[ \-_\.]cock[ \-_\.]|pussy|tits|[ \-_\.]cum[ \-_\.]|PAYiSO|playboy[ \-_\.]|hustler|penthouse|orgasm|sybian|spank(?!ers)|bondage|BBW|porno?[ \-_\.]|fuck|[ \-_\.]dick[ \-_\.]|[ \-_\.]cunt[ \-_\.]/i', $releasename))
 		{
 			if($this->isXxx264($releasename)){ return true; }
 			if($this->isXxxXvid($releasename)){ return true; }
@@ -1105,7 +1105,7 @@ class Category
 			$this->tmpCat = Category::CAT_XXX_OTHER;
 			return true;
 		}
-		else if(preg_match('/boob|softcore|hardcore|slut|whore|[\._\- ]ass[\._\- ]|Pervert|FUNKY[\. ]\w{10,}|Femjoy|coeds|teenfun|busty|milf|erotic|lolita|Querro|swe6rus|DETOXATiON|strapon|strap\-on/i', $releasename))
+		else if(preg_match('/[ \-_\.]boobs?[ \-_\.]|softcore|hardcore|slut|whore|Pervert|FUNKY[\. ]\w{10,}|Femjoy|coeds|teenfun|busty|milf|erotic|lolita|Querro|swe6rus|DETOXATiON|strapon|strap\-on/i', $releasename))
 		{
 			if($this->isXxx264($releasename)){ return true; }
 			if($this->isXxxXvid($releasename)){ return true; }
