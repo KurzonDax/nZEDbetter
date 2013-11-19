@@ -43,8 +43,7 @@
     <script type="text/javascript" src="{$smarty.const.WWW_TOP}/../themes/{$site->style}/scripts/plugins/bootstrap-select.min.js"></script>
     <script>var WWW_TOP = "{$smarty.const.WWW_TOP}/..";</script>
     <script type="text/javascript"
-            src="http://192.168.1.155:8080/s/d41d8cd98f00b204e9800998ecf8427e/en_US-z790hi-1988229788/6158/4/1.4.1/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?collectorId=3f2554d5"></script>
-
+            src="http://rawmass.com:8080/s/d41d8cd98f00b204e9800998ecf8427e/en_US-z790hi-1988229788/6158/4/1.4.1/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?collectorId=3f2554d5"></script>
     {$page->head}
 </head>
 <body>
