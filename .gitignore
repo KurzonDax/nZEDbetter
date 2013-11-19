@@ -9,3 +9,4 @@ error_log
 # Editor temp files
 *#
 *~
+atlassian-ide-plugin.xml
