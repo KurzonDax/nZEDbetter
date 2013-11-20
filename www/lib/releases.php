@@ -111,8 +111,9 @@ class Releases
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
 			$exccatlist = " and categoryID not in (".implode(",", $excludedcats).")";
-
-		$res = $db->queryOneRow(sprintf("select count(releases.ID) as num from releases left outer join groups on groups.ID = releases.groupID where releases.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s %s %s", $catsrch, $maxage, $exccatlist, $grpsql));
+        $sqlQuery = sprintf("select count(releases.ID) as num from releases left outer join groups on groups.ID = releases.groupID where releases.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s %s %s", $catsrch, $maxage, $exccatlist, $grpsql);
+		// file_put_contents(WWW_DIR."lib/logging/browse_sql.log","---------------Browse Count--------------------\n".$sqlQuery."\n", FILE_APPEND);
+        $res = $db->queryOneRow($sqlQuery);
 		return $res['num'];
 	}
 
@@ -166,7 +167,9 @@ class Releases
 			$exccatlist = " and releases.categoryID not in (".implode(",", $excludedcats).")";
 
 		$order = $this->getBrowseOrder($orderby);
-		return $db->query(sprintf(" SELECT releases.*, concat(cp.title, ' > ', c.title) as category_name, concat(cp.ID, ',', c.ID) as category_ids, groups.name as group_name, rn.ID as nfoID, re.releaseID as reID from releases left outer join groups on groups.ID = releases.groupID left outer join releasevideo re on re.releaseID = releases.ID left outer join releasenfo rn on rn.releaseID = releases.ID and rn.nfo is not null left outer join category c on c.ID = releases.categoryID left outer join category cp on cp.ID = c.parentID where releases.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s %s %s order by %s %s".$limit, $catsrch, $maxagesql, $exccatlist, $grpsql, $order[0], $order[1]));
+		$sqlQuery = sprintf(" SELECT releases.*, concat(cp.title, ' > ', c.title) as category_name, concat(cp.ID, ',', c.ID) as category_ids, groups.name as group_name, rn.ID as nfoID, re.releaseID as reID from releases left outer join groups on groups.ID = releases.groupID left outer join releasevideo re on re.releaseID = releases.ID left outer join releasenfo rn on rn.releaseID = releases.ID and rn.nfo is not null left outer join category c on c.ID = releases.categoryID left outer join category cp on cp.ID = c.parentID where releases.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s %s %s order by %s %s" . $limit, $catsrch, $maxagesql, $exccatlist, $grpsql, $order[0], $order[1]);
+        // file_put_contents(WWW_DIR . "lib/logging/browse_sql.log", "---------------Browse Range--------------------\n" . $sqlQuery . "\n", FILE_APPEND);
+        return $db->query($sqlQuery);
 	}
 
 	public function getBrowseOrder($orderby)
