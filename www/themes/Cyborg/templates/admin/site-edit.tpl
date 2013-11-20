@@ -657,6 +657,18 @@
                     <div class="hint">Whether to show passworded or potentially passworded releases in browse, search, api and rss feeds. Potentially passworded means releases which contain .cab or .ace files which are typically password protected.</div>
                 </td>
             </tr>
+
+            <tr>
+                <td><label for="postProcAddBooks">Force additional post processing for books:</label></td>
+                <td>
+                    {html_radios id="postProcAddBooks" name='postProcAddBooks' values=$yesno_ids output=$yesno_names selected=$fsite->postProcAddBooks separator='<br />'}
+                    <div class="hint">If postprocessing additional is turned on, by default, large quantities of books will be skipped to speed up the process.
+                        This is because book NZB's usually do not have NFO's, samples, and typically are not passworded.  However, by leaving this set to no, it is highly
+                        likely that book NZB's that refer to virus laden binaries will slip through.  If you plan to host any book NZB's, it is highly recommend to set
+                        this option to <strong>yes</strong><br/></div>
+                </td>
+            </tr>
+
             <tr>
                 <td><label for="maxpartsprocessed">Maximum add PP parts downloaded:</label></td>
                 <td>

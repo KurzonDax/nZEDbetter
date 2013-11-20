@@ -24,7 +24,7 @@ require_once(WWW_DIR."lib/rarinfo/zipinfo.php");
 
 class PostProcess
 {
-	function PostProcess($echooutput=false)
+	function PostProcess($echooutput=true)
 	{
 		$this->echooutput = $echooutput;
 		$s = new Sites();
@@ -46,7 +46,8 @@ class PostProcess
 		$this->videofileregex = '\.(AVI|F4V|IFO|M1V|M2V|M4V|MKV|MOV|MP4|MPEG|MPG|MPGV|MPV|OGV|QT|RM|RMVB|TS|VOB|WMV)';
 		$this->audiofileregex = '\.(AAC|AIFF|APE|AC3|ASF|DTS|FLAC|MKA|MKS|MP2|MP3|RA|OGG|OGM|W64|WAV|WMA)';
 		$this->supportfiles = "/\.(vol\d{1,3}\+\d{1,3}|par2|srs|sfv|nzb";
-		$this->ignorebookregex = "/\b(epub|lit|mobi|pdf|sipdf|html)\b.*\.rar(?!.{20,})/i";
+        $this->ignoreBooks = (isset($this->site->postProcAddBooks) && !empty($this->site->postProcAddBooks)) ? $this->site->postProcAddBooks : 0;
+		$this->ignorebookregex = "/\b(epub|lit|mobi|pdf|sipdf|html|ebook)\b.*\.rar(?!.{20,})/i";
 
 		$sigs = array(array('00', '00', '01', 'BA'),
 					array('00', '00', '01', 'B3'),
@@ -65,7 +66,7 @@ class PostProcess
 			}
 			$sigstr = $sigstr."|".$str;
 		}
-		$sigstr = "/^ftyp|mp4|^riff|avi|matroska|.rec|.rmf|^oggs|moov|dvd|^0&²u|free|mdat||pnot|skip|wide$sigstr/i";
+		$sigstr = "/^ftyp|mp4|^riff|avi|matroska|.rec|.rmf|^oggs|moov|dvd|^0&²u|free|mdat|pnot|skip|wide$sigstr/i";
 		$this->sigregex = $sigstr;
 		$this->DEBUG_ECHO = false;
 		if (defined("DEBUG_ECHO") && DEBUG_ECHO == true)
@@ -275,7 +276,7 @@ class PostProcess
 				$this->db->setAutoCommit(false);
 				$ticket = $this->db->queryOneRow("SELECT value  FROM `site` WHERE `setting` LIKE 'nextppticket'");
 				$ticket = $ticket["value"];
-				$this->db->queryDirect(sprintf("UPDATE `nZEDb`.`site` SET `value` = %d WHERE `setting` LIKE 'nextppticket' AND `value` = %d", $ticket + 1, $ticket));
+				$this->db->queryDirect(sprintf("UPDATE `site` SET `value` = %d WHERE `setting` LIKE 'nextppticket' AND `value` = %d", $ticket + 1, $ticket));
 				if ($this->db->getAffectedRows() == 1)
 				{
 					$ok = true;
@@ -475,7 +476,7 @@ class PostProcess
 								$jpgmsgid[] = $nzbcontents["segments"][1];
 						}
 					}
-					elseif (preg_match($this->ignorebookregex, $nzbcontents["title"], $type))
+					elseif ($this->ignoreBooks == 0 && preg_match($this->ignorebookregex, $nzbcontents["title"], $type))
 					{
 						$ignoredbooks++;
 					}
@@ -489,7 +490,7 @@ class PostProcess
 				$this->password = $foundcontent = false;
 				$rarpart = array();
 
-				if (count($nzbfiles) > 40 && $ignoredbooks * 2 >= count($nzbfiles))
+				if ($this->ignoreBooks == 0 && count($nzbfiles) > 40 && $ignoredbooks * 2 >= count($nzbfiles))
 				{
 					echo " skipping book flood";
 					$this->db->query($sql = sprintf("update releases set passwordstatus = 0, haspreview = 0, categoryID = 8050 where ID = %d", $rel["ID"]));
@@ -942,7 +943,7 @@ class PostProcess
 				echo "\n";
 		}
 		if ($gui)
-			$this->db->queryDirect(sprintf("UPDATE `nZEDb`.`site` SET `value` = %d WHERE `setting` LIKE 'currentppticket1'", $ticket + 1));
+			$this->db->queryDirect(sprintf("UPDATE `site` SET `value` = %d WHERE `setting` LIKE 'currentppticket1'", $ticket + 1));
 
 		$nntp->doQuit();
 		unset($nntp, $this->consoleTools, $rar, $nzbcontents, $groups, $ri);
