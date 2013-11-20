@@ -146,7 +146,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 	{
 		$type = "Passworded";
 		$db = new DB();
-		$sql = $db->query("select ID, guid, searchname from releases where searchname REGEXP '/passworded|password protect|password/i' and nzbstatus in (1, 2)".$and);
+		$sql = $db->query("select ID, guid, searchname from releases where (searchname REGEXP '/passworded|password protect|password/i' OR passwordstatus=10)  and nzbstatus in (1, 2)".$and);
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
 	}
