@@ -9,6 +9,7 @@ require_once(WWW_DIR."lib/nzb.php");
 require_once(WWW_DIR."lib/nfo.php");
 require_once(WWW_DIR."lib/zipfile.php");
 require_once(WWW_DIR."lib/site.php");
+require_once(WWW_DIR . "lib/tmux.php");
 require_once(WWW_DIR."lib/util.php");
 require_once(WWW_DIR."lib/releasefiles.php");
 require_once(WWW_DIR."lib/releaseextra.php");
@@ -35,6 +36,9 @@ class Releases
 		$this->echooutput = $echooutput;
 		$s = new Sites();
 		$this->site = $s->get();
+        $t = new Tmux();
+        $this->tmux = $t->get();
+        $this->noMiscPurgeBeforeFix = (isset($this->tmux->NO_PURGE_MISC_BEFORE_FIX) && !empty($this->tmux->NO_PURGE_MISC_BEFORE_FIX)) ? $this->tmux->NO_PURGE_MISC_BEFORE_FIX : 'FALSE';
 		$this->stage5limit = (!empty($this->site->maxnzbsprocessed)) ? $this->site->maxnzbsprocessed : 1000;
 		$this->completion = (!empty($this->site->releasecompletion)) ? $this->site->releasecompletion : 0;
 		$this->crosspostt = (!empty($this->site->crossposttime)) ? $this->site->crossposttime : 2;
@@ -2232,18 +2236,43 @@ class Releases
 				$remcount ++;
 			}
 		}
-        if ($echooutput)
-            echo "\nDeleting hashed releases past retention...\n";
 
-        // TODO: Check to see if fixname has had a chance to fix release before purging
+        // Misc other past retention
+        if ($this->site->miscotherretentionhours > 0)
+        {
+            if ($echooutput)
+                echo "\nDeleting releases from Misc->Other that are past retention...\n";
+            if ($this->noMiscPurgeBeforeFix == 'FALSE')
+                $result = $db->queryDirect(sprintf("select ID, guid from releases where categoryID = %d AND adddate <= NOW() - INTERVAL %d HOUR", CATEGORY::CAT_MISC, $page->site->miscotherretentionhours));
+            else
+                $result = $db->queryDirect(sprintf("select ID, guid from releases where categoryID = %d AND adddate <= NOW() - INTERVAL %d HOUR AND (relstatus >= 4 OR passwordstatus > 2)", CATEGORY::CAT_MISC, $page->site->miscotherretentionhours));
+            $resultCount = $db->getNumRows($result);
+            if ($resultCount > 0) {
+                while ($rowrel = $db->fetchAssoc($result)) {
+                    $this->fastDelete($rowrel['ID'], $rowrel['guid'], $this->site);
+                    $miscothercount++;
+                }
+            }
 
+        }
+
+        // Hashed releases past retention
         if($this->site->hashedRetentionHours != 0)
         {
-            $result = $db->query(sprintf("SELECT ID, guid FROM releases WHERE categoryID=7020 AND adddate < (now() - interval %d hour)", $page->site->hashedRetentionHours));
-            foreach ($result as $rowrel)
+            if ($echooutput)
+                echo "\nDeleting hashed releases past retention...\n";
+            if($this->noMiscPurgeBeforeFix == 'FALSE')
+                $result = $db->queryDirect(sprintf("SELECT ID, guid FROM releases WHERE categoryID = %d AND adddate < (now() - interval %d hour)", CATEGORY::CAT_HASHED, $page->site->hashedRetentionHours));
+            else
+                $result = $db->queryDirect(sprintf("SELECT ID, guid FROM releases WHERE categoryID = %d AND adddate < (now() - interval %d hour) AND (relstatus >= 4 OR passwordstatus > 2) ", CATEGORY::CAT_HASHED, $page->site->hashedRetentionHours));
+            $resultCount = $db->getNumRows($result);
+            if($resultCount > 0)
             {
-                $this->fastDelete($rowrel['ID'], $rowrel['guid'], $this->site);
-                $remcount ++;
+                while ($rowrel = $db->fetchAssoc($result))
+                {
+                    $this->fastDelete($rowrel['ID'], $rowrel['guid'], $this->site);
+                    $remcount ++;
+                }
             }
         }
 		// Passworded releases.
@@ -2321,24 +2350,8 @@ class Releases
 			}
 		}
 
-		// misc other
 
-		if ($this->site->miscotherretentionhours > 0)
-        {
-            // TODO: Check to see if fixname has had a chance to fix release before purging
-            if ($echooutput)
-                echo "\nDeleting releases from Misc->Other that are past retention...\n";
-            $sql = sprintf("select ID, guid from releases where categoryID = %d AND adddate <= NOW() - INTERVAL %d HOUR", CATEGORY::CAT_MISC, $page->site->miscotherretentionhours);
 
-			if ($resrel = $db->query($sql)) {
-				foreach ($resrel as $rowrel)
-				{
-					$this->fastDelete($rowrel['ID'], $rowrel['guid'], $this->site);
-					$miscothercount ++;
-				}
-			}
-
-		}
 
 		// $db->queryDirect(sprintf("DELETE nzbs WHERE dateadded < (now() - interval %d hour)", $page->site->partretentionhours));
 

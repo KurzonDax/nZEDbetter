@@ -4,6 +4,7 @@ require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/category.php");
 require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/namecleaning.php");
+require_once(WWW_DIR."/lib/tmux.php");
 
 /* Values of relnamestatus:
  * 0 : New release, just inserted into the table.
@@ -12,17 +13,22 @@ require_once(WWW_DIR."/lib/namecleaning.php");
  * 3 : Fixed with post proc (from mp3 tags or music.php) or predb.
  * 4 : Fixed with misc_sorter.
  * 5 : Fixed with decrypt hashes.
- * 6 : Matched properly in namecleaning.php's releaseCleaner function.
+ * 6 : Matched properly in namecleaning.php's releaseCleaner function. (No longer valid)
+ * 10: Checked NFO but failed
+ * 11: Checked filename but failed
+ * 12: Have checked NFO and Filenames
  */
-define('THREAD_SLEEP', 100);
+
 
 class Namefixer
 {
-    var $_releaseupdated = FALSE;
-
+    	var $_releaseupdated = FALSE;
 
     function Namefixer()
     {
+        $tmux = new Tmux();
+        $t = $tmux->get();
+        $this->noMiscPurgeBeforeFix = (isset($t->NO_PURGE_MISC_BEFORE_FIX) && !empty($t->NO_PURGE_MISC_BEFORE_FIX)) ? $t->NO_PURGE_MISC_BEFORE_FIX : 'FALSE';
         $this->relid = 0;
         $this->fixed = 0;
         $this->checked = 0;
@@ -36,33 +42,33 @@ class Namefixer
 
             if ($time == 1)
         {
-                echo "Fixing search names in the past 6 hours using .nfo files.\n";
+                echo "Fixing search names in the past 24 hours using .NFO files.\n";
         }
         else
         {
-                echo "Fixing search names since the beginning using .nfo files.\n";
+                echo "Fixing search names since the beginning using .NFO files.\n";
         }
 		// sleep(10);
             $db = new DB();
         $type = "NFO, ";
         // Only select releases we haven't checked here before
-        $query = "SELECT nfo.releaseID as nfoID, rel.groupID, rel.categoryID, rel.searchname, uncompress(nfo) as textstring, rel.ID as releaseID from releases rel inner join releasenfo nfo on (nfo.releaseID = rel.ID) where categoryID != 5070 and relnamestatus = 1 and relstatus & " . DB::NFO_PROCESSED_NAMEFIXER . " = 0";
+        $query = "SELECT nfo.releaseID as nfoID, rel.groupID, rel.categoryID, rel.searchname, uncompress(nfo) as textstring, rel.ID as releaseID, rel.relnamestatus as namestatus from releases rel inner join releasenfo nfo on (nfo.releaseID = rel.ID) where categoryID != 5070 and relnamestatus IN (1,11) and relstatus & " . DB::NFO_PROCESSED_NAMEFIXER . " = 0";
 
         //24 hours, other cats
         if ($time == 1 && $cats == 1)
         {
-            $relres = $db->queryDirect($query." and rel.adddate > (now() - interval 6 hour) and rel.categoryID in (1090, 2020, 3050, 6050, 5050, 7010, 7020, 8050) group by rel.ID order by postdate desc");
+            $relres = $db->queryDirect($query." and rel.adddate > (now() - interval 24 hour) and rel.categoryID in (1090, 2020, 3050, 6050, 5050, 7010, 7020, 8050) group by rel.ID order by postdate desc");
         }
         //24 hours, all cats
         if ($time == 1 && $cats == 2)
         {
-            $relres = $db->queryDirect($query." and rel.adddate > (now() - interval 6 hour) group by rel.ID order by postdate desc");
+            $relres = $db->queryDirect($query." and rel.adddate > (now() - interval 24 hour) group by rel.ID order by postdate desc");
         }
         //24 hours, just the Misc->Other category
         if ($time == 1 && $cats == 3)
         {
             echo "Processing just the MISC category...\n";
-            $relres = $db->queryDirect($query." AND rel.adddate > (now() - interval 6 hour) AND rel.categoryID=7010 ORDER BY postdate DESC");
+            $relres = $db->queryDirect($query." AND rel.adddate > (now() - interval 24 hour) AND rel.categoryID=7010 ORDER BY postdate DESC");
         }
         //other cats
         if ($time == 2 && $cats == 1)
@@ -125,26 +131,26 @@ class Namefixer
     {
             if ($time == 1)
         {
-                echo "Fixing search names in the past 6 hours using the filename.\n";
+                echo "Fixing search names in the past 24 hours using filenames.\n";
         }
         else
         {
-                echo "Fixing search names since the beginning using the filename.\n";
+                echo "Fixing search names since the beginning using filenames.\n";
         }
 		sleep(10);
         $db = new DB();
         $type = "Filenames, ";
-        $query = "SELECT relfiles.name as textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID as fileID, rel.ID as releaseID from releases rel inner join releasefiles relfiles on (relfiles.releaseID = rel.ID) where categoryID != 5070 and relnamestatus = 1";
+        $query = "SELECT relfiles.name as textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID as fileID, rel.ID as releaseID from releases rel inner join releasefiles relfiles on (relfiles.releaseID = rel.ID) where categoryID != 5070 and relnamestatus IN (1,10)";
         // $query = "SELECT rel.name as textstring, rel.categoryID, rel.searchname, rel.groupID, rel.ID as releaseID from releases rel where categoryID != 5070 AND relnamestatus = 1";
         //24 hours, other cats
          if ($time == 1 && $cats == 1)
          {
-             $relres = $db->queryDirect($query." and rel.adddate > (now() - interval 6 hour) and rel.categoryID in (1090, 2020, 3050, 6050, 5050, 7010, 7020, 8050) group by rel.ID order by postdate desc");
+             $relres = $db->queryDirect($query." and rel.adddate > (now() - interval 24 hour) and rel.categoryID in (1090, 2020, 3050, 6050, 5050, 7010, 7020, 8050) group by rel.ID order by postdate desc");
          }
         //24 hours, all cats
          if ($time == 1 && $cats == 2)
          {
-            $relres = $db->queryDirect($query." and rel.adddate > (now() - interval 6 hour) group by rel.ID order by postdate desc");
+            $relres = $db->queryDirect($query." and rel.adddate > (now() - interval 24 hour) group by rel.ID order by postdate desc");
         }
         //other cats
         if ($time == 2 && $cats == 1)
@@ -179,6 +185,9 @@ class Namefixer
                 $this->_releaseupdated = FALSE;
                 $this->checkName($relrow, $echo, $type, $namestatus);
                 $this->checked++;
+                //
+                // If we are here, we have checked a release against it's files so set it as checked in the db
+                $db->queryDirect(sprintf("UPDATE releases set relstatus = relstatus | %d where ID = %d", DB::FILES_PROCESSED_NAMEFIXER, $relrow["releaseID"]));
                 if ($this->checked % 100 == 0)
                     echo $this->checked." files processed.\n\n";
             }
@@ -243,7 +252,7 @@ class Namefixer
                         $msg .= "\nFil name: ".$release['textstring'];
                     $msg .= "\nRelease ID: ".$release['releaseID']."  Length Compare: ".$lengthComparison."\n";
                     $msg .= "Old Cat: ".$oldcatname."  New Cat: ".$newcatname."\n--------------------------------------------------\n";
-                    file_put_contents(WWW_DIR."/lib/logging/namefixer-success.log", $msg, FILE_APPEND);
+                    // file_put_contents(WWW_DIR."/lib/logging/namefixer-success.log", $msg, FILE_APPEND);
                     if ($namestatus == 1)
                     {
                         $db = new DB();
@@ -252,7 +261,7 @@ class Namefixer
                     else
                     {
                         $db = new DB();
-                        $db->queryDirect(sprintf('UPDATE `releases` set `searchname` = %s, categoryID = %d where ID = %d', $db->escapeString($newname), $determinedcat, $release["releaseID"]));
+                        $db->queryDirect(sprintf("UPDATE releases set searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
                     }
                 }
                 if ($echo == 2)
@@ -262,13 +271,14 @@ class Namefixer
                             "New cat:  ".$newcatname.$n.
                             "Old cat:  ".$oldcatname.$n.
                             "Group: ".$groupname.$n.
-                            "Method:   ".$type.$method.$n.$n;
-                    $msg = "New name: ".$newname."\nOld name: ".$release['searchname'];
-                    if ($type == "Filenames, ")
-                        $msg .= "\nFil name: ".$release['textstring'];
-                    $msg .= "\nRelease ID: ".$release['releaseID']."  Length Compare: ".$lengthComparison."\n";
-                    $msg .= "Old Cat: ".$oldcatname."  New Cat: ".$newcatname."\n--------------------------------------------------\n";
-                    file_put_contents(WWW_DIR."/lib/logging/namefixer-success.log", $msg, FILE_APPEND);
+                            "Method:   ".$type.$method.$n.$n.
+                            "Echo equals 2".$n.$n;
+                    // $msg = "New name: ".$newname."\nOld name: ".$release['searchname'];
+                    // if ($type == "Filenames, ")
+                    //     $msg .= "\nFil name: ".$release['textstring'];
+                    // $msg .= "\nRelease ID: ".$release['releaseID']."  Length Compare: ".$lengthComparison."\n";
+                    // $msg .= "Old Cat: ".$oldcatname."  New Cat: ".$newcatname."\n--------------------------------------------------\n";
+                    // file_put_contents(WWW_DIR."/lib/logging/namefixer-success.log", $msg, FILE_APPEND);
                 }
             }
         }
@@ -289,7 +299,7 @@ class Namefixer
     {
         $this->_releaseupdated = FALSE;
         $this->relid = 0;
-        usleep(THREAD_SLEEP);
+        
         echo "\n\nChecking filename: Category: \033[01;33m{$release['categoryID']}  {$release['releaseID']} ".$release['searchname']."\033[00;37m\n";
         // echo "\n".trim($release['textstring'])."\n\n";
         // sleep(3);
@@ -357,11 +367,22 @@ class Namefixer
 				return;
 			
         }
+        $sql = '';
 		if($this->_releaseupdated === FALSE)
 		{
-				echo "Failed to find a match for {$release['searchname']}\n";
-				file_put_contents(WWW_DIR."/lib/logging/namefixer.log", $type.", ".$release['categoryID'].", ".$release['searchname']."\n",FILE_APPEND);
-				echo "Log file written.\n";	
+            echo "Failed to find a match for {$release['searchname']}\n";
+            // file_put_contents(WWW_DIR."/lib/logging/namefixer.log", $type.", ".$release['categoryID'].", ".$release['searchname']."\n",FILE_APPEND);
+            // echo "Log file written.\n";
+            if(($release['namestatus'] == '10' && $type == "Filenames, ") || ($release['namestatus'] == '11' && $type == "NFO, "))
+                $sql = "UPDATE releases SET relnamestatus=12 WHERE ID=".$release['releaseID'];
+            elseif($type == "NFO, ")
+                $sql = "UPDATE releases SET relnamestatus=10 WHERE ID=" . $release['releaseID'];
+            elseif($type == "Filenames, ")
+                $sql = "UPDATE releases SET relnamestatus=11 WHERE ID=" . $release['releaseID'];
+
+            $db = new DB();
+            $db->query($sql);
+
 		}
     }
 
