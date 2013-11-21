@@ -1,5 +1,3 @@
-<h1>{$page->title}</h1> 
-
 {if $anidblist}
 
 <div style="float:right;">

@@ -1,5 +1,3 @@
- 
-<h1>{$page->title}</h1>
 
 <table class="data Sortable highlight">
 

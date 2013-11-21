@@ -265,7 +265,7 @@
             {
                 return $rating;
             }
-            file_put_contents(WWW_DIR."/lib/logging/amazon_response.log",$html_response, FILE_APPEND);
+            // file_put_contents(WWW_DIR."/lib/logging/amazon_response.log",$html_response, FILE_APPEND);
 
             preg_match('/alt\="(\d\.\d) out of 5 stars"/i', $html_response, $matches);
 

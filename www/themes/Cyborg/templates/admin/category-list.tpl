@@ -1,5 +1,3 @@
- 
-<h1>{$page->title}</h1>
 
 <p>
 	Make a category inactive to remove it from the menu. This does not prevent binaries being matched into an appropriate category. Disable preview prevents ffmpeg being used for releases in the category.

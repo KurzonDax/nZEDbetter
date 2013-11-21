@@ -1,5 +1,3 @@
- 
-<h1>{$page->title}</h1>
 
 <table style="margin-top:10px;" class="data highlight">
 
