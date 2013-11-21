@@ -1,14 +1,20 @@
 Please visit the official nZEDbetter Wiki at http://nzedbetter.org
+The original nZEDb is available here: https://github.com/nZEDb/nZEDb
+
 ---
-## Version 0.6 Released
+
+### Version 0.6 Released
 Version 0.6 is now in the master branch.  If you are an existing user, you should be able to use the misc/autopatcher.php script to update.  If you haven't used nZEDbetter before, you can visit [the nZEDbetter Wiki](http://nzedbetter.org/index.php?title=Installation#Do_You_Want_To_Do_This_the_Easy_Way_or_the_Hard_Way.3F) for an easy to use setup script that will install everything you need to get a base Ubuntu 12 or 13 system up and running.
 
 Speaking of Ubuntu, I have been testing non-stop on 13.10 without any issues.  This means that nZEDbetter now supports 13.04 and 13.10, 64-bit.  I have also been using PHP 5.5 for all testing for about a month with no issues, so consider it blessed as well.
 
-This latest version incorporate some bug fixes and a few enhancements.  For the full list, please visit the [changelog on the wiki](http://nzedbetter.org/index.php?title=ChangeLog).
+This latest version incorporates some bug fixes and a few enhancements.  For the full list, please visit the [changelog on the wiki](http://nzedbetter.org/index.php?title=ChangeLog).
 
 Lastly, the MusicBrainz integration is coming along nicely.  So far, I'm seeing a fairly decent increase in proper identification compared with the Amazon look-ups.  I plan to have the first version with MB integration completed and released by December 2nd.
+
+
 ---
+
 #### 11/4 Update - New Feature Added To Keep Parts DB Small
 
 Three major fixes/additions:
@@ -26,14 +32,14 @@ To see screenshots of the new newsgroups section, look at https://github.com/Kur
 
 My next major tasks are outlined below:
 - [ ] Finish MusicBrainz Integrtion (2-3 weeks to complete)
-- [X] Test with Ubuntu 13.10, Apache 2.4, and PHP 5.5 (2 weeks to fully test)
+- [X] Test with Ubuntu 13.10, Apache 2.4, and PHP 5.5 - Completed, all are now supported
 - [ ] Get this repo moved so it's an actual fork of @nZEDb (see help request below)
 - [ ] Develop Sphinx integration (unknown dev time, probably a month)
 - [ ] Update search options on web front-end (1-2 weeks)
 
 ---
 
-### HELP!!
+#### HELP!!
 I need some help.  I freely admit that I'm a github newb and would rather be coding than learning
 how to use it properly.  That being said, I really would like to move this repo to be a true fork
 of the original nZEDb project.  The catch is, I don't want to lose my history.  I've done some
@@ -43,7 +49,7 @@ I will forever be in your debt.
 
 ---
 
-### Latest Changes
+#### Latest Changes
 Some of the things I've added most recently:  
 * Admin seciton has a new look.  It isn't complete yet, but the groups administration section is done.
 * Some minor bug fixes with the front end templates
@@ -63,20 +69,11 @@ Some of the things I've added most recently:
     Good for groups that you want to index, but don't see updates that often.
 * Numerous other bug fixes and improvements  
 
-### Info
+#### Info
 
-The original nZEDb project can be found here: https://github.com/nZEDb/nZEDb
+nZEDbetter is based completely on the amazing work of @johnnyboy, @sinfuljosh, and the rest of the nZEDb team.  This application would not have been possible without me standing on the shoulders of those giants.
 
-Some of the major changes I'm working on integrating:  
-* Reworking the update binaries process to not only improve performance, but also fix some, what I felt were, significant bugs in the process.  
-* Reworking the update releases stages.  Again, the main goal is improving the performance, but also fixing bugs along the way.  
-* Standardizing on the InnoDB storage engine, and experimenting with various configurations to optimize settings.  
-* All work is being tested using Percona Server, v5.6. While this is still an unreleased version, I feel there are enough improvements in it to warrant its use.  Additionally, it provides significantly better logging and instrumentation over MySQL.    
-* Improving the categorization process.  
-
-Future plans:  
-* Reintegrating Sphinx full text indexing.  Newznab plus had this, though the support of it seemed a bit questionable.  nZEDb removed it.  I'm going to take a stab at putting it back in.  To be honest, it will depend on the cost-to-benefit ratio.  If it negatively impacts stability and performance, then I may scrap the idea.
-* Revising the web front end.  This will focus mainly on better search capabilities (with or without Sphinx).  Unfortunately, I'm a much better at coding than I am at making web sites look awesome, but we'll see what I can come up with.
+The original nZEDb project can be found here: https://github.com/nZEDb/nZEDb.  If you have some spare change to donate, send it their way as a thanks for all of their hard work.
 
 This project will remain open sourced, and open for user contributions.
 
