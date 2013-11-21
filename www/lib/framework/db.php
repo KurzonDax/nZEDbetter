@@ -10,6 +10,7 @@ class DB
         // List of processed constants - used in releases table. Constants need to be powers of 2: 1, 2, 4, 8, 16 etc...
         const NFO_PROCESSED_NAMEFIXER     = 1;  // We have processed the release against its .nfo file in the namefixer
         const PREDB_PROCESSED_NAMEFIXER   = 2;  // We have processed the release against a predb name
+        const FILES_PROCESSED_NAMEFIXER   = 4;  // We have processed release files with namefixer
 
 	private static $initialized = false;
 	private static $mysqli = null;

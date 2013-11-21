@@ -18,7 +18,7 @@ echo "deb-src http://repo.percona.com/apt raring main" | sudo tee -a /etc/apt/so
 sudo apt-get update
 sudo apt-get -y install openssh-server proftpd htop unrar software-properties-common tmux
 sudo apt-get -y install nmon vnstat tcptrack bwm-ng mytop
-sudo apt-get -y install percona-server-server-5.6 percona-toolkit
+sudo apt-get -y install percona-server-server-5.6 percona-server-client-5.6 percona-server-common-5.6 percona-toolkit
 sudo apt-get -y install apache2
 sudo a2enmod rewrite
 sudo service apache2 restart
@@ -153,6 +153,12 @@ echo -e '	1. Set the default time zone in /etc/php5/cli/php.ini'
 echo -e '	2. Set the default time zone in /etc/php5/apache2/php.ini'
 echo -e '	3. Create a my.cnf and save it in /etc/mysql/my.cnf'
 echo -e '	   Go to http://tools.percona.com to create a base my.cnf tailored to your hardware\n'
+echo -e '\nOnce you create a my.cnf file and save it, you will need to restart Percona.'
+echo -e '\nFrom a terminal window, type sqlstop && sqlstart\n'
+echo -e '\n'
+echo -e 'Once you have created the my.cnf file, and restarted Percona (MySQL), you can launch\n'
+echo -e 'the installation wizard which will walk you through setting up the database and your\n'
+echo -e 'Usenet Service Provider.  Access the installation wizard at http://localhost/install\n'
 cd ~
 . .bashrc
 

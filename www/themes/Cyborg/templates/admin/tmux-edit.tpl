@@ -1,4 +1,3 @@
-<h1>{$page->title}</h1>
 <br/>
 <div class="hint" style="font-size: medium; margin-bottom: 20px;">You must click the <a href="#SaveSettings" style="margin: 0; text-decoration: underline; color: darkred; font-size: medium;">save settings</a> button under the tabs to preserve any changes you make.</div>
 
@@ -402,6 +401,19 @@
                     up the collections, binaries, and parts databases by deleting items past retention.  It also removes <br />
                     releases that have gone past their retention.  Recommend to run this once every 24 hours.  It is not really<br />
                     necessary to run it more often than that.
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width:160px;"><label for="NO_PURGE_MISC_BEFORE_FIX">Require namecheck before purging Hashed or Misc-Other releases:</label></td>
+            <td>
+                {html_radios id="NO_PURGE_MISC_BEFORE_FIX" name='NO_PURGE_MISC_BEFORE_FIX' values=$truefalse_names output=$truefalse_names selected=$ftmux->NO_PURGE_MISC_BEFORE_FIX separator='<br />'}
+                <div class="hint">
+                    This option will prevent the purging of Misc->Other and Misc->Hashed releases until the name fixer script has had
+                    a chance to process the release (and move it to a new category with a fixed name).  If you set this to true, you must
+                    have postprocessing set to Additional or All above.  You must also have Fix Release Names (under optional processes) set
+                    to true.  Lastly, the retention hours for Misc->Other and Hashed releases must be greater than zero on the Site Settings
+                    Advanced tab.
                 </div>
             </td>
         </tr>

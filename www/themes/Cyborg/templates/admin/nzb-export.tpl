@@ -1,5 +1,3 @@
- 
-<h1>{$page->title}</h1>
 
 <p>
 Export nzbs from the system into a folder. Specify the full file path to a folder.
