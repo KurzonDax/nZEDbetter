@@ -1,5 +1,4 @@
 
-<h1>{$page->title}</h1>
 <br/>
 <div class="hint" style="font-size: medium; margin-bottom: 20px;">You must click the <a href="#SaveSettings" style="margin: 0; text-decoration: underline; color: darkred; font-size: medium;">save settings</a> button under the tabs to preserve any changes you make.</div>
 <form action="{$SCRIPT_NAME}?action=submit" method="post">
