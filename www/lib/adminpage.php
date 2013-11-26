@@ -3,6 +3,7 @@
 require_once("config.php");
 require_once(WWW_DIR."/lib/framework/basepage.php");
 require_once(WWW_DIR."/lib/users.php");
+require_once(WWW_DIR."/lib/framework/db.php");
 
 class AdminPage extends BasePage
 {
@@ -28,7 +29,10 @@ class AdminPage extends BasePage
 
 	public function render()
 	{
-		$this->smarty->assign('page',$this);
+		$db = new DB();
+        $version = $db->queryOneRow("SELECT value as version FROM site WHERE setting='NZEDBETTER_VERSION'");
+        $this->smarty->assign('version', $version['version']);
+        $this->smarty->assign('page',$this);
 
 		$admin_menu = $this->smarty->fetch('adminmenu.tpl');
 		$this->smarty->assign('admin_menu',$admin_menu);

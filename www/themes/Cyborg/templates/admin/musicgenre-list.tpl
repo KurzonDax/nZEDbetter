@@ -1,5 +1,3 @@
- 
-<h1>{$page->title}</h1>
 
 <p>
 	Disable a music genre to prevent releases in the genre.

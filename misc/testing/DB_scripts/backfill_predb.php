@@ -20,7 +20,7 @@ if (isset($argv[1]) && is_numeric($argv[1]))
 		exit("Wrong argument. It must be a number between 1 and 142.\n");
 	else if ($argv[1] < $predbv["v"])
 		$filenums = $predbv["v"]+$argv[1];
-	else if ($argv[1] + $predbv["v"] > 142)
+	else if ($argv[1] + $predbv["v"] > 143)
 		$filenums = 142-$predbv["v"];
 	else if ($argv[1] >= $predbv["v"])
 		$filenums = $argv[1];

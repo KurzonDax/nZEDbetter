@@ -20,6 +20,7 @@ class Backfill
 		$this->hashcheck = (!empty($site->hashcheck)) ? $site->hashcheck : 0;
 		$this->sleeptime = (!empty($site->postdelay)) ? $site->postdelay : 300;
         $this->switchToPosts = (!empty($site->switchToPosts)) ? $site->switchToPosts : 0;
+        $this->useCompression = (!empty($site->compressedheaders)) ? $site->compressedheaders : 0;
 	}
 
 	//
@@ -31,6 +32,7 @@ class Backfill
 			exit("You must run update_binaries.php to update your collectionhash.\n");
 		$n = $this->n;
 		$groups = new Groups();
+        $compressedFailed = false;
 
 		if ($groupName != '')
 		{
@@ -48,13 +50,13 @@ class Backfill
 		$counter = 1;
 		if (@$res)
 		{
-			// No compression.
-			
-			$nntp = new Nntp();
-			$nntp->doConnectNC();
-			// Compression.
-			$nntpc = new Nntp();
-			$nntpc->doConnect();
+			// TODO: Why are we connecting to the NNTP server twice?
+			// With compression.
+			    $nntpc = new Nntp();
+                $nntpc->doConnect();
+            // Without compression
+                $nntp = new Nntp();
+                $nntp->doConnectNC();
 
 			foreach($res as $groupArr)
 			{
@@ -78,7 +80,7 @@ class Backfill
 		$binaries = new Binaries();
 		$n = $this->n;
 		$this->startGroup = microtime(true);
-
+        // TODO: Again, why are we connecting to the NNTP server twice?
 		// Compression.
 		if (!isset($nntp))
 		{
@@ -138,6 +140,7 @@ class Backfill
 		}
 
 		// Check if we are grabbing further than the server has.
+        // TODO: Why the hardcoded value here?
 		if($groupArr['first_record'] <= $data['first']+50000)
 		{
 			echo "We have hit the maximum we can backfill for this ".$groupArr['name'].", disabling it.".$n.$n;
@@ -268,7 +271,7 @@ class Backfill
 		}
 		else
 		{
-			echo "No groups specified. Ensure groups are added to nZEDb's database for updating.".$n;
+			echo "No groups specified. Ensure groups are added to nZEDbetter's database for updating.".$n;
 		}
 	}
 
@@ -276,6 +279,7 @@ class Backfill
 	{
 		$db = new DB();
 		$binaries = new Binaries();
+        //TODO: Shouldn't we be checking whether to use compression here?
 		$nntp = new Nntp();
 		$nntp->doConnect();
 		$n = $this->n;
@@ -303,7 +307,7 @@ class Backfill
 		$targetpost =  round($groupArr['first_record']-$articles);
 		if ($targetpost < 0)
 			$targetpost = round($data['first']);
-
+        // TODO: If $targetpost < 0, it may mean there are just fewer than $articles left to backfill.  We should get those articles
 		if($groupArr['first_record'] <= 0 || $targetpost <= 0)
 		{
 			echo "You need to run update_binaries on the ".$data['group'].". Otherwise the group is dead, you must disable it.".$n;
@@ -311,6 +315,7 @@ class Backfill
 		}
 
 		// Check if we are grabbing further than the server has.
+        // TODO: This has to be a bug.  Should be $targetpost <= $data['first'] then just get remaining articles and disable group backfill
 		if($groupArr['first_record'] <= $data['first']+$articles)
 		{
 			//echo $groupArr['first_record']."\n";

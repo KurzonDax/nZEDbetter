@@ -9,6 +9,7 @@ require_once(WWW_DIR."lib/nzb.php");
 require_once(WWW_DIR."lib/nfo.php");
 require_once(WWW_DIR."lib/zipfile.php");
 require_once(WWW_DIR."lib/site.php");
+require_once(WWW_DIR . "lib/tmux.php");
 require_once(WWW_DIR."lib/util.php");
 require_once(WWW_DIR."lib/releasefiles.php");
 require_once(WWW_DIR."lib/releaseextra.php");
@@ -35,6 +36,9 @@ class Releases
 		$this->echooutput = $echooutput;
 		$s = new Sites();
 		$this->site = $s->get();
+        $t = new Tmux();
+        $this->tmux = $t->get();
+        $this->noMiscPurgeBeforeFix = (isset($this->tmux->NO_PURGE_MISC_BEFORE_FIX) && !empty($this->tmux->NO_PURGE_MISC_BEFORE_FIX)) ? $this->tmux->NO_PURGE_MISC_BEFORE_FIX : 'FALSE';
 		$this->stage5limit = (!empty($this->site->maxnzbsprocessed)) ? $this->site->maxnzbsprocessed : 1000;
 		$this->completion = (!empty($this->site->releasecompletion)) ? $this->site->releasecompletion : 0;
 		$this->crosspostt = (!empty($this->site->crossposttime)) ? $this->site->crossposttime : 2;
@@ -111,8 +115,9 @@ class Releases
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
 			$exccatlist = " and categoryID not in (".implode(",", $excludedcats).")";
-
-		$res = $db->queryOneRow(sprintf("select count(releases.ID) as num from releases left outer join groups on groups.ID = releases.groupID where releases.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s %s %s", $catsrch, $maxage, $exccatlist, $grpsql));
+        $sqlQuery = sprintf("select count(releases.ID) as num from releases left outer join groups on groups.ID = releases.groupID where releases.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s %s %s", $catsrch, $maxage, $exccatlist, $grpsql);
+		// file_put_contents(WWW_DIR."lib/logging/browse_sql.log","---------------Browse Count--------------------\n".$sqlQuery."\n", FILE_APPEND);
+        $res = $db->queryOneRow($sqlQuery);
 		return $res['num'];
 	}
 
@@ -166,7 +171,9 @@ class Releases
 			$exccatlist = " and releases.categoryID not in (".implode(",", $excludedcats).")";
 
 		$order = $this->getBrowseOrder($orderby);
-		return $db->query(sprintf(" SELECT releases.*, concat(cp.title, ' > ', c.title) as category_name, concat(cp.ID, ',', c.ID) as category_ids, groups.name as group_name, rn.ID as nfoID, re.releaseID as reID from releases left outer join groups on groups.ID = releases.groupID left outer join releasevideo re on re.releaseID = releases.ID left outer join releasenfo rn on rn.releaseID = releases.ID and rn.nfo is not null left outer join category c on c.ID = releases.categoryID left outer join category cp on cp.ID = c.parentID where releases.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s %s %s order by %s %s".$limit, $catsrch, $maxagesql, $exccatlist, $grpsql, $order[0], $order[1]));
+		$sqlQuery = sprintf(" SELECT releases.*, concat(cp.title, ' > ', c.title) as category_name, concat(cp.ID, ',', c.ID) as category_ids, groups.name as group_name, rn.ID as nfoID, re.releaseID as reID from releases left outer join groups on groups.ID = releases.groupID left outer join releasevideo re on re.releaseID = releases.ID left outer join releasenfo rn on rn.releaseID = releases.ID and rn.nfo is not null left outer join category c on c.ID = releases.categoryID left outer join category cp on cp.ID = c.parentID where releases.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s %s %s order by %s %s" . $limit, $catsrch, $maxagesql, $exccatlist, $grpsql, $order[0], $order[1]);
+        // file_put_contents(WWW_DIR . "lib/logging/browse_sql.log", "---------------Browse Range--------------------\n" . $sqlQuery . "\n", FILE_APPEND);
+        return $db->query($sqlQuery);
 	}
 
 	public function getBrowseOrder($orderby)
@@ -2229,18 +2236,43 @@ class Releases
 				$remcount ++;
 			}
 		}
-        if ($echooutput)
-            echo "\nDeleting hashed releases past retention...\n";
 
-        // TODO: Check to see if fixname has had a chance to fix release before purging
+        // Misc other past retention
+        if ($this->site->miscotherretentionhours > 0)
+        {
+            if ($echooutput)
+                echo "\nDeleting releases from Misc->Other that are past retention...\n";
+            if ($this->noMiscPurgeBeforeFix == 'FALSE')
+                $result = $db->queryDirect(sprintf("select ID, guid from releases where categoryID = %d AND adddate <= NOW() - INTERVAL %d HOUR", CATEGORY::CAT_MISC, $page->site->miscotherretentionhours));
+            else
+                $result = $db->queryDirect(sprintf("select ID, guid from releases where categoryID = %d AND adddate <= NOW() - INTERVAL %d HOUR AND (relstatus >= 4 OR passwordstatus > 2)", CATEGORY::CAT_MISC, $page->site->miscotherretentionhours));
+            $resultCount = $db->getNumRows($result);
+            if ($resultCount > 0) {
+                while ($rowrel = $db->fetchAssoc($result)) {
+                    $this->fastDelete($rowrel['ID'], $rowrel['guid'], $this->site);
+                    $miscothercount++;
+                }
+            }
 
+        }
+
+        // Hashed releases past retention
         if($this->site->hashedRetentionHours != 0)
         {
-            $result = $db->query(sprintf("SELECT ID, guid FROM releases WHERE categoryID=7020 AND adddate < (now() - interval %d hour)", $page->site->hashedRetentionHours));
-            foreach ($result as $rowrel)
+            if ($echooutput)
+                echo "\nDeleting hashed releases past retention...\n";
+            if($this->noMiscPurgeBeforeFix == 'FALSE')
+                $result = $db->queryDirect(sprintf("SELECT ID, guid FROM releases WHERE categoryID = %d AND adddate < (now() - interval %d hour)", CATEGORY::CAT_HASHED, $page->site->hashedRetentionHours));
+            else
+                $result = $db->queryDirect(sprintf("SELECT ID, guid FROM releases WHERE categoryID = %d AND adddate < (now() - interval %d hour) AND (relstatus >= 4 OR passwordstatus > 2) ", CATEGORY::CAT_HASHED, $page->site->hashedRetentionHours));
+            $resultCount = $db->getNumRows($result);
+            if($resultCount > 0)
             {
-                $this->fastDelete($rowrel['ID'], $rowrel['guid'], $this->site);
-                $remcount ++;
+                while ($rowrel = $db->fetchAssoc($result))
+                {
+                    $this->fastDelete($rowrel['ID'], $rowrel['guid'], $this->site);
+                    $remcount ++;
+                }
             }
         }
 		// Passworded releases.
@@ -2318,24 +2350,8 @@ class Releases
 			}
 		}
 
-		// misc other
 
-		if ($this->site->miscotherretentionhours > 0)
-        {
-            // TODO: Check to see if fixname has had a chance to fix release before purging
-            if ($echooutput)
-                echo "\nDeleting releases from Misc->Other that are past retention...\n";
-            $sql = sprintf("select ID, guid from releases where categoryID = %d AND adddate <= NOW() - INTERVAL %d HOUR", CATEGORY::CAT_MISC, $page->site->miscotherretentionhours);
 
-			if ($resrel = $db->query($sql)) {
-				foreach ($resrel as $rowrel)
-				{
-					$this->fastDelete($rowrel['ID'], $rowrel['guid'], $this->site);
-					$miscothercount ++;
-				}
-			}
-
-		}
 
 		// $db->queryDirect(sprintf("DELETE nzbs WHERE dateadded < (now() - interval %d hour)", $page->site->partretentionhours));
 
@@ -2482,8 +2498,8 @@ class Releases
 
         // Delete old releases and finished collections.
         if ($echooutput)
-            echo $n."\033[1;33m[".date("H:i:s A")."] Checking For Dead Collections.\033[0m".$n;
-        $stageStart = TIME();
+            echo $n."\033[1;33m[".date("H:i:s A")."] Checking For Stale Collections.\033[0m".$n;
+        $stageStart = time();
         if($maxAge<1)
             $maxAge=6;
         $loopTime = microtime(true);
@@ -2508,7 +2524,7 @@ class Releases
         $colsTotal = $db->getNumRows($completeCols);
         if($colsTotal == 0 || $colsTotal == false)
         {
-            echo "\n No collections to remove right now.  Exiting stage.\n";
+            echo "\n No stale collections to remove right now.  Exiting stage.\n";
             return false;
         }
         $colsChecked = 0;
@@ -2527,7 +2543,7 @@ class Releases
             else
             {
                 $colsDeleted++;
-                $db->queryDirect("DELETE 8732 FROM parts WHERE collectionID=".$currentCol['ID']);
+                $db->queryDirect("DELETE parts FROM parts WHERE collectionID=".$currentCol['ID']);
                 $partsDeleted += $db->getAffectedRows();
                 // $db->query("UPDATE groups SET partsInDB=partsInDB-".$partsDeleted." WHERE ID=".$currentCol['groupID']);
 
@@ -2561,7 +2577,7 @@ class Releases
         }
 
         If ($echooutput)
-            echo "\nStage completed in ".$consoletools->convertTime(TIME() - $stageStart).".\n";
+            echo "\nStage completed in ".$consoletools->convertTime(time() - $stageStart).".\n";
         return true;
     }
 
