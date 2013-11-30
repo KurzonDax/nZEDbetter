@@ -288,7 +288,7 @@ class Category
 
 		// 
 		// Note that in byGroup() some overrides occur...
-        if($this->isXXX($releasename)){ return $this->tmpCat; }
+        if($this->isXXX($releasename, $groupID)){ return $this->tmpCat; }
         if($this->byGroup($releasename, $groupID)){ return $this->tmpCat; }
 		if($this->isPC($releasename)){ return $this->tmpCat; }
 		if($this->isTV($releasename)){ return $this->tmpCat; }
@@ -631,14 +631,14 @@ class Category
 					$this->tmpCat = Category::CAT_PC_0DAY;
 					return true;
 				}
-                if (preg_match('/alt\.binaries\.town$/', $groupRes["name"]))
+                /*if (preg_match('/alt\.binaries\.town$/', $groupRes["name"]))
                 {
                     if($this->isXxx($releasename)){ return $this->tmpCat; }
                     if($this->isPC($releasename)) {return $this->tmpCat;}
                     $this->tmpCat =  Category::CAT_XXX_OTHER;
                     return true;
 
-                }
+                }*/
                 if (preg_match('/alt\.binaries\.u\-4all$/', $groupRes["name"]))
                 {
                     if($this->isXxx($releasename)){ return $this->tmpCat; }
@@ -1080,9 +1080,17 @@ class Category
 	//   XXX
 	//
 
-	public function isXxx($releasename)
+	public function isXxx($releasename, $groupID='')
 	{
-		if(preg_match('/[\.\-_ ](XXX|PORNOLATiON)/i', $releasename))
+		if($groupID!='')
+        {
+            $groups = new Groups();
+            $groupName = $groups->getByID($groupID);
+            if(preg_match('/sound|game|nintendo|music|wii|xbox|ps3|emulator|psp/i',$groupName['name']))
+                return false;
+        }
+
+        if(preg_match('/[\.\-_ ](XXX|PORNOLATiON)/i', $releasename))
 		{
 			if($this->isXxx264($releasename)){ return true; }
 			if($this->isXxxXvid($releasename)){ return true; }
@@ -1094,7 +1102,7 @@ class Category
 			return true;
 		}
 
-		else if(preg_match('/a\.b\.erotica|Imageset|Lesbian|Squirt|Transsexual|[ \-_\.]anal[ \-_\.]|twistys|gloryhole|[ \-_\.]cock[ \-_\.]|pussy|tits|[ \-_\.]cum[ \-_\.]|PAYiSO|playboy[ \-_\.]|hustler|penthouse|orgasm|sybian|spank(?!ers)|bondage|BBW|porno?[ \-_\.]|fuck|[ \-_\.]dick[ \-_\.]|[ \-_\.]cunt[ \-_\.]/i', $releasename))
+		else if(preg_match('/a\.b\.erotica|Imageset|Lesbian|Squirt|Transsexual|[ \-_\.]anal[ \-_\.]|twistys|gloryhole|[ \-_\.]cock[ \-_\.]|[ \-_\.]pussy|tits|[ \-_\.]cum[ \-_\.]|PAYiSO|playboy[ \-_\.]|hustler|penthouse|orgasm|sybian|spank(?!ers)|bondage|BBW|porno?[ \-_\.]|fuck|[ \-_\.]dick[ \-_\.]|[ \-_\.]cunt[ \-_\.]/i', $releasename))
 		{
 			if($this->isXxx264($releasename)){ return true; }
 			if($this->isXxxXvid($releasename)){ return true; }

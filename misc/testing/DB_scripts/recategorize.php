@@ -55,7 +55,7 @@ if($relsToProcess = $db->queryDirect($sql))
         $consoletools->overWrite("Working on release ".$consoletools->percentString($relsProcessed, $relsCount)." Updates: ".$relsChanged);
         if($newCategory != $relRow['categoryID'])
         {
-            $db->query("UPDATE releases SET categroyID=".$newCategory." WHERE ID=".$relRow['ID']);
+            $db->query("UPDATE releases SET categoryID=".$newCategory." WHERE ID=".$relRow['ID']);
             file_put_contents(WWW_DIR."lib/logging/recategorize.log",$relRow['ID'].", '".$relRow['searchname']."', ".$newCategory."\n", FILE_APPEND);
             $relsChanged ++;
         }
