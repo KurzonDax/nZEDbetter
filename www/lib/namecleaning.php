@@ -167,6 +167,8 @@ class nameCleaning
         $cleanerName = preg_replace('/as requested|\d{5,10}|nmr|repack|AS REQ |by req |2nd try |per req |REPOST |THEATRICAL |AKA |\d{2,} (?=.+(20|19)\d\d)|feature films/i', '', $cleanerName);
         if($debug)
             echo "7 - ".$cleanerName."\n";
+        // Remove web site ads
+        $cleanerName = preg_replace('/www .+ (org|com|info|net) |sponsored by \w+ |town (tv|music|movie|pr0n|anime) /i', '', $cleanerName);
 		//Change [pw] to passworded.
 		$cleanerName = str_replace(array('[pw]', '[PW]', ' PW ', '(Password)'), ' PASSWORDED ', $cleanerName);
         if($debug)
