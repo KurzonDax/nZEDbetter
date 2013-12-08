@@ -181,7 +181,7 @@ else if(isset($_POST['action']) && !empty($_POST['action']) && !empty($_POST['id
             $groupArr[] = $group->add($newGroup);
         }
 
-        // print json_encode($groupArr);
+        print json_encode($groupArr);
 
         exit;
     }

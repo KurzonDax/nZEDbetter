@@ -433,10 +433,8 @@ jQuery(function($){
             type      : "POST",
             success   : function(data)
             {
-                console.log(data);
                 var returnData = jQuery.parseJSON(data);
                 var groupsNotAdded = [];
-                console.log(returnData);
                 if(submitData.match(/bulkadd/) != null) {
                     $.each(returnData, function(key, value) {
                         if(value.status.match(/#!GROUP EXISTS/) != null) {
