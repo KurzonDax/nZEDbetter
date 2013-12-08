@@ -261,10 +261,10 @@ class nameCleaning
             return false;
         // First group is case insensitive
         $text = preg_replace('/^have fun|http lostmoviearchives com( movie)?( thumbs)?|walt disney|walt disney.s|director s cut|directors cut|TGS|E4S|RE UP |^RS |mp4a|unrated |repack |dubbed |subtitled |extended cut |x264 \w+$|x264 |englisch/i', '', $text);
-        $text = preg_replace('/NTSC|MOViEONLY|DVD(5|9)|F0RFUN|www allyourbasearebelongtous pw |DVDR|ANiPUNK(.+)?|Mayhem|AN0NYM0US(.+)?|EwDp|unrated|norbit|www drlecter tk | R\d|(\-)?ironclub/i', '', $text);
-        $text = preg_replace('/DAMiANA|1098JHWOTNGS|xvid([\- ]\w+$)?|(dvd|bd)rip|(\-)?AN0NYM0US( CD)?|sample/i', '', $text);
+        $text = preg_replace('/NTSC|MOViEONLY|DVD(5|9)|F0RFUN|www allyourbasearebelongtous pw |DVDR(ip)?|ANiPUNK(.+)?|Mayhem|AN0NYM0US(.+)?|EwDp|unrated|norbit|www drlecter tk | R\d|(\-)?ironclub/i', '', $text);
+        $text = preg_replace('/DAMiANA|1098JHWOTNGS|xvid([\- ]\w+$)?|(dvd|bd)rip|(\-)?AN0NYM0US( CD)?|sample|R E L E A S E /i', '', $text);
         // Second group is case sensitive
-        $text = preg_replace('/FILL|AmA (DIVX|XviD)|PROPER |1080p|720p|480p|AVC|(H|h)264|PAL|iNT|COMPLETE|LIMITED|MASTER|iOM|SAM|RETAIL|MADE|NZBGRABIT LOWERS TONE AGAIN PAY PER DOWNLOAD/', '', $text);
+        $text = preg_replace('/TOWN MOVIE|FILL|AmA (DIVX|XviD)|PROPER |1080p|720p|480p|AVC|(H|h)264|PAL|iNT|COMPLETE|LIMITED|MASTER|iOM|SAM|RETAIL|MADE|NZBGRABIT LOWERS TONE AGAIN PAY PER DOWNLOAD|ip$/', '', $text);
         // NTSC DVDR MADE NZBGRABIT LOWERS TONE AGAIN PAY PER DOWNLOAD 0 1098JHWOTNGS
         return $text;
 

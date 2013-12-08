@@ -256,7 +256,7 @@ class Movie
 	{
 		$ri = new ReleaseImage();
 
-		if ($this->echooutput && $this->service == false && $tmdbID=false)
+		if ($this->echooutput && $this->service == false && $tmdbID == false)
 			echo "Fetching IMDB info from TMDB using IMDB ID: ".$imdbId."\n";
         elseif ($tmdbID != false)
             echo "Fetching TMDB info using TMDB ID: ".$tmdbID."\n";
@@ -441,7 +441,7 @@ class Movie
                 $traktimdbid = $trakt->traktMoviesummary($searchname, "imdbid");
             }
             if($searchname == '' || $traktimdbid == false)
-                $ImdbID='9999998';
+                $ImdbID='-1';
             else
             {
                 $ImdbID = str_replace('tt', '', $traktimdbid);
@@ -711,7 +711,7 @@ class Movie
 				}
 				else
 				{
-					$db->query(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $arr["ID"]));
+					$db->query(sprintf("UPDATE releases SET imdbID = '-1' WHERE ID = %d", $arr["ID"]));
 					continue;
 				}
 			}
@@ -924,26 +924,9 @@ public function searchTMDb($release)
     $namecleaning = new nameCleaning();
     // $category = new Category();
     $fetchWithoutYear = false;
-//    $updatedCategory = $category->determineCategory($release['name'], $release['groupID']);
-//    if($updatedCategory != $release['categoryID'])
-//    {
-//        echo "\n".$release['searchname']." is being assigned to a new category: ".$updatedCategory."\n";
-//        $db->query("UPDATE releases SET categoryID=".$db->escapeString($updatedCategory)." WHERE ID=".$release['ID']);
-//        if(!($updatedCategory>2000 && $updatedCategory<2999))
-//        {
-//            echo "\n".$release['searchname']." is no longer considered a movie.\n";
-//            return false;
-//        }
-//    }
-    //$refinedSearchName = $namecleaning->releaseCleaner($release['name']);
+
     $refinedSearchName = $release['searchname'];
-    /*if($refinedSearchName != $release['searchname'])
-    {
-        echo "Updating searchname field in database.\n";
-        echo "Old name:     ".$release['searchname']."\n";
-        echo "New name:     ".$refinedSearchName."\n";
-        $db->query("UPDATE releases SET searchname=".$db->escapeString($refinedSearchName)." WHERE ID=".$release['ID']);
-    }*/
+
     $refinedSearchName = $namecleaning->movieCleaner($refinedSearchName);
     $movieCleanNameYear = $this->parseMovieSearchName($refinedSearchName);
 
@@ -956,7 +939,7 @@ public function searchTMDb($release)
     elseif(!$fetchWithoutYear)
     {
         echo "\nMovie does not have a year in the release search name. Skipping. Title: ".$refinedSearchName."\n";
-        $db->query("UPDATE releases SET imdbID = 9999999 WHERE ID = ".$release['ID']);
+        $db->query("UPDATE releases SET imdbID = 0000000 WHERE ID = ".$release['ID']);
         return false;
     }
     elseif($fetchWithoutYear && $movieCleanNameYear != false)
@@ -1002,7 +985,7 @@ public function searchTMDb($release)
     else
     {
         echo "\nNo matches found in IMDB for ".$refinedSearchName."\n";
-        $db->query("UPDATE releases SET imdbID = 0000000 WHERE ID = ".$release['ID']);
+        $db->query("UPDATE releases SET imdbID = '-1' WHERE ID = ".$release['ID']);
         file_put_contents(WWW_DIR."/lib/logging/tmdb-nomatch.log",$release['ID'].",".$db->escapeString($refinedSearchName)."\n", FILE_APPEND);
         return false;
     }
