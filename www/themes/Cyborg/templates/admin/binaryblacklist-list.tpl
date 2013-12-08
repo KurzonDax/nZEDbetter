@@ -40,3 +40,9 @@
 	{/foreach}
 
 </table>
+
+<br />
+<a id="SaveSettings" class="btn btn-primary btn-default" style="float: left; margin-top: 15px" href="binaryblacklist-edit.php">
+    <i class="icon-plus"></i>
+    Add New Blacklist
+</a>
