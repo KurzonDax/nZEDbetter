@@ -2301,22 +2301,10 @@ class Releases
 			}
 		}
 
-		// Releases below completion %.
-        if ($echooutput)
-            echo "\nDeleting releases less than ".$this->completion."% completed...\n";
-		if($this->completion > 0)
-		{
-			if($resrel = $db->query(sprintf("SELECT ID, guid FROM releases WHERE completion < %d and completion > 0", $this->completion)))
-			{
-				foreach ($resrel as $rowrel)
-				{
-					$this->fastDelete($rowrel['ID'], $rowrel['guid'], $this->site);
-					$completioncount ++;
-				}
-			}
-		}
 
-		// Disabled categories.
+        // $completioncount = $this->removePartialReleases($db, $completioncount);
+
+        // Disabled categories.
 		if ($catlist = $category->getDisabledIDs())
 		{
 			while ($cat = mysqli_fetch_assoc($catlist))
@@ -2696,5 +2684,37 @@ class Releases
 		$returnVal = shell_exec("which $cmd 2>/dev/null");
 		return (empty($returnVal) ? false : true);
 	}
+
+    /**
+     * @param string $echoOutput
+     *
+     * @return void
+     */
+    public function removeIncompleteReleases($echoOutput)
+    {
+        // Releases below completion %.
+        $completionCount = 1;
+        $db = new DB();
+        $consoleTools = new ConsoleTools();
+        if ($this->completion > 1) {
+            if ($echoOutput)
+                echo "\nDeleting releases less than " . $this->completion . "% completed...\n";
+            $resReleases = $db->queryDirect(sprintf("SELECT ID, guid FROM releases WHERE completion < %d and completion > 0", $this->completion));
+            $releaseCount = $db->getNumRows($resReleases);
+            if ($releaseCount>0)
+            {
+                while($releaseRow=$db->fetchAssoc($resReleases))
+                {
+                    $consoleTools->overWrite("Deleting releases ".$consoleTools->percentString($completionCount,$releaseCount));
+                    $this->fastDelete($releaseRow['ID'], $releaseRow['guid'], $this->site);
+                    $completionCount++;
+                }
+
+            if($echoOutput)
+                echo "\nDeleted ".$completionCount." incomplete releases.";
+            }
+        }
+        return;
+    }
 
 }

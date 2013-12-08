@@ -45,12 +45,15 @@ else
     echo "\n Stale collection purge has been disabled.\n";
 $timestart = TIME();
 $releases->processReleasesStage7a('', true, $maxdeletions);
+if ($next_dead_check['next_dead_check'] != null && time() > $next_dead_check['next_dead_check'] - 1800 && $dead_hours['dead_hours'] > 0)
+    $releases->removeIncompleteReleases(true);
 if ($next_dead_check['next_dead_check'] !=null && time() > $next_dead_check['next_dead_check'] && $dead_hours['dead_hours'] > 0)
 {
     echo "\n\033[01;31m[".date("H:i:s")."] Beginning dead collection check...\n\033[00;37m";
     $releases->checkDeadCollections($dead_hours['dead_hours']);
     setNextDeadCheck(true);
 }
+
 if ($next_full_purge['next_purge'] != null && time() > $next_full_purge['next_purge'])
 {
     echo "\n\033[01;31m[".date("H:i:s")."] Beginning full purge...\n\033[00;37m";
