@@ -835,6 +835,7 @@ jQuery(function($){
         submitData['ob'] = $("#order_by").val();
         submitData['rand'] = Math.random();
         $("#frmAdvancedSearch")[0].reset();
+        $("#searchGroupName").val("");
         $("input[id|='chkAdvancedSearch']").each(function() {
             $(this).prop('checked', false);
             $(this).parent().parent().parent().find('[name=advSearchControl]').prop('disabled', true);
