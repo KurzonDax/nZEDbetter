@@ -433,15 +433,25 @@ jQuery(function($){
             type      : "POST",
             success   : function(data)
             {
+                console.log(data);
                 var returnData = jQuery.parseJSON(data);
                 var groupsNotAdded = [];
-                $.each(returnData, function(key, value) {
-                    if(value.status.match(/#!GROUP EXISTS/) != null) {
-                        groupsNotAdded.push(value.name);
-                        return true;
-                    }
-                    $("#modalAddGroupsTable").append('<tr><td>'+value.id+'</td><td>'+value.name+'</td><td>'+value.status+'</td></tr>')
-                });
+                console.log(returnData);
+                if(submitData.match(/bulkadd/) != null) {
+                    $.each(returnData, function(key, value) {
+                        if(value.status.match(/#!GROUP EXISTS/) != null) {
+                            groupsNotAdded.push(value.name);
+                            return true;
+                        }
+                        $("#modalAddGroupsTable").append('<tr><td>'+value.id+'</td><td>'+value.name+'</td><td>'+value.status+'</td></tr>')
+                    });
+                }
+                else if(returnData.status.match(/#!GROUP EXISTS/) == null)  {
+                    $("#modalAddGroupsTable").append('<tr><td>' + returnData.id + '</td><td>' + returnData.name + '</td><td>' + returnData.status + '</td></tr>');
+                }
+                else {
+                    groupsNotAdded.push(returnData.name);
+                }
                 if(groupsNotAdded.length > 0){
                     var notAddedMsg = '';
                     $("#addGroupsFinished").append('<p id="pNotAdded-1">The following groups were not added because they already exist in the database:</p>');
