@@ -57,7 +57,7 @@ class Nfo
 		$s = new Sites();
 		$site = $s->get();
 		$nntp = new Nntp();
-		$site->alternate_nntp == "1" ? $nntp->doConnect_A() : $nntp->doConnect();
+		// $site->alternate_nntp == "1" ? $nntp->doConnect_A() : $nntp->doConnect();
 		$groups = new Groups();
 		$nzbcontents = new NZBcontents($this->echooutput);
 		$nfocount = 0;
@@ -110,7 +110,7 @@ class Nfo
 						return;
 					}
 				}
-
+                $nntp->doQuit();
 				if ($fetchedBinary !== false)
 				{
 					//insert nfo into database

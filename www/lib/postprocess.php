@@ -261,7 +261,8 @@ class PostProcess
 
 
         $nntp = new Nntp();
-        $connect = ($this->site->alternate_nntp == "1") ? $nntp->doConnect_A() : $nntp->doConnect();
+        // Why the hell the following was there, I have no idea
+        // $connect = ($this->site->alternate_nntp == "1") ? $nntp->doConnect_A() : $nntp->doConnect();
 
         if (substr($this->tmpPath, -strlen( '/' ) ) != '/')
             $this->tmpPath = $this->tmpPath.'/';
@@ -589,6 +590,8 @@ class PostProcess
                                     return;
                                 }
                             }
+                            // Close the damn connection
+                            $nntp->doQuit();
 
                             if ($this->echooutput)
                                 echo " b";
@@ -737,6 +740,7 @@ class PostProcess
                             return;
                         }
                     }
+                    $nntp->doQuit();
                     if ($this->echooutput)
                         echo " s";
                     if ($sampleBinary !== false)
@@ -771,6 +775,7 @@ class PostProcess
                             return;
                         }
                     }
+                    $nntp->doQuit();
                     if ($this->echooutput)
                         echo " m";
                     if ($mediaBinary !== false)
@@ -811,6 +816,7 @@ class PostProcess
                             return;
                         }
                     }
+                    $nntp->doQuit();
                     if ($this->echooutput)
                         echo " a";
                     if ($audioBinary !== false)
@@ -843,6 +849,7 @@ class PostProcess
                             return;
                         }
                     }
+                    $nntp->doQuit();
                     if ($this->echooutput)
                         echo " j";
                     if ($jpgBinary !== false)

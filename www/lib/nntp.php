@@ -129,7 +129,7 @@ class Nntp extends Net_NNTP_Client
 
 	function doQuit()
 	{
-		$this->quit();
+		$this->disconnect();
 	}
 
 	function getMessage($groupname, $partMsgId)

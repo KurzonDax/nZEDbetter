@@ -78,6 +78,7 @@ Class NZBcontents
 		if (!file_exists($nzbpath = $nzb->NZBPath($guid)))
         {
             echo "\n".$guid." appears to be an invalid release, skipping.";
+            $db->query("UPDATE releases SET groupID=888888 WHERE ID=".$relID);
             return false;
         }
 		else
