@@ -16,7 +16,7 @@ $db = new DB();
 $category = new Category();
 $consoletools = new ConsoleTools();
 $gotIt = false;
-
+$msg = '';
 do {
 
     $catToProcess = $consoletools->getUserInput("\nPlease enter the category ID or Parent ID that you want to reprocess, or type quit to exit: ");
@@ -48,6 +48,10 @@ if($relsToProcess = $db->queryDirect($sql))
         $consoletools->overWrite("Working on release ".$consoletools->percentString($relsProcessed, $totalRows)." ID: ".$currentRow['ID']." Changed: ".$relsChanged);
         if($db->escapeString($newSearchName) != $db->escapeString($currentRow['searchname']))
         {
+            $msg = $currentRow['searchname'] . "\n";
+            $msg .= $newSearchName . "\n";
+            $msg .= '--------------------------------------------------------------\n';
+            file_put_contents(WWW_DIR . "/lib/logging/searchnameFix.log", $msg, FILE_APPEND);
             $db->query("UPDATE releases SET searchname=".$db->escapeString($newSearchName)." WHERE ID=".$currentRow['ID']);
             $relsChanged ++;
         }

@@ -52,7 +52,7 @@ class Namefixer
             $db = new DB();
         $type = "NFO, ";
         // Only select releases we haven't checked here before
-        $query = "SELECT nfo.releaseID as nfoID, rel.groupID, rel.categoryID, rel.searchname, uncompress(nfo) as textstring, rel.ID as releaseID, rel.relnamestatus as namestatus from releases rel inner join releasenfo nfo on (nfo.releaseID = rel.ID) where categoryID != 5070 and relnamestatus IN (1,11) and relstatus & " . DB::NFO_PROCESSED_NAMEFIXER . " = 0";
+        $query = "SELECT nfo.releaseID as nfoID, rel.groupID, rel.categoryID, rel.searchname, uncompress(nfo) as textstring, rel.ID as releaseID, rel.relnamestatus as namestatus from releases rel inner join releasenfo nfo on (nfo.releaseID = rel.ID) where categoryID != 5070 and relnamestatus IN (1,11) and relstatus & " . DB::NFO_PROCEuhiAHdsyfg.SSED_NAMEFIXER . " = 0";
 
         //24 hours, other cats
         if ($time == 1 && $cats == 1)

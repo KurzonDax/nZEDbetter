@@ -260,7 +260,7 @@ class nameCleaning
         if( $text == NULL || $text == '')
             return false;
         // First group is case insensitive
-        $text = preg_replace('/^have fun|http lostmoviearchives com( movie)?( thumbs)?|walt disney|walt disney.s|director s cut|directors cut|TGS|E4S|RE UP |^RS |mp4a|unrated |repack |dubbed |subtitled |extended cut |x264 \w+$|x264 |englisch/i', '', $text);
+        $text = preg_replace('/^\d{1,2} \d{1,2} |^have fun|http lostmoviearchives com( movie)?( thumbs)?|walt disney|walt disney.s|director s cut|directors cut|TGS|E4S|RE UP |^RS |mp4a|unrated |repack |dubbed |subtitled |extended cut |x264 \w+$|x264 |englisch/i', '', $text);
         $text = preg_replace('/NTSC|MOViEONLY|DVD(5|9)|F0RFUN|www allyourbasearebelongtous pw |DVDR(ip)?|ANiPUNK(.+)?|Mayhem|AN0NYM0US(.+)?|EwDp|unrated|norbit|www drlecter tk | R\d|(\-)?ironclub/i', '', $text);
         $text = preg_replace('/DAMiANA|1098JHWOTNGS|xvid([\- ]\w+$)?|(dvd|bd)rip|(\-)?AN0NYM0US( CD)?|sample|R E L E A S E /i', '', $text);
         // Second group is case sensitive
@@ -273,7 +273,7 @@ class nameCleaning
     public function musicCleaner($text)
     {
 
-        $newname = preg_replace('/ \d{3,4} ?(kbps|cbr)|(\d{1,2} \d{1,2} )?(Bootleg|Boxset|Clean.+Version|Compiled by.+|\d{1,2}CDs?|Digipak|DIRFIX|DVBS|FLAC|(Ltd )?(Deluxe|Limited|Special).+Edition|Promo|PROOF|Reissue|Remastered|REPACK|RETAIL(.+UK)?|SACD|Sampler|SAT|Summer.+Mag|UK.+Import|Deluxe.+Version|VINYL|WEB)/i', ' ', $text);
+        $newname = preg_replace('/^\d{1,2} \d{1,2} | \d{3,4} ?(kbps|cbr)|(\d{1,2} \d{1,2} )?(Bootleg|Boxset|Clean.+Version|Compiled by.+|\d{1,2}CDs?|Digipak|DIRFIX|DVBS|FLAC|(Ltd )?(Deluxe|Limited|Special).+Edition|Promo|PROOF|Reissue|Remastered|REPACK|RETAIL(.+UK)?|SACD|Sampler|SAT|Summer.+Mag|UK.+Import|Deluxe.+Version|VINYL|WEB)/i', ' ', $text);
         $newname = preg_replace('/ ([a-z]+[0-9]+[a-z]+[0-9]+.+|[a-z]{2,}[0-9]{2,}?.+|3FM|B00[a-z0-9]+|BRC482012|H056|UXM1DW086|(4WCD|ATL|bigFM|CDP|DST|ERE|FIM|MBZZ|MSOne|MVRD|QEDCD|RNB|SBD|SFT|ZYX) \d.+)/i', ' ', $newname);
         $newname = preg_replace('/ (\d{1,2} \d{1,2} )?([A-Z])( ?$)|[0-9]{8,}| (CABLE|FREEWEB|LINE|MAG|MCD|YMRSMILES)/', ' ', $newname);
         $newname = preg_replace('/VA( |-)/', 'Various Artists ', $newname);
@@ -316,7 +316,7 @@ class nameCleaning
                 else
                     $newname=$text;
             }
-            $newname = preg_replace('/^\d{4}||\x27\d{4}|multi(\d{1,2})?|(EU(R)?|US|JP(N)?|KS|DE|IT|FR|NL|M\d|AU) games|v\d{1,2}|(19|20)\d\d|multi$|Intro/i', '', $newname);
+            $newname = preg_replace('/^\d{1,2} \d{1,2} |^\d{4}||\x27\d{4}|multi(\d{1,2})?|(EU(R)?|US|JP(N)?|KS|DE|IT|FR|NL|M\d|AU) games|v\d{1,2}|(19|20)\d\d|multi$|Intro/i', '', $newname);
             $newname = preg_replace('/\d{3} mb|trimmed|place2home net (\d{4})?|FULL \#abgx\@EFNET|(FULL )?ABGX( net)?( FULL)?|Shadowman|\@efnet|P2H|wildrose|^\# \w+ | \d$/i', '', $newname);
             $newname = preg_replace('/readnfo|read nfo|description|repack|nintendo |^snake|nintendo ds \d{4}|DS Roms z\d{1,4} z\d{1,4}( \d{4})?|internal/i', '', $newname);
             $newname = preg_replace('/Europe( En)?( Es)?( Sv)?( No)?( Da)?( Fi)?|Rev \d|enhanced( [A-Za-z])?|dubbed|ver |www Thunder[\- ]News org/i', '', $newname);
@@ -338,7 +338,7 @@ class nameCleaning
                 $newname=$text;
             if($debug)
                 echo "Category ID: ".$categoryID." Newname: ".$newname."\n";
-            $newname = preg_replace('/(FULL )?ABGX( net)?( FULL)?|abgx net|abgx|abgx full|abgx net full|clandestine|clan raca|place2home( net)?( duplex)?|description|duplex|HR hpatdh1u/i', '', $newname);
+            $newname = preg_replace('/^\d{1,2} \d{1,2} |(FULL )?ABGX( net)?( FULL)?|abgx net|abgx|abgx full|abgx net full|clandestine|clan raca|place2home( net)?( duplex)?|description|duplex|HR hpatdh1u/i', '', $newname);
             $newname = preg_replace('/SweeTpS3|proton| ps3(?=PS3)|CLARE clp3 tovj|SweeTpS3 sweet maps|Caravan cvn qwetjb|\@efnet|ohne |Caravan cvn ogs|MOEMOE |moe ffxiii|STORMAN|HR |german |ASiA |multi\d{1,2}| PROPER/i', '', $newname);
             $newname = preg_replace('/repack|dubbed|ver |1080|EBOOT|PATCH( \d\d\d)?( TB)?|www Thunder[\- ]News org|readnfo|read nfo|repack|JB-PEMA|FW\d\d\d|UPDATE|v\d (\d\d)?|\d \d\d/i', '', $newname);
             $newname = preg_replace('/2continue org|info|^snake|(19|20)\d\d|Sponsored by Secretusenet(.+)?$/i', '', $newname);
@@ -359,7 +359,7 @@ class nameCleaning
                 $newname=$text;
             if($debug)
                 echo "Category ID: ".$categoryID." Newname: ".$newname."\n";
-            $newname = preg_replace('/PSX2PSP|EBOOT|pspking(.+)?$|USA |ABGX( net)?( FULL)?|\@efnet|JPN|JAP|EUR|USA|PSN|(ZERO|ZER0)|www realmom| CHT | NRP(.+)?$| CLARE(.+)?$|\-PLAYASiA\-4/i', '', $newname);
+            $newname = preg_replace('/^\d{1,2} \d{1,2} |PSX2PSP|EBOOT|pspking(.+)?$|USA |ABGX( net)?( FULL)?|\@efnet|JPN|JAP|EUR|USA|PSN|(ZERO|ZER0)|www realmom| CHT | NRP(.+)?$| CLARE(.+)?$|\-PLAYASiA\-4/i', '', $newname);
             $newname = preg_replace('/trailer |PSXPSP(.+)?$|PSX|(\-)?PAL(\-)?|R3ds|(full )?(working )?UMDRIP|read nfo|proper|\-episode|UMD|readnfo|disc (\d )+/i', '', $newname);
             // The following groups are case sensitive
             $newname = preg_replace('/EUR|JB|MRN|PSN|USA|JPN|JAP|PAL/', '', $newname);
@@ -377,7 +377,7 @@ class nameCleaning
                 $newname=$text;
             if($debug)
                 echo "Category ID: ".$categoryID." Newname: ".$newname."\n";
-            $newname = preg_replace('/(19|20)\d\d|ABGX( net)?( FULL)?|as disir |place2home |PAL |USA |REPACK|MULTi\d{1,2}.+$|RARFIX| int|German |\d \d{1,2} |NGC |WORKING( internal)?( for)?|repack|NZBSRUS| ind fixed copy protection(.+)?$/i', '', $newname);
+            $newname = preg_replace('/^\d{1,2} \d{1,2} |(19|20)\d\d|ABGX( net)?( FULL)?|as disir |place2home |PAL |USA |REPACK|MULTi\d{1,2}.+$|RARFIX| int|German |\d \d{1,2} |NGC |WORKING( internal)?( for)?|repack|NZBSRUS| ind fixed copy protection(.+)?$/i', '', $newname);
             $newname = preg_replace('/SPANiSH|abgx EFNET FULL|FULL \#abgwii\@EFNet|(19|20)\d\d|^Department|\#a b g wii\@efnet|www newsconnection eu|format/i', '', $newname);
             // The following groups are case sensitive
             $newname = preg_replace('/EUR|JB|MRN|PSN|USA|JPN|JAP|PAL|WBFS/', '', $newname);
@@ -394,7 +394,7 @@ class nameCleaning
                 $newname=$text;
             if($debug)
                 echo "Category ID: ".$categoryID." Newname: ".$newname."\n";
-            $newname = preg_replace('/PAL |USA |REPACK|MULTi\d{1,2}.+$|MULTI|DVD\-.+$|PAL\-.+$|DVD\-RIP|Games XBOX |NTSC|wildrose/i', '', $newname);
+            $newname = preg_replace('/^\d{1,2} \d{1,2} |PAL |USA |REPACK|MULTi\d{1,2}.+$|MULTI|DVD\-.+$|PAL\-.+$|DVD\-RIP|Games XBOX |NTSC|wildrose/i', '', $newname);
             if(!preg_match('/XBOX$/i', $newname))
                 $newname = $newname.' XBOX';
         }
@@ -414,7 +414,7 @@ class nameCleaning
             }
             if($debug)
                 echo "Category ID: ".$categoryID." Newname: ".$newname."\n";
-            $newname = preg_replace('/imars|XBOX |ISORIP|ABGX( net)?( FULL)?( complex)?|ABGX net unlimited|place2home( net)?( complex)?|USA (RF)?|full abgx net|German|P AL|PAL|UNCUT|read( nfo)?|NTSC|^XBOX 360 /i', '', $newname);
+            $newname = preg_replace('/^\d{1,2} \d{1,2} |imars|XBOX |ISORIP|ABGX( net)?( FULL)?( complex)?|ABGX net unlimited|place2home( net)?( complex)?|USA (RF)?|full abgx net|German|P AL|PAL|UNCUT|read( nfo)?|NTSC|^XBOX 360 /i', '', $newname);
             if(!preg_match('/XBOX360$/i', $newname))
                 $newname = $newname.' XBOX360';
 
@@ -433,7 +433,7 @@ class nameCleaning
     public function bookCleaner($text)
     {
 
-        $newname = preg_replace('/\d{1,2} \d{1,2} \d{2,4}|(19|20)\d\d|anybody got .+?[a-z]\? |[\.\-_ ](Novel|TIA)([\.\-_ ]|$)|( |\.)HQ(-|\.| )|[\(\)\.\-_ ]?(DOC|EPUB|LIT|MOBI|NFO|(si)?PDF|RTF|TXT)(?![a-z0-9])/i', '', $text);
+        $newname = preg_replace('/^\d{1,2} \d{1,2} |\d{1,2} \d{1,2} \d{2,4}|(19|20)\d\d|anybody got .+?[a-z]\? |[\.\-_ ](Novel|TIA)([\.\-_ ]|$)|( |\.)HQ(-|\.| )|[\(\)\.\-_ ]?(DOC|EPUB|LIT|MOBI|NFO|(si)?PDF|RTF|TXT)(?![a-z0-9])/i', '', $text);
         $newname = preg_replace('/compleet|DAGSTiDNiNGEN|DiRFiX|\+ extra|more ebooks|r?e ?Books?([\.\-_ ]English|ers)?|ePu(b|p)s?|html|mobi|^NEW[\.\-_ ]/i', '', $newname);
         $newname = preg_replace('/PDF([\.\-_ ]English)?|Please post more|Post description|Proper|Repack(fix)?|[\.\-_ ](Chinese|English|French|German|Italian|Retail|Scan|Swedish)/i', '', $newname);
         $newname = preg_replace('/^R4 |Repost|Skytwohigh|TIA!+|TruePDF|V413HAV|(would someone )?please (re)?post.+? "|with the authors name right|^Wildrose|e books \d{1,2} (20|19)\d\d/i', '', $newname);
