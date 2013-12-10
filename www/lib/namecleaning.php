@@ -164,12 +164,14 @@ class nameCleaning
         if($debug)
             echo "6 - ".$cleanerName."\n";
         // More unwanted crap
-        $cleanerName = preg_replace('/n0crypt|as requested|\d{5,10}|nmr|repack|AS REQ |by req |2nd try |per req |REPOST |THEATRICAL |AKA |\d{2,} (?=.+(20|19)\d\d)|feature films/i', '', $cleanerName);
+        $cleanerName = preg_replace('/wildrose|n0crypt|as requested|\d{5,10}|nmr|repack|AS REQ |by req |2nd try |per req |REPOST |THEATRICAL |AKA |\d{2,} (?=.+(20|19)\d\d)|feature films/i', '', $cleanerName);
         if($debug)
             echo "7 - ".$cleanerName."\n";
         // Remove web site ads
-        $cleanerName = preg_replace('/^\s*\d{1,2}\s+\d{1,2}\s+|www .+ (org|com|info|net) |sponsored by \w+ |town\s+(tv|music|movie|pr0n|anime)|art of usenet/i', '', $cleanerName);
-		//Change [pw] to passworded.
+        $cleanerName = preg_replace('/#scnzb@efnet|www .+ (org|com|info|net) |sponsored by \w+ |town\s+(tv|music|movie|pr0n|anime)|art of usenet/i', '', $cleanerName);
+		// Trying to dump the leading two sets of digits that happen from part counts in the original name: [01/30] or (14/34)
+        $cleanerName = preg_replace('/^\s*\d{1,2}\s+\d{1,2}\s+/', '', $cleanerName);
+        //Change [pw] to passworded.
 		$cleanerName = str_replace(array('[pw]', '[PW]', ' PW ', '(Password)'), ' PASSWORDED ', $cleanerName);
         if($debug)
             echo "8 - ".$cleanerName."\n";
