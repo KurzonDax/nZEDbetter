@@ -158,6 +158,15 @@ if (isset($argv[1]) && $argv[1] == "true")
 		$db = new DB();
 		$sql = $db->query("select ID, guid, searchname from releases where totalPart = 1 and nzbstatus=1 and size < 1000000 and categoryID not in (8000, 8010, 8020, 8030, 8040, 8050, 8060, 3010)".$and);
 		$delcount = deleteReleases($sql, $type);
+
+        // Check releases against category minimum sizes
+        $sql = $db->query("SELECT r.ID, guid, searchname FROM releases AS r LEFT JOIN
+                                (SELECT c.ID, c.minsize, parentSize FROM `category` as c left join
+                                    (SELECT ID as pID, minsize AS parentSize FROM category AS parent WHERE parentID IS NULL) as p
+                                ON c.parentID=p.pID WHERE parentID IS NOT NULL and pID IS NOT NULL) as cat
+                                ON r.categoryID=cat.ID
+                            WHERE r.size <= cat.minsize OR r.size <= cat.parentSize".$and);
+        $delcount += deleteReleases($sql, $type);
 		return $delcount;
 	}
 	
