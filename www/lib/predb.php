@@ -474,14 +474,8 @@ Class Predb
 						{
 							$category = new Category();
 							$determinedcat = $category->determineCategory($b["title"], $row["groupID"]);
+                            $db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 3 where ID = %d", $db->escapeString($b["title"]), $determinedcat, $row["ID"]));
 
-							if ($echo == 1)
-							{
-								if ($namestatus == 1)
-									$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 3 where ID = %d", $db->escapeString($b["title"]), $determinedcat, $row["ID"]));
-								else
-									$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d where ID = %d", $db->escapeString($b["title"]), $determinedcat, $row["ID"]));
-							}
 							if ($this->echooutput)
 							{
 								$groups = new Groups();
@@ -499,7 +493,7 @@ Class Predb
 					}
 				}
 			}
-            if($res=$db->queryDirect("SELECT rf.*, r.name AS releaseName, r.searchname AS releaseSearchName, r.relnamestatus, r.groupID AS releaseGroupID " .
+            if($res=$db->queryDirect("SELECT rf.*, r.name AS releaseName, r.searchname AS releaseSearchName, r.relnamestatus, r.groupID AS releaseGroupID, r.categoryID AS releaseCat " .
                 "FROM `releasefiles` AS rf LEFT JOIN `releases` AS r ON rf.releaseID=r.ID " .
                 "WHERE rf.name REGEXP'[a-fA-F0-9]{32}|[a-fA-F0-9]{40}' AND r.relnamestatus != 3"))
             {
@@ -521,19 +515,17 @@ Class Predb
                                 $category = new Category();
                                 $determinedcat = $category->determineCategory($b["title"], $row["releaseGroupID"]);
 
-                                if ($echo == 1)
-                                {
-                                    $db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 3 where ID = %d", $db->escapeString($b["title"]), $determinedcat, $row["releaseID"]));
-                                }
+                                $db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 3 where ID = %d", $db->escapeString($b["title"]), $determinedcat, $row["releaseID"]));
+
                                 if ($this->echooutput)
                                 {
                                     $groups = new Groups();
 
                                     echo "New name: " . $b["title"] . "\n" .
-                                        "Old name: " . $row["searchname"] . "\n" .
+                                        "Old name: " . $row["releaseSearchName"] . "\n" .
                                         "New cat:  " . $category->getNameByID($determinedcat) . "\n" .
-                                        "Old cat:  " . $category->getNameByID($row["categoryID"]) . "\n" .
-                                        "Group:    " . $groups->getByNameByID($row["groupID"]) . "\n" .
+                                        "Old cat:  " . $category->getNameByID($row["releaseCat"]) . "\n" .
+                                        "Group:    " . $groups->getByNameByID($row["releaseGroupID"]) . "\n" .
                                         "Method:   " . "predb md5 release name: " . $b["source"] . "\n" . "\n";
                                 }
                                 $updated++;
