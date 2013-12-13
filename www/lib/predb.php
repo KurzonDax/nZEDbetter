@@ -474,7 +474,7 @@ Class Predb
 						{
 							$category = new Category();
 							$determinedcat = $category->determineCategory($b["title"], $row["groupID"]);
-                            $db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 3 where ID = %d", $db->escapeString($b["title"]), $determinedcat, $row["ID"]));
+                            $db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 3 where ID = %d", $db->escapeString($b["title"]), $determinedcat, $row["relID"]));
 
 							if ($this->echooutput)
 							{
