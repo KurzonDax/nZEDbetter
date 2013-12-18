@@ -397,8 +397,8 @@ function stripSearchName($text)
 }
 
 /**
- * @param      $text
- * @param bool $includeArticles
+ * @param string    $text
+ * @param bool      $includeArticles
  *
  * @return mixed|string
  */

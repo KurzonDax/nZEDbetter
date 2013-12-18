@@ -1,6 +1,14 @@
 ALTER TABLE parts DROP `ID`, DROP INDEX parthash, ADD PRIMARY KEY (`parthash`);
-ALTER TABLE `movieinfo` CHANGE `imdbID` `imdbID` INT ( 8 ) NOT NULL;
-UPDATE `site` SET `VALUE` = '0.7' WHERE `setting` = 'NZEDBETTER_VERSION';
+ALTER TABLE `movieinfo` CHANGE `imdbID` `imdbID` INT ( 8 ) NOT NULL,
+    ADD  `MPAArating` VARCHAR( 10 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL AFTER  `rating` ,
+    ADD  `MPAAtext` VARCHAR( 200 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL AFTER  `MPAArating` ,
+    ADD  `duration` SMALLINT NULL DEFAULT NULL AFTER `actors`,
+    CHANGE  `tmdbID`  `tmdbID` INT( 10 ) NOT NULL DEFAULT  '-1';
+    CHANGE  `cover`  `cover` VARCHAR( 75 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT  '0',
+    CHANGE  `backdrop`  `backdrop` VARCHAR( 75 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT  '0',
+    DROP INDEX `imdbID`,
+    ADD INDEX ( `MPAArating` ),
+    ADD INDEX (  `year` );
 ALTER TABLE `predb`
     ADD `md2` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
     ADD `md4` VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
@@ -42,4 +50,10 @@ CREATE TABLE IF NOT EXISTS `movieIDtoGenre` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `movieID` (`movieID`,`genreID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+ALTER TABLE  `releases` ADD  `tmdbID` INT NULL DEFAULT NULL AFTER  `imdbID` ,
+    ADD INDEX ( `tmdbID` );
+UPDATE `site` SET `setting`='movie_search_imdb', `value`='TRUE' WHERE `setting`='movie_search_google';
+DELETE FROM `site` WHERE `setting` IN ('movie_search_yahoo', 'movie_search_bing');
+INSERT INTO `site` (`ID`, `setting`, `value`, `updateddate`) VALUES (NULL, 'movieNoYearMatchPercent', '90', CURRENT_TIMESTAMP), (NULL, 'movieWithYearMatchPercent', '80', CURRENT_TIMESTAMP);
+UPDATE `site` SET `VALUE` = '0.7' WHERE `setting` = 'NZEDBETTER_VERSION';
 UPDATE `site` SET `VALUE` = 'v0003' WHERE `setting` = 'sqlpatch';

@@ -18,6 +18,21 @@ require_once(WWW_DIR."/lib/movie.php");
 require_once(WWW_DIR."/lib/TMDb.php");
 require_once(WWW_DIR."/lib/namecleaning.php");
 
+$s = new Sites();
+$site = $s->get();
+$tmdb = new TMDb($site->tmdbkey);
+$cast = $tmdb->getMovieCast(550);
+foreach($cast['cast'] as $name)
+    echo $name['name'] . "\n";
+exit;
+
+
+
+
+
+
+
+/*
 $db = new DB();
 $movie = new Movie();
 $namecleaning = new nameCleaning();
@@ -138,4 +153,4 @@ while ($movierow=$db->fetchAssoc($movieres))
 }
 exit ("\nAll done...\nMovies matched: ".$matchedMovies."/".$processed."\n"."Renamed movies: ".$renamedMovies."\nChanged Category: ".$movedCategory."\n");
 
-
+*/

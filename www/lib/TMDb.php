@@ -944,6 +944,79 @@ class TMDb
 		}
 		return $return;
 	}
+
+    public function lookupMovie($tmdbID)
+    {
+        try
+        {
+            $tmdbLookup = $this->getMovie($tmdbID);
+        }
+        catch (exception $e)
+        {
+            return false;
+        }
+
+        if (!$tmdbLookup)
+        {
+            return false;
+        };
+        if (isset($tmdbLookup['status_code']) && $tmdbLookup['status_code'] !== 1)
+        {
+            return false;
+        }
+
+        $ret = array();
+        $ret['title'] = $tmdbLookup['title'];
+        $ret['tmdb_id'] = $tmdbLookup['id'];
+        $ret['imdb_id'] = (isset($tmdbLookup['imdb_id']) ? str_replace('tt', '', $tmdbLookup['imdb_id']) : -1);
+
+        if ($ret['imdb_id'] == '0000000' || $ret['imdb_id'] == 0 || empty($ret['imdb_id']))
+            $ret['imdb_id'] = -1;
+
+        $ret['rating'] = (isset($tmdbLookup['vote_average']) && $tmdbLookup['vote_average'] > 0 ? $tmdbLookup['vote_average'] : '');
+        $ret['tagline'] = (isset($tmdbLookup['tagline']) ? $tmdbLookup['tagline'] : '');
+        $ret['plot'] = (isset($tmdbLookup['overview']) ? $tmdbLookup['overview'] : '');
+        $ret['year'] = (isset($tmdbLookup['release_date']) ? date("Y", strtotime($tmdbLookup['release_date'])) : -1 );
+
+        if(isset($tmdbLookup['genres']))
+        {
+            $ret['genres'] = array();
+            foreach($tmdbLookup['genres'] as $genre)
+                $ret['genres'][] = $genre['name'];
+        }
+        else
+            $ret['genres'] = null;
+        $ret['cover'] = (isset($tmdbLookup['poster_path']) && !empty($tmdbLookup['poster_path']) ?
+                            $this->getImageUrl($tmdbLookup['poster_path'], "poster", "w185") : '');
+
+        $ret['backdrop'] = (isset($tmdbLookup['backdrop_path']) && !empty($tmdbLookup['backdrop_path'])  ?
+                                $this->getImageUrl($tmdbLookup['backdrop_path'], "backdrop", "original") : '');
+
+        $cast = $this->getMovieCast($tmdbID);
+        $ret['actors'] = array();
+        foreach($cast['cast'] as $actor)
+            $ret['actors'][] = $actor['name'];
+        foreach($cast['crew'] as $crew)
+        {
+            if($crew['job'] == "Director")
+            {
+                $ret['director'] = $crew['name'];
+                break;
+            }
+            else
+                $ret['director'] = null;
+        }
+        if(is_null($ret['director']))
+            unset($ret['director']);
+        if(isset($tmdbLookup['spoken_languages']))
+        {
+            foreach($tmdbLookup['spoken_languages'] as $language)
+                $ret['language'] .= $language['name'] . ",";
+            $ret['language'] = substr($ret['language'], 0, -1);
+        }
+        $ret['duration'] = (isset($tmdbLookup['runtime']) ? $tmdbLookup['runtime'] : '-1');
+        return $ret;
+    }
 }
 
 /**
