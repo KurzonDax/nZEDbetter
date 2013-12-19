@@ -235,10 +235,10 @@ class Binaries
 
 				if ($lastId === false)
 				{
-					// Scan failed - skip group.
+                    echo "\033[01;31mERROR: Update failed for group " . $groupArr['name'] . "\n";
 					return;
 				}
-				$db->query(sprintf("UPDATE groups SET last_record = %s, last_updated = now() WHERE ID = %d", $db->escapeString($lastId), $groupArr['ID']));
+				// $db->query(sprintf("UPDATE groups SET last_record = %s, last_updated = now() WHERE ID = %d", $db->escapeString($lastId), $groupArr['ID']));
 
                 // TODO: Bug here that can cause a group to repeatedly grab the same articles.
                 // Seems to happen when the server does not return a large number of messages.  Need to
@@ -264,12 +264,14 @@ class Binaries
 					$first = $last + 1;
 				}
 			}
-
-			$last_record_postdate = $backfill->postdate($nntp,$last,false,$groupArr['name']);
-			// Set group's last postdate.
-			$db->query(sprintf("UPDATE groups SET last_record_postdate = FROM_UNIXTIME(".$last_record_postdate."), last_updated = now() WHERE ID = %d", $groupArr['ID']));
-			$timeGroup = number_format(microtime(true) - $this->startGroup, 2);
-			echo $data['group']." processed in ".$timeGroup." seconds.\n\n";
+            if(!is_null($last) && $last !== false && !empty($last) && $last > 0)
+            {
+                $last_record_postdate = $backfill->postdate($nntp,$last,false,$groupArr['name']);
+                // Set group's last postdate.
+                $db->query(sprintf("UPDATE groups SET last_record_postdate = FROM_UNIXTIME(".$last_record_postdate."), last_updated = now() WHERE ID = %d", $groupArr['ID']));
+                $timeGroup = number_format(microtime(true) - $this->startGroup, 2);
+                echo $data['group']." processed in ".$timeGroup." seconds.\n\n";
+            }
 		}
 		else
         {
@@ -282,6 +284,8 @@ class Binaries
 	function scan($nntp, $groupArr, $first, $last, $type='update')
 	{
 
+        if($first < 1 || is_null($first) || $last < 1 || is_null($last))
+            return false;
 
         $db = new Db();
 		$namecleaning = new nameCleaning();
