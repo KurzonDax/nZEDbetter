@@ -296,35 +296,38 @@ class Movie
 
         $movieId = $db->queryInsert($query);
 
-        // Update genres and genres mapping
+
 
         // $genreArr = explode(",", $movieData['genre']);
-        if(!is_null($movieData['genres']))
-        {
-            foreach ($movieData['genres'] as $genre)
-            {
-                $genre = trim($genre);
-                if ($genreExists = $db->queryOneRow("SELECT ID FROM movieGenres WHERE name = '" . $genre . "' OR name LIKE '" . $genre . "%'"))
-                {
-                    $db->query("INSERT IGNORE INTO movieIDtoGenre (movieID, genreID) VALUES (" . $movieId . ", " . $genreExists['ID'] . ")");
-                }
-                else
-                {
-                    $newGenre = $db->queryInsert("INSERT INTO movieGenres (name) VALUES ('" . $genre . "')");
-                    $db->query("INSERT IGNORE INTO movieIDtoGENRE (movieID, genreID) VALUES (" . $movieId . ", " . $newGenre . ")");
-                }
-            }
-        }
+
         if ($movieId)
         {
+            if (!is_null($movieData['genres']) && array_count_values($movieData['genres']) > 0)
+            {
+                // Update genres and genres mapping
+                foreach ($movieData['genres'] as $genre)
+                {
+                    $genre = trim($genre);
+                    if ($genreExists = $db->queryOneRow("SELECT ID FROM movieGenres WHERE name = '" . $genre . "' OR name LIKE '" . $genre . "%'"))
+                    {
+                        $db->query("INSERT IGNORE INTO movieIDtoGenre (movieID, genreID) VALUES (" . $movieId . ", " . $genreExists['ID'] . ")");
+                    } else
+                    {
+                        $newGenre = $db->queryInsert("INSERT INTO movieGenres (name) VALUES ('" . $genre . "')");
+                        $db->query("INSERT IGNORE INTO movieIDtoGENRE (movieID, genreID) VALUES (" . $movieId . ", " . $newGenre . ")");
+                    }
+                }
+            }
             if ($this->echooutput && $this->service == "")
-                echo "Added/updated movie: ".$movieData['title']." (".$movieData['year'].") - ".$movieData['imdbID']. "  " . $movieData['tmdbID'] . "\n";
+                echo "\033[01;32mAdded/updated movie: ".$movieData['title']." (".$movieData['year'].") - ".$movieData['imdbID']. "  " . $movieData['tmdbID'] . "\n";
         }
         else
         {
+            $lastDBerror = $db->Error();
             if ($this->echooutput && $this->service == "")
-                echo "Nothing to update for movie: ".$movieData['title']." (".$movieData['year'].") - ".$movieData['imdbID']. "  " . $movieData['tmdbID'] . "\n";
-            file_put_contents(WWW_DIR."lib/logging/movie_update_sql.log", $query . "\n-----------------------------------------\n", FILE_APPEND);
+                echo "\033[01;35mNothing to update for movie: ".$movieData['title']." (".$movieData['year'].") - ".$movieData['imdbID']. "  " . $movieData['tmdbID'] . "\n";
+            echo "Last DB Error: " . $lastDBerror . "\033[01;37m\n";
+            file_put_contents(WWW_DIR."lib/logging/movie_update_sql.log", $query . "\nDB Error: " . $lastDBerror . "\n-----------------------------------------\n", FILE_APPEND);
         }
 
         return $movieId;
@@ -404,6 +407,7 @@ class Movie
          * -2 = Search without year is false, and movie did not have a year in the searchname
          * -3 = Failure to find any matches from either service
          * -4 = Unable to parse the searchname
+         * -5 = An error occurred inserting/updating movieinfo table
          *
          */
 
@@ -455,6 +459,11 @@ class Movie
 
                 if($cleanName = $this->parseMovieSearchName($nameCleaning->movieCleaner($arr['searchname'])))
                 {
+                    if(isset($cleanName['TVSeries']) && $cleanName['TVSeries'] == 'TRUE')
+                    {
+                        $db->query("UPDATE releases SET categoryID=" . Category::CAT_TV_SD . " WHERE ID=" . $arr['ID']);
+                        continue;
+                    }
                     if(is_null($cleanName['year']) && $this->matchMoviesWithoutYear == 'FALSE')
                     {
                         echo "\033[01;37mMovie does not have a year in the searchname: " . $arr['searchname'] . "\n";
@@ -476,6 +485,11 @@ class Movie
                                 echo "\033[01;31mERROR: The Movie DB returned no data for ID: " . $tmdbResult . "\033[01;37m\n";
                                 unset($tmdbProps);
                             }
+                        }
+                        else
+                        {
+                            $msg = $arr['ID'].",".$db->escapeString($arr['searchname']).",".$db->escapeString($cleanName['name'])."\n";
+                            file_put_contents(WWW_DIR."lib/logging/tmdb-fail.log", $msg, FILE_APPEND);
                         }
 
                         if ($this->imdbSearch == 'FALSE' && (!isset($tmdbProps) || $tmdbProps === false))
@@ -502,7 +516,7 @@ class Movie
                         else
                             $imdbResults = $this->searchIMDB($cleanName['name'], $cleanName['year']);
 
-                        if($imdbResults !== false)
+                        if($imdbResults !== false && preg_replace('/tt|0+/', '', $imdbResults['id']) != 1)
                         {
                             $imdbProps = $imdb->lookupMovie($imdbResults);
                             // Check if no data returned from IMDB lookup
@@ -512,7 +526,7 @@ class Movie
                                 unset($imdbProps);
                             }
                             else
-                                echo "\033[01;36mReceived IMDB data for " . $imdbProps['title'] . "\033[01;37m\n";
+                                echo "Received IMDB data for " . $imdbProps['title'] . "\033[01;37m\n";
                         }
                         else
                             unset($imdbProps);
@@ -540,8 +554,10 @@ class Movie
                 $movieID = $this->updateMovieInfo($movieData);
 
                 if($movieID)
-                    $db->query("UPDATE releases SET imdbID=" . $movieData['imdbID'] . ", tmdbID=" . $movieData['tmdbID'] .
+                    $db->query("UPDATE releases SET movieID=". $movieID . ", imdbID=" . $movieData['imdbID'] . ", tmdbID=" . $movieData['tmdbID'] .
                                 " WHERE ID=" . $arr['ID']);
+                else
+                    $db->query("UPDATE releases SET movieID=-5, imdbID=-5, tmdbID=-5 WHERE ID=" . $arr['ID']);
 
             } // foreach
         } // if moviecount > 0
@@ -556,6 +572,11 @@ class Movie
         $cat = new Category();
         if (!$cat->isMovieForeign($releasename))
         {
+            if(preg_match('/S\d{1,2}E\d{1,2}| S\d{1,2} | D\d{1,2} /i', $releasename))
+            {
+                echo "\033[01;36mAppears to be TV Series, changing category: " . $releasename . "\n";
+                return array('TVSeries' => 'TRUE');
+            }
             preg_match('/^(?P<name>.*)[\.\-_\( ](?P<year>19\d{2}|20\d{2})/i', $releasename, $matches);
             if (!isset($matches['year']))
             {
@@ -583,22 +604,35 @@ class Movie
         $movieData['tagline'] = (!is_null($tmdbProps) && (strlen($tmdbProps['tagline']) >= (!is_null($imdbProps) && isset($imdbProps['tagline']) ? strlen($imdbProps['tagline']) : 0))) ?
                                     $tmdbProps['tagline'] : (!is_null($imdbProps) ? $imdbProps['tagline'] : '');
         $tmdbPlot = (!is_null($tmdbProps) ? $tmdbProps['plot'] : '');
-        $imdbPlot = (!is_null($imdbProps) ? (isset($imdbProps['description']) ? $imdbProps['description'] :
-                        (isset($imdbProps['shortDescription']) ? $imdbProps['shortDescription'] : '')) : '');
+        if(!is_null($imdbProps))
+        {
+            $imdbDescLength = isset($imdbProps['description']) && !is_null($imdbProps['description']) ? strlen($imdbProps['description']) : 0;
+            $imdbShortDescLength = isset($imdbProps['shortDescription']) && !is_null($imdbProps['shortDescription']) ? strlen($imdbProps['shortDescription']) : 0;
+            if($imdbDescLength > 0 && $imdbShortDescLength > 0)
+                $imdbPlot = $imdbDescLength > $imdbShortDescLength ? $imdbProps['description'] : $imdbProps['shortDescription'];
+            else
+                $imdbPlot = '';
+        }
+
+        // $imdbPlot = (!is_null($imdbProps) ? (isset($imdbProps['description']) ? $imdbProps['description'] :
+        //                (isset($imdbProps['shortDescription']) ? $imdbProps['shortDescription'] : '')) : '');
         $movieData['plot'] = (strlen($tmdbPlot) >= strlen($imdbPlot) ? $tmdbPlot : $imdbPlot);
         $movieData['year'] = (!is_null($tmdbProps) && $tmdbProps['year'] != -1 ? $tmdbProps['year'] : (!is_null($imdbProps) && $imdbProps['year'] != -1 ?
-                                $imdbProps['year'] : 'NULL'));
+                                $imdbProps['year'] : 'N/A'));
         // $movieData['genres'] = array();
-        $movieData['genres'] = (!is_null($tmdbProps) && isset($tmdbProps['genres']) && !is_null($tmdbProps['genres']) ? (array)$tmdbProps['genres'] : null);
-        $movieData['genres'] = (!is_null($imdbProps) && isset($imdbProps['genres']) && !is_null($imdbProps['genres']) ?
+        $movieData['genres'] = (!is_null($tmdbProps) && isset($tmdbProps['genres']) && array_count_values($tmdbProps['genres']) > 0 ? $tmdbProps['genres'] : null);
+        $movieData['genres'] = (!is_null($imdbProps) && isset($imdbProps['genres']) && array_count_values($imdbProps['genres']) > 0 ?
                                     (!is_null($movieData['genres']) ? array_unique(array_merge((array)$imdbProps['genres'], $movieData['genres'])) :
-                                    $imdbProps['genres']) : '');
+                                    $imdbProps['genres']) : array('N/A'));
+        if(is_null($movieData['genres']))
+            $movieData['genres'] = array('N/A');
         $movieData['type'] = 'Movie';
         $movieData['director'] = (!is_null($tmdbProps) && isset($tmdbProps['director']) ? $tmdbProps['director'] :
                                     (!is_null($imdbProps) && isset($imdbProps['director']) ? $imdbProps['director'] : ''));
-        $movieData['actors'] = (!is_null($tmdbProps) && isset($tmdbProps['actors']) ? (array)$tmdbProps['actors'] : array());
-        $movieData['actors'] = (!is_null($imdbProps) && isset($imdbProps['actors']) ? array_unique(array_merge((array)$imdbProps['actors'], $movieData['actors'])) :
-                                    $movieData['actors']);
+        $movieData['actors'] = (!is_null($tmdbProps) && isset($tmdbProps['actors']) && array_count_values($tmdbProps['actors']) > 0 ? $tmdbProps['actors'] : null);
+        $movieData['actors'] = (!is_null($imdbProps) && isset($imdbProps['actors']) && array_count_values($imdbProps['actors']) > 0 ?
+                                    (!is_null($movieData['actors']) ? array_unique(array_merge((array)$imdbProps['actors'], $movieData['actors'])) :
+                                    $imdbProps['actors']) : array('N/A'));
         $movieData['language'] = (!is_null($tmdbProps) && isset($tmdbProps['language']) ? $tmdbProps['language'] :
                                     (!is_null($imdbProps) && isset($imdbProps['language']) ? $imdbProps['language'] : 'English'));
         $movieData['cover'] = (!is_null($tmdbProps) && isset($tmdbProps['cover']) && !empty($tmdbProps['cover']) ? $tmdbProps['cover'] :
@@ -675,13 +709,13 @@ class Movie
                     $matchedYear = true;
                 if (!is_null($cleanYear) && $percentSimilar > $this->movieWithYearMatchPercent && $matchedYear)
                 {
-                    echo "\033[01;32mTMDb Match found:   ".$possibleMatch['title']." (".$tmdbYear.") Match Number: ".$matchCount."  ID: ".$possibleMatch['id']."\n\033[00;37m";
+                    echo "TMDb Match found:   ".$possibleMatch['title']." (".$tmdbYear.") Match Number: ".$matchCount."  ID: ".$possibleMatch['id']."\n\033[00;37m";
                     $matchFound = $possibleMatch['id'];
                     break;
                 }
                 elseif (is_null($cleanYear) && $this->matchMoviesWithoutYear == 'TRUE' && $percentSimilar > $this->movieNoYearMatchPercent)
                 {
-                    echo "\033[01;32mTMDb Match found \033[01;31m(no year)\033[01;31m:   " . $possibleMatch['title'] . "  Match Number: " . $matchCount . "  ID: " . $possibleMatch['id'] . "\n\033[00;37m";
+                    echo "TMDb Match found \033[01;31m(no year)\033[01;31m:   " . $possibleMatch['title'] . "  Match Number: " . $matchCount . "  ID: " . $possibleMatch['id'] . "\n\033[00;37m";
                     $matchFound = $possibleMatch['id'];
                     break;
                 }
@@ -717,12 +751,12 @@ class Movie
                     $matchedYear = true;
                 if (!is_null($cleanYear) && $percentSimilar > $this->movieWithYearMatchPercent && $matchedYear)
                 {
-                    echo "\033[01;36mIMDB Match found:   " . $possibleMatch['title'] . " (" . (isset($imdbYear) ? $imdbYear : "N/A") . ") Match Number: " . $matchCount . "  ID: " . $possibleMatch['id'] . "\n\033[00;37m";
+                    echo "IMDB Match found:   " . $possibleMatch['title'] . " (" . (isset($imdbYear) ? $imdbYear : "N/A") . ") Match Number: " . $matchCount . "  ID: " . $possibleMatch['id'] . "\n\033[00;37m";
                     $matchFound = $possibleMatch['id'];
                     break;
                 } elseif (is_null($cleanYear) && $this->matchMoviesWithoutYear == 'TRUE' && $percentSimilar > $this->movieNoYearMatchPercent)
                 {
-                    echo "\033[01;36mIMDB Match found \033[01;31m(no year)\033[01;31m:   " . $possibleMatch['title'] . "  Match Number: " . $matchCount . "  ID: " . $possibleMatch['id'] . "\n\033[00;37m";
+                    echo "IMDB Match found \033[01;31m(no year)\033[01;31m:   " . $possibleMatch['title'] . "  Match Number: " . $matchCount . "  ID: " . $possibleMatch['id'] . "\n\033[00;37m";
                     $matchFound = $possibleMatch['id'];
                     break;
                 }

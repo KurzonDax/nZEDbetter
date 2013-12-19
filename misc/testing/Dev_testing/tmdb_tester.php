@@ -21,11 +21,12 @@ require_once(WWW_DIR."/lib/namecleaning.php");
 $s = new Sites();
 $site = $s->get();
 $tmdb = new TMDb($site->tmdbkey);
-$cast = $tmdb->getMovieCast(550);
-foreach($cast['cast'] as $name)
-    echo $name['name'] . "\n";
-exit;
-
+$consoleTools = new ConsoleTools();
+$search = $consoleTools->getUserInput("\n\nWhat would you like to search for: ");
+$results = $tmdb->lookupMovie($search);
+print_r($results);
+// echo "Movie Name: ". $results . "\n";
+exit("\nThanks for playing\n");
 
 
 

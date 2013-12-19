@@ -122,6 +122,23 @@ class IMDB
         {
             if(count($html))
             {
+                // Check if movie is "in development", and if so, bail out because there is
+                // typically no valid data.
+                $movieData = $html->find("div[class=article]");
+                if(is_object($movieData))
+                {
+                    foreach($movieData as $block)
+                    {
+                        if(strstr($block->innertext, "<i>in development,</i>"))
+                        {
+                            $html->clear();
+                            unset($html);
+                            return false;
+                        }
+                    }
+                }
+                unset($movieData);
+
                 $results = array();
 
                 // IMDB ID
@@ -151,8 +168,9 @@ class IMDB
 
                 // Actors
                 $movieData = $html->find('table[class="cast_list"]');
-                if(isset($movieData) && is_object($movieData))
+                if(isset($movieData[0]))
                 {
+                    // echo "Found cast_list\n";
                     $actors = $movieData[0]->find('span[itemprop=name]');
                     $results['actors'] = array();
                     foreach ($actors as $actor)
