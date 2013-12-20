@@ -256,8 +256,10 @@ class Movie
 
     public function updateMovieInfo($movieData)
     {
-        $ri = new ReleaseImage();
         $db = new DB();
+
+        $ri = new ReleaseImage();
+
 
         // Get the poster and backdrop
 
@@ -274,31 +276,38 @@ class Movie
             $imageResult = $ri->saveImage('imdb' . $movieData['imdbID'] . 'tmdb' . $movieData['tmdbID'] . '-backdrop', $movieData['backdrop'], $this->imgSavePath, 1024, 768);
             $movieData['backdrop'] = $imageResult ? 'imdb' . $movieData['imdbID'] . 'tmdb' . $movieData['tmdbID'] . '-backdrop' . $ext[0]: 'NULL';
         }
-
-        $query = sprintf("
-			INSERT INTO movieinfo
-				(imdbID, tmdbID, title, tagline, rating, MPAArating, MPAAtext, plot, year, genre, type, director, actors, language, cover, backdrop, duration, createddate, updateddate)
-			VALUES
-				(%d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, NOW(), NOW())
-			ON DUPLICATE KEY UPDATE
+        $query = "SELECT ID FROM movieinfo WHERE imdbID=" . $movieData['imdbID'] . " AND tmdbID=" . $movieData['tmdbID'];
+        if ($existingID = $db->queryOneRow($query))
+        {
+            $query = sprintf("UPDATE movieinfo SET
 				imdbID=%d, tmdbID=%d, title=%s, tagline=%s, rating=%s, MPAArating=%s, MPAAtext=%s, plot=%s, year=%s, genre=%s, type=%s, director=%s,
-				actors=%s, language=%s, cover=%s, backdrop=%s, duration=%d, updateddate=NOW()",
-            $movieData['imdbID'], $movieData['tmdbID'], $db->escapeString($movieData['title']), $db->escapeString($movieData['tagline']), $db->escapeString($movieData['rating']),
-            $db->escapeString($movieData['MPAArating']), $db->escapeString($movieData['MPAAtext']), $db->escapeString($movieData['plot']), $db->escapeString($movieData['year']),
-            $db->escapeString(implode(",", $movieData['genres'])), $db->escapeString($movieData['type']), $db->escapeString($movieData['director']),
-            $db->escapeString(implode(",", $movieData['actors'])), $db->escapeString($movieData['language']), $db->escapeString($movieData['cover']),
-            $db->escapeString($movieData['backdrop']), $movieData['duration'],
-            $movieData['imdbID'], $movieData['tmdbID'], $db->escapeString($movieData['title']), $db->escapeString($movieData['tagline']), $db->escapeString($movieData['rating']),
-            $db->escapeString($movieData['MPAArating']), $db->escapeString($movieData['MPAAtext']), $db->escapeString($movieData['plot']), $db->escapeString($movieData['year']),
-            $db->escapeString(is_array($movieData['genres']) && !is_null($movieData['genres']) ? implode(",", $movieData['genres']) : ''), $db->escapeString($movieData['type']), $db->escapeString($movieData['director']),
-            $db->escapeString(implode(",", $movieData['actors'])), $db->escapeString($movieData['language']), $db->escapeString($movieData['cover']),
-            $db->escapeString($movieData['backdrop']), $movieData['duration']);
+				actors=%s, language=%s, cover=%s, backdrop=%s, duration=%d, updateddate=NOW() WHERE ID=%d",
+                $movieData['imdbID'], $movieData['tmdbID'], $db->escapeString($movieData['title']), $db->escapeString($movieData['tagline']), $db->escapeString($movieData['rating']),
+                $db->escapeString($movieData['MPAArating']), $db->escapeString($movieData['MPAAtext']), $db->escapeString($movieData['plot']), $db->escapeString($movieData['year']),
+                $db->escapeString(is_array($movieData['genres']) && !is_null($movieData['genres']) ? implode(",", $movieData['genres']) : ''), $db->escapeString($movieData['type']), $db->escapeString($movieData['director']),
+                $db->escapeString(implode(",", $movieData['actors'])), $db->escapeString($movieData['language']), $db->escapeString($movieData['cover']),
+                $db->escapeString($movieData['backdrop']), $movieData['duration'], $existingID['ID']);
+            $db->query($query);
+            if($db->getAffectedRows() > 0)
+                $movieId = $existingID['ID'];
+            else
+                $movieId = false;
+        }
+        else
+        {
+            $query = sprintf("
+                INSERT INTO movieinfo
+                    (imdbID, tmdbID, title, tagline, rating, MPAArating, MPAAtext, plot, year, genre, type, director, actors, language, cover, backdrop, duration, createddate, updateddate)
+                VALUES
+                    (%d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, NOW(), NOW())",
+                $movieData['imdbID'], $movieData['tmdbID'], $db->escapeString($movieData['title']), $db->escapeString($movieData['tagline']), $db->escapeString($movieData['rating']),
+                $db->escapeString($movieData['MPAArating']), $db->escapeString($movieData['MPAAtext']), $db->escapeString($movieData['plot']), $db->escapeString($movieData['year']),
+                $db->escapeString(implode(",", $movieData['genres'])), $db->escapeString($movieData['type']), $db->escapeString($movieData['director']),
+                $db->escapeString(implode(",", $movieData['actors'])), $db->escapeString($movieData['language']), $db->escapeString($movieData['cover']),
+                $db->escapeString($movieData['backdrop']), $movieData['duration']);
 
-        $movieId = $db->queryInsert($query);
-
-
-
-        // $genreArr = explode(",", $movieData['genre']);
+            $movieId = $db->queryInsert($query);
+        }
 
         if ($movieId)
         {
@@ -572,7 +581,7 @@ class Movie
         $cat = new Category();
         if (!$cat->isMovieForeign($releasename))
         {
-            if(preg_match('/S\d{1,2}E\d{1,2}| S\d{1,2} | D\d{1,2} /i', $releasename))
+            if(preg_match('/S\d{1,2}E\d{1,2}| S\d{1,2} | D\d{1,2} |Episode \d{1,2} /i', $releasename))
             {
                 echo "\033[01;36mAppears to be TV Series, changing category: " . $releasename . "\n";
                 return array('TVSeries' => 'TRUE');

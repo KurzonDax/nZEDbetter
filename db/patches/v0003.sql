@@ -51,6 +51,8 @@ CREATE TABLE IF NOT EXISTS `movieIDtoGenre` (
   UNIQUE KEY `movieID` (`movieID`,`genreID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 ALTER TABLE  `releases` ADD  `tmdbID` INT NULL DEFAULT NULL AFTER  `imdbID` ,
+    ADD  `movieID` INT NULL DEFAULT NULL AFTER  `tvairdate` ,
+    CHANGE  `imdbID`  `imdbID` INT( 8 ) NULL DEFAULT NULL,
     ADD INDEX ( `tmdbID` );
 UPDATE `site` SET `setting`='movie_search_imdb', `value`='TRUE' WHERE `setting`='movie_search_google';
 DELETE FROM `site` WHERE `setting` IN ('movie_search_yahoo', 'movie_search_bing');
