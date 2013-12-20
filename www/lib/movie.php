@@ -555,6 +555,8 @@ class Movie
                 {
                     echo "\033[01;33mNo results found for ID: " . $arr['ID'] . "   " . $cleanName['name'] . "\033[01;37m\n";
                     $db->query("UPDATE releases SET imdbID = -2, tmdbID = -2 WHERE ID = " . $arr['ID']);
+                    $msg = $arr['ID'] . "," . $db->escapeString($arr['searchname']) . "," . $db->escapeString($cleanName['name']) . "\n";
+                    file_put_contents(WWW_DIR."lib/logging/movie-no-match.log",$msg, FILE_APPEND);
                     continue;
                 }
 
