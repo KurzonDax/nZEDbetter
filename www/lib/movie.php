@@ -298,8 +298,15 @@ class Movie
             $imageResult = $ri->saveImage('imdb' . $movieData['imdbID'] . 'tmdb' . $movieData['tmdbID'] . '-backdrop', $movieData['backdrop'], $this->imgSavePath, 1024, 768);
             $movieData['backdrop'] = $imageResult ? 'imdb' . $movieData['imdbID'] . 'tmdb' . $movieData['tmdbID'] . '-backdrop' . $ext[0]: 'NULL';
         }
-        $query = "SELECT ID FROM movieinfo WHERE imdbID=" . $movieData['imdbID'] . " AND tmdbID=" . $movieData['tmdbID'];
-        if ($existingID = $db->queryOneRow($query))
+        $queryByTitle = "SELECT ID FROM movieinfo WHERE title=" . $db->escapeString($movieData['title'] . " AND year=" . $movieData['year']);
+        $existingID = $db->queryOneRow($queryByTitle);
+        if(!$existingID)
+        {
+            $queryByID = "SELECT ID FROM movieinfo WHERE imdbID=" . $movieData['imdbID'] . " AND tmdbID=" . $movieData['tmdbID'];
+            $existingID = $db->queryOneRow($queryByID);
+        }
+
+        if ($existingID)
         {
             $query = sprintf("UPDATE movieinfo SET
 				imdbID=%d, tmdbID=%d, title=%s, tagline=%s, rating=%s, MPAArating=%s, MPAAtext=%s, plot=%s, year=%s, genre=%s, type=%s, director=%s,
