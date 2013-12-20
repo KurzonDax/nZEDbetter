@@ -114,13 +114,21 @@
                 </td>
                 <td colspan="3" class="left">
                     <h2>{$result.title|stripslashes|escape:"htmlall"} (<a class="title" title="{$result.year}" href="{$smarty.const.WWW_TOP}/movies?year={$result.year}">{$result.year}</a>) {if $result.rating != ''}{$result.rating}/10{/if}
+                        {if $result.MPAArating != null && $result.MPAArating !="APPROVED" && $result.MPAArating != "PASSED" && $result.MPAArating != "GP" && $result.MPAArating != "NOT RATED"}
+                            <img src="{$smarty.const.WWW_TOP}/themes/{$site->style}/images/MPAA/{$result.MPAArating}.png"
+                                 height="25px" style="margin-top: -5px;">
+                        {elseif $result.MPAArating == "NOT RATED"}
+                            <img src="{$smarty.const.WWW_TOP}/themes/{$site->style}/images/MPAA/NR.png"
+                                 height="25px" style="margin-top: -5px;">
+                        {/if}
+
                         {* foreach from=$result.languages item=movielanguage}
                             {release_flag($movielanguage, browse)}
                         {/foreach *}</h2>
                     {if $result.tagline != ''}<b>{$result.tagline|stripslashes}</b><br>{/if}
                     {if $result.plot != ''}{$result.plot|stripslashes}<br>{/if}
                     <br>
-                    {if $result.MPAAtext != 'NULL'}<b>MPAA Rating:</b> {$result.MPAAtext}<br>{/if}
+                    {if $result.MPAAtext != NULL}<b>MPAA Rating:</b>  {$result.MPAAtext}<br>{/if}
                     {if $result.genre != ''}<b>Genre:</b> {$result.genre|stripslashes}<br>{/if}
                     {if $result.director != ''}<b>Director:</b> {$result.director}<br>{/if}
                     {if $result.actors != ''}<b>Starring:</b> {$result.actors}<br>{/if}

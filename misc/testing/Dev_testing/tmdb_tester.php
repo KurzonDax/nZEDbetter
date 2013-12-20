@@ -25,6 +25,9 @@ $consoleTools = new ConsoleTools();
 $search = $consoleTools->getUserInput("\n\nWhat would you like to search for: ");
 $results = $tmdb->lookupMovie($search);
 print_r($results);
+$actorsCount = array_count_values($results['actors']);
+print_r($actorsCount);
+echo "Count: " . count($results['actors']);
 // echo "Movie Name: ". $results . "\n";
 exit("\nThanks for playing\n");
 
