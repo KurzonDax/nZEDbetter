@@ -93,16 +93,19 @@
         <tbody>
         {foreach from=$results item=result}
             {$result.imdbID = $result.imdbID|string_format:"%07d"}
+
             <tr>
                 <td style="vertical-align: top"><center>
                         <div class="movcover">
-                            <a target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbID}/" name="name{$result.imdbID}" title="View movie info" class="modal_imdb thumbnail" rel="movie" >
-                                <img class="shadow" style="margin: 3px 0;" src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbID}-cover.jpg{else}{$smarty.const.WWW_TOP}/themes/{$site->style}/images/movie-no-cover.jpg{/if}" width="160" border="0" alt="{$result.title|escape:"htmlall"}">
+                            <a target="_blank" href="{$site->dereferrer_link}{if $result.imdbID > 1}http://www.imdb.com/title/tt{$result.imdbID}/{else}http://www.themoviedb.org/movie/{$result.tmdbID}{/if}" name="name{$result.imdbID}" title="View movie info" class="modal_imdb thumbnail" rel="movie" >
+                                <img class="shadow" style="margin: 3px 0;" src="{if $result.cover != '0' && $result.cover != ''}{$smarty.const.WWW_TOP}/covers/movies/{$result.cover}{else}{$smarty.const.WWW_TOP}/themes/{$site->style}/images/movie-no-cover.jpg{/if}" width="160" border="0" alt="{$result.title|escape:"htmlall"}">
                             </a>
                             <div class="relextra" style="margin-top: 10px;"><center>
-                                    <span class="label label-inverse"><a target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbID}/" name="name{$result.imdbID}" title="View movie info" class="modal_imdb" rel="movie" >Cover</a></span>
-                                    <span class="label label-inverse"><a target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbID}/" name="imdb{$result.imdbID}" title="View imdb page">Imdb</a></span>
-                                    <span class="label label-inverse"><a target="_blank" href="{$site->dereferrer_link}http://trakt.tv/search/imdb?q=tt{$result.imdbID}/" name="trakt{$result.imdbID}" title="View trakt page">Trakt</a></span>
+                                    <span class="label label-inverse"><a target="_blank" href="{$site->dereferrer_link}{if $result.imdbID > 1}http://www.imdb.com/title/tt{$result.imdbID}/{else}http://www.themoviedb.org/movie/{$result.tmdbID}{/if}"
+                                                                         name="name{$result.imdbID}" title="View movie info" class="modal_imdb" rel="movie" >Cover</a></span>
+                                    <span class="label label-inverse"><a target="_blank" href="{$site->dereferrer_link}{if $result.imdbID > 1}http://www.imdb.com/title/tt{$result.imdbID}/{else}http://www.themoviedb.org/movie/{$result.tmdbID}{/if}"
+                                                                         name="imdb{$result.imdbID}" title="View {if $result.imdbID > 1}imdb{else}tmdb{/if} page">{if $result.imdbID > 1}Imdb{else}Tmdb{/if}</a></span>
+                                    {* <span class="label label-inverse"><a target="_blank" href="{$site->dereferrer_link}http://trakt.tv/search/imdb?q=tt{$result.imdbID}/" name="trakt{$result.imdbID}" title="View trakt page">Trakt</a></span> *}
                                     {*<span class="label label-inverse"><a target="blackhole" href="#" name="CP{$result.imdbID}" title="Send to Sabnzbd - NYI">Sab</a></span>
                                     <span class="label label-inverse"><a target="blackhole" href="#" name="CP{$result.imdbID}" title="Add to CouchPotato - NYI">CP</a></span>
                                     <span class="label label-inverse"><a target="blackhole" href="{$site->dereferrer_link}{$site->CPurl}/api/{$site->CPapikey}/movie.add/?identifier=tt{$result.imdbID}&title={$result.title}" name="CP{$result.imdbID}" title="Add to CouchPotato">CouchPotato</a></span>*}</center>
@@ -111,15 +114,17 @@
                 </td>
                 <td colspan="3" class="left">
                     <h2>{$result.title|stripslashes|escape:"htmlall"} (<a class="title" title="{$result.year}" href="{$smarty.const.WWW_TOP}/movies?year={$result.year}">{$result.year}</a>) {if $result.rating != ''}{$result.rating}/10{/if}
-                        {foreach from=$result.languages item=movielanguage}
+                        {* foreach from=$result.languages item=movielanguage}
                             {release_flag($movielanguage, browse)}
-                        {/foreach}</h2>
+                        {/foreach *}</h2>
                     {if $result.tagline != ''}<b>{$result.tagline|stripslashes}</b><br>{/if}
                     {if $result.plot != ''}{$result.plot|stripslashes}<br>{/if}
                     <br>
+                    {if $result.MPAAtext != 'NULL'}<b>MPAA Rating:</b> {$result.MPAAtext}<br>{/if}
                     {if $result.genre != ''}<b>Genre:</b> {$result.genre|stripslashes}<br>{/if}
                     {if $result.director != ''}<b>Director:</b> {$result.director}<br>{/if}
                     {if $result.actors != ''}<b>Starring:</b> {$result.actors}<br>{/if}
+                    {if $result.duration != 0}<b>Duration:</b> {$result.duration} minutes<br>{/if}
                     <br>
                     <div class="relextra">
                         <table class="table table-condensed table-hover">

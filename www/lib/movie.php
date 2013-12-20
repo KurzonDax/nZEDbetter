@@ -100,11 +100,11 @@ class Movie
                             $chlist.=", ".$child["ID"];
 
                         if ($chlist != "-99")
-                            $catsrch .= " r.categoryID in (".$chlist.") or ";
+                            $catsrch .= " r.categoryID in (".$chlist.") OR ";
                     }
                     else
                     {
-                        $catsrch .= sprintf(" r.categoryID = %d or ", $category);
+                        $catsrch .= sprintf(" r.categoryID = %d OR ", $category);
                     }
                 }
             }
@@ -112,15 +112,18 @@ class Movie
         }
 
         if ($maxage > 0)
-            $maxage = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
+            $maxage = sprintf(" AND r.postdate > NOW() - INTERVAL %d DAY ", $maxage);
         else
             $maxage = "";
 
         $exccatlist = "";
         if (count($excludedcats) > 0)
-            $exccatlist = " and r.categoryID not in (".implode(",", $excludedcats).")";
+            $exccatlist = " AND r.categoryID NOT IN (".implode(",", $excludedcats).")";
 
-        $sql = sprintf("select count(distinct r.imdbID) as num from releases r inner join movieinfo m on m.imdbID = r.imdbID and m.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s ", $browseby, $catsrch, $maxage, $exccatlist);
+        $sql = sprintf("SELECT COUNT(DISTINCT r.movieID) AS num FROM releases AS r
+                            INNER JOIN movieinfo AS m ON m.ID = r.movieID AND m.title != ''
+                            WHERE r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s %s %s ",
+                            $browseby, $catsrch, $maxage, $exccatlist);
         $res = $db->queryOneRow($sql);
         return $res["num"];
     }
@@ -173,7 +176,26 @@ class Movie
             $exccatlist = " and r.categoryID not in (".implode(",", $excludedcats).")";
 
         $order = $this->getMovieOrder($orderby);
-        $sql = sprintf(" SELECT GROUP_CONCAT(r.ID ORDER BY r.postdate desc SEPARATOR ',') as grp_release_id, GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate desc SEPARATOR ',') as grp_rarinnerfilecount, GROUP_CONCAT(r.haspreview ORDER BY r.postdate desc SEPARATOR ',') as grp_haspreview, GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate desc SEPARATOR ',') as grp_release_password, GROUP_CONCAT(r.guid ORDER BY r.postdate desc SEPARATOR ',') as grp_release_guid, GROUP_CONCAT(rn.ID ORDER BY r.postdate desc SEPARATOR ',') as grp_release_nfoID, GROUP_CONCAT(groups.name ORDER BY r.postdate desc SEPARATOR ',') as grp_release_grpname, GROUP_CONCAT(r.searchname ORDER BY r.postdate desc SEPARATOR '#') as grp_release_name, GROUP_CONCAT(r.postdate ORDER BY r.postdate desc SEPARATOR ',') as grp_release_postdate, GROUP_CONCAT(r.size ORDER BY r.postdate desc SEPARATOR ',') as grp_release_size, GROUP_CONCAT(r.totalpart ORDER BY r.postdate desc SEPARATOR ',') as grp_release_totalparts, GROUP_CONCAT(r.comments ORDER BY r.postdate desc SEPARATOR ',') as grp_release_comments, GROUP_CONCAT(r.grabs ORDER BY r.postdate desc SEPARATOR ',') as grp_release_grabs, m.*, groups.name as group_name, rn.ID as nfoID from releases r left outer join groups on groups.ID = r.groupID inner join movieinfo m on m.imdbID = r.imdbID and m.title != '' left outer join releasenfo rn on rn.releaseID = r.ID and rn.nfo is not null where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and r.imdbID != '0000000' and %s %s %s %s group by m.imdbID order by %s %s".$limit, $browseby, $catsrch, $maxage, $exccatlist, $order[0], $order[1]);
+        $sql = sprintf(" SELECT GROUP_CONCAT(r.ID ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
+                            GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') AS grp_rarinnerfilecount,
+                            GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') as grp_haspreview,
+                            GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_password,
+                            GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_guid,
+                            GROUP_CONCAT(rn.ID ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_nfoID,
+                            GROUP_CONCAT(groups.name ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_grpname,
+                            GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') as grp_release_name,
+                            GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_postdate,
+                            GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_size,
+                            GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_totalparts,
+                            GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_comments,
+                            GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') as grp_release_grabs,
+                            m.*, groups.name AS group_name, rn.ID AS nfoID
+                            FROM releases AS r LEFT OUTER JOIN groups ON groups.ID = r.groupID
+                                INNER JOIN movieinfo AS m on m.ID = r.movieID AND m.title != ''
+                                LEFT OUTER JOIN releasenfo AS rn ON rn.releaseID = r.ID AND rn.nfo IS NOT NULL
+                            WHERE r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease')
+                            AND %s %s %s %s GROUP BY m.ID ORDER BY %s %s " . $limit,
+                        $browseby, $catsrch, $maxage, $exccatlist, $order[0], $order[1]);
         return $db->query($sql);
     }
 
@@ -235,7 +257,7 @@ class Movie
         if ($data[$field] == "")
             return "";
 
-        $tmpArr = explode(', ',$data[$field]);
+        $tmpArr = explode(',',$data[$field]);
         $newArr = array();
         $i = 0;
         foreach($tmpArr as $ta) {
@@ -789,33 +811,12 @@ class Movie
 
     public function getGenres()
     {
-        return array(
-            'Action',
-            'Adventure',
-            'Animation',
-            'Biography',
-            'Comedy',
-            'Crime',
-            'Documentary',
-            'Drama',
-            'Family',
-            'Fantasy',
-            'Film-Noir',
-            'Game-Show',
-            'History',
-            'Horror',
-            'Music',
-            'Musical',
-            'Mystery',
-            'News',
-            'Reality-TV',
-            'Romance',
-            'Sci-Fi',
-            'Sport',
-            'Talk-Show',
-            'Thriller',
-            'War',
-            'Western'
-        );
+        $db = new DB();
+        $query = $db->queryDirect("SELECT DISTINCT name FROM movieGenres WHERE active=1");
+        $allGenres = array();
+        while($genre = $db->fetchAssoc($query))
+            $allGenres[] = $genre['name'];
+        sort($allGenres, SORT_STRING);
+        return $allGenres;
     }
 }
