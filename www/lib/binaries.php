@@ -25,7 +25,7 @@ class Binaries
 		$this->NewGroupMsgsToScan = (!empty($site->newgroupmsgstoscan)) ? $site->newgroupmsgstoscan : 500000;
 		$this->NewGroupDaysToScan = (!empty($site->newgroupdaystoscan)) ? $site->newgroupdaystoscan : 3;
 
-        $this->groupMaxMsgsPerLoop = (!empty($site->groupMaxMsgsPerLoop) && !is_null($site->groupMaxMsgsPerLoop)) ? $site->groupMaxMsgsPerLoop : 1000000;
+        $this->groupMaxMsgsPerLoop = (!empty($site->groupMaxMsgsPerLoop) && !is_null($site->groupMaxMsgsPerLoop)) ? $site->groupMaxMsgsPerLoop : 500000;
 
         $this->DoPartRepair = $site->partrepair;  // Why would you turn off part repair if site->partrepair is set to 2?? <- That was based on the original code
         /*
@@ -225,7 +225,12 @@ class Binaries
 					else
 						$last = $first + $this->messagebuffer;
 				}
-
+                // Below is a stop-gap measure until I figure out under what conditions this happens.
+                if($grouplast - $last > $this->groupMaxMsgsPerLoop)
+                {
+                    echo "\033[01;31mERROR: Group message numbers have gotten out of sync: ".$groupArr['name']."\n";
+                    return;
+                }
 				echo $n."Getting ".number_format($last-$first+1)." articles (".number_format($first)." to ".number_format($last).") from \033[01;36m".$data["group"]." - ".number_format($grouplast - $last)."\033[00;37m in queue.\n";
 				flush();
 
