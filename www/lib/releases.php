@@ -2102,16 +2102,25 @@ class Releases
             }
         } while ($colsDeleted>0 && $fastAndFurious == 'TRUE');
 
-        if(((time()>=$this->nextCrosspostCheck) || $this->nextCrosspostCheck==0)&& ($resrel = $db->query(sprintf("SELECT ID, guid FROM releases WHERE adddate > (now() - interval %d hour) GROUP BY name HAVING count(name) > 1", $this->crosspostt))))
+        // if(((time()>=$this->nextCrosspostCheck) || $this->nextCrosspostCheck==0)&& ($resrel = $db->query(sprintf("SELECT ID, guid FROM releases GROUP BY name HAVING count(name) > 1", $this->crosspostt))))
+        if ($resrel = $db->queryDirect("SELECT ID, guid, name FROM releases GROUP BY name HAVING count(name) > 1"))
         {
+            $totalDupes = $db->getNumRows($resrel);
+            $dupesProcessed = 0;
             if ($echooutput)
                 echo "\nDeleting cross-posted releases...\n";
             $db->query("UPDATE site SET value=".(time()+3600)." WHERE setting='nextCrosspostCheck'");
             $dupecount = 0;
-            foreach ($resrel as $rowrel)
+            while ($rowrel = $db->fetchAssoc($resrel))
             {
-                $this->fastDelete($rowrel['ID'], $rowrel['guid'], $this->site);
-                $dupecount ++;
+                $dupesProcessed ++;
+                $consoletools->overWrite("Processing duplicate release ".$consoletools->percentString($dupesProcessed, $totalDupes));
+                $dupeReleases = $db->queryDirect("SELECT ID, GUID FROM releases WHERE name=".$db->escapeString($rowrel['name'])." AND ID !=".$rowrel['ID']);
+                while($dupes = $db->fetchAssoc($dupeReleases))
+                {
+                    $this->fastDelete($dupes['ID'], $dupes['guid'], $this->site);
+                    $dupecount ++;
+                }
             }
             if($echooutput)
                 echo "\n".$dupecount." cross-posted releases deleted.\n";
