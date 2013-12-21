@@ -17,17 +17,22 @@ require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/movie.php");
 require_once(WWW_DIR."/lib/TMDb.php");
 require_once(WWW_DIR."/lib/namecleaning.php");
+require_once(WWW_DIR . "/lib/imdb.php");
 
 $s = new Sites();
 $site = $s->get();
 $tmdb = new TMDb($site->tmdbkey);
+$imdb = new IMDB();
+$movie = new Movie();
 $consoleTools = new ConsoleTools();
-$search = $consoleTools->getUserInput("\n\nWhat would you like to search for: ");
-$results = $tmdb->lookupMovie($search);
-print_r($results);
-$actorsCount = array_count_values($results['actors']);
-print_r($actorsCount);
-echo "Count: " . count($results['actors']);
+$search = $consoleTools->getUserInput("\n\nWhat tMDB ID would you like to search for: ");
+$resultsTMDB = $tmdb->lookupMovie($search);
+$search = $consoleTools->getUserInput("\n\nWhat iMDB ID would you like to search for: ");
+$resultsIMDB = $imdb->lookupMovie($search);
+$movieData = $movie->normalizeMovieData($resultsTMDB, $resultsIMDB);
+print_r($movieData);
+// print_r($actorsCount);
+// echo "Count: " . count($results['actors']);
 // echo "Movie Name: ". $results . "\n";
 exit("\nThanks for playing\n");
 

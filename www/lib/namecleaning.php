@@ -266,7 +266,7 @@ class nameCleaning
         $text = preg_replace('/MOViEONLY|uncut|DVD(5|9)|F0RFUN|www allyourbasearebelongtous pw |ANiPUNK(.+)?|Mayhem|AN0NYM0US(.+)?|EwDp|unrated|norbit|www drlecter tk | R\d|(\-)?ironclub/i', '', $text);
         $text = preg_replace('/DAMiANA|1098JHWOTNGS|(\-)?AN0NYM0US( CD)?|sample|R E L E A S E |color red b/i', '', $text);
         // Second group is case sensitive
-        $text = preg_replace('/PePPeP|Bin Poster|TiTLE|TOWN MOVIE| TOWN |Release Name|FILL|AmA (DIVX|XviD)|PROPER |1080p|720p|480p|AVC|(H|h)264|PAL|iNT|COMPLETE|LIMITED|MASTER|iOM|SAM|RETAIL|MADE|NZBGRABIT LOWERS TONE AGAIN PAY PER DOWNLOAD|ip$/', '', $text);
+        $text = preg_replace('/PePPeP|Bin Poster|TiTLE|TOWN MOVIE|TOWN |Release Name|FILL|AmA (DIVX|XviD)|PROPER |1080p|720p|480p|AVC|(H|h)264|PAL|iNT|COMPLETE|LIMITED|MASTER|iOM|SAM|RETAIL|MADE|NZBGRABIT LOWERS TONE AGAIN PAY PER DOWNLOAD|ip$/', '', $text);
         // NTSC DVDR MADE NZBGRABIT LOWERS TONE AGAIN PAY PER DOWNLOAD 0 1098JHWOTNGS
         return trim($text);
 

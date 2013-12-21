@@ -181,12 +181,12 @@ class IMDB
                 unset($movieData);
 
                 // Duration
-                $movieData = $html->find("time[itemprop='duration']");
+                $movieData = $html->find("time[itemprop=duration]");
                 $results['duration'] = isset($movieData[0]) ? trim(str_ireplace('min', '', $movieData[0]->innertext)) : '-1';
                 unset($movieData);
 
                 // Genres
-                $movieData = $html->find("span[itemprop='genre']");
+                $movieData = $html->find("span[itemprop=genre]");
                 if (isset($movieData[0]))
                 {
                     foreach($movieData as $genre)
@@ -199,12 +199,12 @@ class IMDB
                 unset($movieData);
 
                 // Rating
-                $movieData = $html->find("span[itemprop='ratingValue']");
+                $movieData = $html->find("span[itemprop=ratingValue]");
                 $results['rating'] = isset($movieData[0]) ? $movieData[0]->innertext : '';
                 unset($movieData);
 
                 // Short Description
-                $movieData = $html->find("meta[name='description']");
+                $movieData = $html->find("meta[name=description]");
                 $results['shortDescription'] = isset($movieData[0]) ? trim($movieData[0]->content) : '';
                 unset($movieData);
 
@@ -216,7 +216,7 @@ class IMDB
                     {
                         if($block->itemprop == 'director')
                         {
-                            $name = $block->find("span[itemprop='name']");
+                            $name = $block->find("span[itemprop=name]");
                             $results['director'] = isset($name[0]) ? $name[0]->innertext : '';
                         }
                     }
@@ -226,7 +226,7 @@ class IMDB
                 unset($movieData);
 
                 // Description
-                $movieData = $html->find("div[itemprop='description']");
+                $movieData = $html->find("div[itemprop=description]");
                 if(isset($movieData[0]))
                 {
                     $text = $movieData[0]->innertext;
@@ -250,7 +250,7 @@ class IMDB
                 unset($movieData);
 
                 // MPAA Rating
-                $movieData = $html->find("span[itemprop='contentRating']");
+                $movieData = $html->find("span[itemprop=contentRating]");
                 foreach($movieData as $block)
                 {
                     if(isset($block->content))

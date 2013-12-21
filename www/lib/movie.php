@@ -340,7 +340,7 @@ class Movie
 
         if ($movieId)
         {
-            if (!is_null($movieData['genres']) && array_count_values($movieData['genres']) > 0)
+            if (!is_null($movieData['genres']) && count($movieData['genres']) > 0)
             {
                 // Update genres and genres mapping
                 foreach ($movieData['genres'] as $genre)
@@ -659,20 +659,35 @@ class Movie
         $movieData['plot'] = (strlen($tmdbPlot) >= strlen($imdbPlot) ? $tmdbPlot : $imdbPlot);
         $movieData['year'] = (!is_null($tmdbProps) && $tmdbProps['year'] != -1 ? $tmdbProps['year'] : (!is_null($imdbProps) && $imdbProps['year'] != -1 ?
                                 $imdbProps['year'] : 'N/A'));
-        // $movieData['genres'] = array();
-        $movieData['genres'] = (!is_null($tmdbProps) && isset($tmdbProps['genres']) && count($tmdbProps['genres']) > 0 ? $tmdbProps['genres'] : null);
-        $movieData['genres'] = (!is_null($imdbProps) && isset($imdbProps['genres']) && count($imdbProps['genres']) > 0 ?
+        $movieData['genres'] = array();
+        /*$movieData['genres'] = (!is_null($tmdbProps) && isset($tmdbProps['genres']) && count($tmdbProps['genres']) > 0 ?
+                                    array_merge($tmdbProps['genres'], $movieData['genres']) : null);*/
+        if($tmdbProps != null)
+            $movieData['genres'] = $tmdbProps['genres'];
+        elseif($imdbProps != null)
+            $movieData['genres'] = $imdbProps['genres'];
+        else
+            $movieData['genres'] = array("N/A");
+
+        /*$movieData['genres'] = (!is_null($imdbProps) && isset($imdbProps['genres']) && count($imdbProps['genres']) > 0 ?
                                     (!is_null($movieData['genres']) ? array_unique(array_merge($imdbProps['genres'], $movieData['genres'])) :
-                                    $imdbProps['genres']) : array('N/A'));
-        if(is_null($movieData['genres']))
-            $movieData['genres'] = array('N/A');
+                                    $imdbProps['genres']) : array('N/A'));*/
         $movieData['type'] = 'Movie';
         $movieData['director'] = (!is_null($tmdbProps) && isset($tmdbProps['director']) ? $tmdbProps['director'] :
                                     (!is_null($imdbProps) && isset($imdbProps['director']) ? $imdbProps['director'] : ''));
-        $movieData['actors'] = (!is_null($tmdbProps) && isset($tmdbProps['actors']) && count($tmdbProps['actors']) > 0 ? $tmdbProps['actors'] : null);
+        if ($tmdbProps != null)
+            $movieData['actors'] = $tmdbProps['actors'];
+        elseif ($imdbProps != null)
+            $movieData['actors'] = $imdbProps['actors'];
+        else
+            $movieData['actors'] = array("N/A");
+
+        /*$movieData['actors'] = array();
+        $movieData['actors'] = (!is_null($tmdbProps) && isset($tmdbProps['actors']) && count($tmdbProps['actors']) > 0 ?
+                                    array_merge($tmdbProps['actors'], $movieData['actors']) : null);
         $movieData['actors'] = (!is_null($imdbProps) && isset($imdbProps['actors']) && count($imdbProps['actors']) > 0 ?
                                     (!is_null($movieData['actors']) ? array_unique(array_merge($imdbProps['actors'], $movieData['actors'])) :
-                                    $imdbProps['actors']) : array('N/A'));
+                                    $imdbProps['actors']) : array('N/A'));*/
         $movieData['language'] = (!is_null($tmdbProps) && isset($tmdbProps['language']) ? $tmdbProps['language'] :
                                     (!is_null($imdbProps) && isset($imdbProps['language']) ? $imdbProps['language'] : 'English'));
         $movieData['cover'] = (!is_null($tmdbProps) && isset($tmdbProps['cover']) && !empty($tmdbProps['cover']) ? $tmdbProps['cover'] :
