@@ -554,7 +554,7 @@ class Movie
                         else
                             $imdbResults = $this->searchIMDB($cleanName['name'], $cleanName['year']);
 
-                        if($imdbResults !== false && preg_replace('/tt|0+/', '', $imdbResults['id']) != 1)
+                        if($imdbResults !== false)
                         {
                             $imdbProps = $imdb->lookupMovie($imdbResults);
                             // Check if no data returned from IMDB lookup
@@ -795,6 +795,8 @@ class Movie
             $matchCount = 0;
             foreach ($results as $possibleMatch)
             {
+                if($possibleMatch['id'] === 1 || $possibleMatch === '0000001')
+                    continue;
                 $ourName = $nameCleaning->normalizeText(strtolower($cleanName));
                 $imdbName = $nameCleaning->normalizeText(strtolower($possibleMatch['title']));
                 similar_text($ourName, $imdbName, $percentSimilar);
@@ -811,7 +813,7 @@ class Movie
                     break;
                 } elseif (is_null($cleanYear) && $this->matchMoviesWithoutYear == 'TRUE' && $percentSimilar > $this->movieNoYearMatchPercent)
                 {
-                    echo "IMDB Match found \033[01;31m(no year)\033[01;31m:   " . $possibleMatch['title'] . "  Match Number: " . $matchCount . "  ID: " . $possibleMatch['id'] . "\n\033[00;37m";
+                    echo "IMDB Match found \033[01;31m(no year)\033[01;37m:   " . $possibleMatch['title'] . "  Match Number: " . $matchCount . "  ID: " . $possibleMatch['id'] . "\n\033[00;37m";
                     $matchFound = $possibleMatch['id'];
                     break;
                 }
