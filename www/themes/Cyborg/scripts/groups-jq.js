@@ -311,11 +311,10 @@ jQuery(function($){
         $(document).scrollTop(0);
         $("#group_list").prepend('<div id="warningGroupsResetStart" class="alert-warning alert-pagetop">'+
             '<b><i class="icon-warning-sign"></i> Warning!</b> Group(s) are in the process of being reset. Please <strong>DO NOT</strong> ' +
-            'refresh or leave this page until the process is complete.</div>');
+            'refresh or leave this page until the process is complete.  This may take some time to complete, depending on the number of groups.</div>');
         var action = 'resetGroups';
         if($("#chkDeleteCollections").prop('checked')){
             action = action + '&deleteCollections=1';
-            $("#warningGroupsResetStart").text().append(" This process may take some time to finish.");
         }
         var rand_no = Math.random();
         groupIDs = getCheckedIDs();
