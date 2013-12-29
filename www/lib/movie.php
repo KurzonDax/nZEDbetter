@@ -505,7 +505,7 @@ class Movie
                     if(is_null($cleanName['year']) && $this->matchMoviesWithoutYear == 'FALSE')
                     {
                         echo "\033[01;37mMovie does not have a year in the searchname: " . $arr['searchname'] . "\n";
-                        $db->query("UPDATE releases SET imdbID = -2 WHERE ID = " . $arr['ID']);
+                        $db->query("UPDATE releases SET movieID = -2, tmdbID = -2, imdbID = -2 WHERE ID = " . $arr['ID']);
                         continue;
                     }
 
@@ -537,7 +537,7 @@ class Movie
                             echo "\033[01;35mNo results found from The Movie DB for " . $arr['searchname'] . "\033[01;37m\n";
                             file_put_contents(WWW_DIR . "/lib/logging/tmdb-nomatch.log", $arr['ID'] . "," . $db->escapeString($arr['searchname']) .
                                 "," . $db->escapeString($cleanName['name']) . "," . (is_null($cleanName['year']) ? "NULL" : $cleanName['year']) . "\n", FILE_APPEND);
-                            $db->query("UPDATE releases SET imdbID = -3, tmdbID = -3 WHERE ID = " . $arr['ID']);
+                            $db->query("UPDATE releases SET movieID = -3, tmdbID = -3, imdbID = -3 WHERE ID = " . $arr['ID']);
                             continue;
                         }
                     }
@@ -575,7 +575,7 @@ class Movie
                 {
                     // Something went wrong parsing the searchname, update imdbID and tmdbID to -4 for the release
                     echo "\033[01;31mERROR: Unable to parse searchname for ID: " . $arr['ID'] . "  " . $arr['searchname'] . "\033[01;37m\n";
-                    $db->query("UPDATE releases SET imdbID = -4, tmdbID = -4 WHERE ID = " . $arr['ID']);
+                    $db->query("UPDATE releases SET movieID = -4, tmdbID = -4, imdbID = -4 WHERE ID = " . $arr['ID']);
                     continue;
                 }
 
@@ -583,7 +583,7 @@ class Movie
                 if (!isset($imdbProps) && !isset($tmdbProps))
                 {
                     echo "\033[01;33mNo results found for ID: " . $arr['ID'] . "   " . $cleanName['name'] . "\033[01;37m\n";
-                    $db->query("UPDATE releases SET imdbID = -2, tmdbID = -2 WHERE ID = " . $arr['ID']);
+                    $db->query("UPDATE releases SET movieID = -4, tmdbID = -4, imdbID = -4  WHERE ID = " . $arr['ID']);
                     $msg = $arr['ID'] . "," . $db->escapeString($arr['searchname']) . "," . $db->escapeString($cleanName['name']) . "\n";
                     file_put_contents(WWW_DIR."lib/logging/movie-no-match.log",$msg, FILE_APPEND);
                     continue;
@@ -612,7 +612,7 @@ class Movie
         $cat = new Category();
         if (!$cat->isMovieForeign($releasename))
         {
-            if(preg_match('/S\d{1,2}E\d{1,2}| S\d{1,2} | D\d{1,2} |Episode \d{1,2} /i', $releasename))
+            if(preg_match('/S\d{1,2}E\d{1,2}| S\d{1,2} | D\d{1,2} |Episode \d{1,2} |Season \d{1,2}|NBA |NFL| NHL| MLB/i', $releasename))
             {
                 echo "\033[01;36mAppears to be TV Series, changing category: " . $releasename . "\n";
                 return array('TVSeries' => 'TRUE');
@@ -620,7 +620,7 @@ class Movie
             preg_match('/^(?P<name>.*)[\.\-_\( ](?P<year>19\d{2}|20\d{2})/i', $releasename, $matches);
             if (!isset($matches['year']))
             {
-                preg_match('/^(?P<name>.*)[\.\-_ ](?:dvdrip|ntsc|dvdr|bdrip|brrip|bluray|hdtv|divx|xvid|hdrip|proper|repack|real\.proper|sub\.?fix|sub\.?pack|ac3d|unrated|1080i|1080p|720p)/i', $releasename, $matches);
+                preg_match('/^(?P<name>.*)[\.\-_ ](?:dvdrip|ntsc|dvdr|bdrip|brrip|bluray|hdtv|divx|xvid|hdrip|dvdscreener|proper|repack|real\.proper|sub\.?fix|sub\.?pack|ac3d|unrated|1080i|1080p|720p)/i', $releasename, $matches);
             }
 
             if (isset($matches['name']))

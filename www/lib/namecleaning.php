@@ -264,10 +264,13 @@ class nameCleaning
         // First group is case insensitive
         $text = preg_replace('/^\d{1,2} \d{1,2} |^have fun|http lostmoviearchives com( movie)?( thumbs)?|walt disney|walt disney.s|director s cut|directors cut|TGS|E4S|RE UP |^RS |mp4a|unrated |repack |dubbed |subtitled |extended cut |x264 \w+$|x264 |englisch/i', '', $text);
         $text = preg_replace('/MOViEONLY|uncut|DVD(5|9)|F0RFUN|www allyourbasearebelongtous pw |ANiPUNK(.+)?|Mayhem|AN0NYM0US(.+)?|EwDp|unrated|norbit|www drlecter tk | R\d|(\-)?ironclub/i', '', $text);
-        $text = preg_replace('/DAMiANA|1098JHWOTNGS|(\-)?AN0NYM0US( CD)?|sample|R E L E A S E |color red b/i', '', $text);
+        $text = preg_replace('/DAMiANA|1098JHWOTNGS|(\-)?AN0NYM0US( CD)?|sample|R E L E A S E |Pontypandy Gone Wild|color [#A-Za-z0-9]+ b |color [A-Za-z]+ size \d{1,2}|Ltu PRESENTS/i', '', $text);
+        $text = preg_replace('/hallo |Untouched|BluRay|AC3|DualAudio|xWiKi|thanks for sharing|file xyz|(\d\dth )?(special )?(collectors|special|deluxe?) edition|u4a|RiffTrax| ae /i', '', $text);
         // Second group is case sensitive
-        $text = preg_replace('/PePPeP|Bin Poster|TiTLE|TOWN MOVIE|TOWN |Release Name|FILL|AmA (DIVX|XviD)|PROPER |1080p|720p|480p|AVC|(H|h)264|PAL|iNT|COMPLETE|LIMITED|MASTER|iOM|SAM|RETAIL|MADE|NZBGRABIT LOWERS TONE AGAIN PAY PER DOWNLOAD|ip$/', '', $text);
-        // NTSC DVDR MADE NZBGRABIT LOWERS TONE AGAIN PAY PER DOWNLOAD 0 1098JHWOTNGS
+        $text = preg_replace('/^Title |KOREAN|CHINESE|EXTENDED|PePPeP|Bin Poster (\d+)?|TiTLE|TOWN MOVIE|RELEASE|TOWN |Release Name|FILL|AmA (DIVX|XviD)|PROPER |1080p|720p|480p|AVC(HD)?|(H|h)264|PAL|iNT|COMPLETE|LIMITED/', '', $text);
+        $text = preg_replace('/ENJOY|MASTER|iOM|SAM|RETAIL|MADE|NZBGRABIT LOWERS TONE AGAIN PAY PER DOWNLOAD|ip$|U+ |mOViE|[A-Z]{3,12} /', '', $text);
+        // Remove extra spaces
+        $text = preg_replace('/\s\s/', ' ', $text);
         return trim($text);
 
     }
@@ -458,7 +461,7 @@ class nameCleaning
         $text = strtolower($text);
         if ($includeArticles)
             $text = preg_replace('/\b(a|an|the)\b/i', ' ', $text);
-        $text = str_replace(array(".", "_", '-', "|", "<", ">", '"', "=", "~", '[', "]", "(", ")", "{", "}", "*", ";", ":", ",", "~", "/", "+", "'s ", "!", "?"), " ", $text);
+        $text = str_replace(array("`",".", "_", '-', "|", "<", ">", '"', "=", "~", '[', "]", "(", ")", "{", "}", "*", ";", ":", ",", "~", "/", "+", "'s ", "!", "?", "·"), " ", $text);
         $text = str_ireplace(' vol ', ' Volume ', $text);
         $text = preg_replace('/\s{2,}/', ' ', $text);
         $text = trim($text);
