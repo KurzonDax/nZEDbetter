@@ -2102,9 +2102,9 @@ class Releases
             }
         } while ($colsDeleted>0 && $fastAndFurious == 'TRUE');
 
-        // if(((time()>=$this->nextCrosspostCheck) || $this->nextCrosspostCheck==0)&& ($resrel = $db->query(sprintf("SELECT ID, guid FROM releases GROUP BY name HAVING count(name) > 1", $this->crosspostt))))
-        if ($resrel = $db->queryDirect("SELECT ID, guid, name FROM releases GROUP BY name HAVING count(name) > 1"))
+        if(((time()>=$this->nextCrosspostCheck) || $this->nextCrosspostCheck==0))
         {
+            $resrel = $db->queryDirect("SELECT ID, guid, name FROM releases WHERE adddate > NOW() - INTERVAL 12 HOUR GROUP BY name HAVING count(name) > 1");
             $totalDupes = $db->getNumRows($resrel);
             $dupesProcessed = 0;
             if ($echooutput)

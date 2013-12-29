@@ -243,7 +243,7 @@ class Binaries
                     echo "\033[01;31mERROR: Update failed for group " . $groupArr['name'] . "\n";
 					return;
 				}
-				// $db->query(sprintf("UPDATE groups SET last_record = %s, last_updated = now() WHERE ID = %d", $db->escapeString($lastId), $groupArr['ID']));
+				$db->query(sprintf("UPDATE groups SET last_record = %s, last_updated = now() WHERE ID = %d", $db->escapeString($lastId), $groupArr['ID']));
 
                 // TODO: Bug here that can cause a group to repeatedly grab the same articles.
                 // Seems to happen when the server does not return a large number of messages.  Need to
