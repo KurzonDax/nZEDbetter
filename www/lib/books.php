@@ -259,18 +259,19 @@ require_once(WWW_DIR."/lib/namecleaning.php");
 				if ($bookInfo !== false)
 				{
 					if ($this->echooutput)
-						echo 'Looking up: '.$bookInfo."\n";
+						echo "\033[01;37mLooking up: ".$bookInfo."\n";
 
 					$bookId = $this->updateBookInfo($bookInfo);
 					if ($bookId === false)
 					{
 						$bookId = -2;
                         $msg=$arr['ID']."  ".$arr['searchname']."\nNo Amazon match found\n--------------------------------\n";
-                        file_put_contents(WWW_DIR."lib/logging/bookfail.log",$msg,FILE_APPEND);
+                        file_put_contents(WWW_DIR."lib/logging/book-nomatch.log",$msg,FILE_APPEND);
 					}
 
 					// Update release.
 					$db->query(sprintf("UPDATE releases SET bookinfoID = %d WHERE ID = %d", $bookId, $arr["ID"]));
+                    usleep($this->sleeptime * 1000);
 
 				}
 				else
@@ -278,7 +279,7 @@ require_once(WWW_DIR."/lib/namecleaning.php");
 					// Could not parse release title.
 					$db->query(sprintf("UPDATE releases SET bookinfoID = %d WHERE ID = %d", -2, $arr["ID"]));
                 }
-				usleep($this->sleeptime*1000);
+
 			}
 		}
 	}
@@ -288,29 +289,38 @@ require_once(WWW_DIR."/lib/namecleaning.php");
 
         if(preg_match('/dutch|german|italian|russian|french|chinese|Wochenendkiste|Bücherkiste| Das /i', $releasename))
         {
-            echo "Changing category to foreign books: ".$releasename."\n";
+            echo "\033[00;33mChanging category to foreign books: ".$releasename."\n\033[00;37m";
             $db = new DB();
             $db->query(sprintf("UPDATE releases SET categoryID = %d WHERE ID = %d", 8060, $releaseID));
             $msg=$releaseID."  ".$releasename."\nMoved to foreign books\n--------------------------------\n";
-            file_put_contents(WWW_DIR."lib/logging/bookfail.log",$msg,FILE_APPEND);
+            file_put_contents(WWW_DIR."lib/logging/book-foreign.log",$msg,FILE_APPEND);
+            return false;
+        }
+        if(preg_match('/^New eBooks \d{1,2} (January|February|March|April|May|June|July|August|September|O(c|k)tober|November|De(c|z)ember)/i',$releasename))
+        {
+            echo "\033[00;33mAppears to be a book flood, changing to books->other category: " . $releasename . "\n\033[00;37m";
+            $db = new DB();
+            $db->query(sprintf("UPDATE releases SET categoryID = %d WHERE ID = %d", 8050, $releaseID));
+            $msg = $releaseID . "  " . $releasename . "\nMoved to misc books\n--------------------------------\n";
+            file_put_contents(WWW_DIR . "lib/logging/book-flood.log", $msg, FILE_APPEND);
             return false;
         }
         else if (preg_match('/^([a-z0-9] )+$|ArtofUsenet|ekiosk|(ebook|mobi).+collection|erotica|Full Video|ImwithJamie|linkoff org|Mega.+pack|^[a-z0-9]+ (?!((January|February|March|April|May|June|July|August|September|O(c|k)tober|November|De(c|z)ember)))[a-z]+( (ebooks?|The))?$|NY Times|(Book|Massive) Dump|Sexual/i', $releasename))
 		{
-			echo "Changing category to misc books: ".$releasename."\n";
+			echo "\033[00;33mChanging category to misc books: ".$releasename."\n\033[00;37m";
 			$db = new DB();
 			$db->query(sprintf("UPDATE releases SET categoryID = %d WHERE ID = %d", 8050, $releaseID));
             $msg=$releaseID."  ".$releasename."\nMoved to misc books\n--------------------------------\n";
-            file_put_contents(WWW_DIR."lib/logging/bookfail.log",$msg,FILE_APPEND);
+            file_put_contents(WWW_DIR."lib/logging/book-misc.log",$msg,FILE_APPEND);
 			return false;
 		}
 		else if (preg_match('/Magazine|^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}(a|b|c)?$|(\d{1,2} )?(Jan( |unary ?|$)|Feb( |ruary ?|$)|Mar( |ch ?|$)|Apr( |il ?|$)|May(?![a-z0-9])|Jun( |e ?|$)|Jul( |y ?|$)|Aug( |ust ?)|Sep( |tember ?|$)|O(c|k)t( |ober ?|$)|Nov( |ember ?|$)|De(c|z)( |ember ?|$))((19|20)\d\d|[0-3]?[0-9])|(19|20)\d\d \d{1,2} \d{1,2}|issue \d{1,2}| [0-3]?\d (19|20)\d\d|(Winter|Spring|Summer|Fall|Holiday|Special) (19|20)\d\d/i', $releasename) && !preg_match('/(e)?book(s)?|Part \d+/i', $releasename))
 		{
-			echo "Changing category to magazines: ".$releasename."\n";
+			echo "\033[00;33mChanging category to magazines: ".$releasename."\n\033[00;37m";
 			$db = new DB();
 			$db->query(sprintf("UPDATE releases SET categoryID = %d WHERE ID = %d", 8030, $releaseID));
             $msg=$releaseID."  ".$releasename."\nMoved to magazines\n--------------------------------\n";
-            file_put_contents(WWW_DIR."lib/logging/bookfail.log",$msg,FILE_APPEND);
+            file_put_contents(WWW_DIR."lib/logging/book-mags.log",$msg,FILE_APPEND);
 			return false;
 		}
 		else if (!empty($releasename) && !preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename))
@@ -321,7 +331,7 @@ require_once(WWW_DIR."/lib/namecleaning.php");
         else
         {
             $msg=$releaseID."  ".$releasename."\nCould not parse title\n--------------------------------\n";
-            file_put_contents(WWW_DIR."lib/logging/bookfail.log",$msg,FILE_APPEND);
+            file_put_contents(WWW_DIR."lib/logging/book-fail.log",$msg,FILE_APPEND);
 			return false;
         }
 	}
@@ -430,14 +440,14 @@ require_once(WWW_DIR."/lib/namecleaning.php");
 		{
 			if ($this->echooutput)
 			{
-				echo "Added/updated book: ";
+				echo "\033[01;32mAdded/updated book: ";
 				if ($book['author'] !== "")
 					echo "Author: ".$book['author'].", ";
-				echo "Title: ".$book['title'];
+				echo "Title: \033[01;36m".$book['title'];
 				if ($book['genre'] !== "null")
-					echo ", Genre: ".$book['genre'].".\n";
+					echo ", \033[01;32mGenre: ".$book['genre'].".\n";
 				else
-					echo ".\n";
+					echo ".\n\033[00;37m";
 			}
 
 			$book['cover'] = $ri->saveImage($bookId, $book['coverurl'], $this->imgSavePath, 250, 250);
