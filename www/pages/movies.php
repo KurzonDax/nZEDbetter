@@ -8,27 +8,39 @@ $cat = new Category;
 if (!$users->isLoggedIn())
     $page->show403();
 
+$resultsFiltered = false;
 
 $moviecats = $cat->getChildren(Category::CAT_PARENT_MOVIE);
 $mtmp = array();
 foreach($moviecats as $mcat) {
     $mtmp[$mcat['ID']] = $mcat;
 }
-$category = Category::CAT_PARENT_MOVIE;
-if (isset($_REQUEST["t"]) && array_key_exists($_REQUEST['t'], $mtmp))
-    $category = $_REQUEST["t"] + 0;
-
+$mtmp[Category::CAT_PARENT_MOVIE] = "All Movies";
+$category = 't%5B%5D=' . Category::CAT_PARENT_MOVIE . '&amp;';
 $catarray = array();
-$catarray[] = $category;
+if(isset($_GET['t']))
+{
+    foreach($_GET['t'] as $categoryNumber)
+    {
+        if(array_key_exists($categoryNumber, $mtmp))
+        {
+            $category = 't%5B%5D=' . $categoryNumber . '&amp;';
+            $catarray[] = $categoryNumber;
+            $resultsFiltered = ($categoryNumber != Category::CAT_PARENT_MOVIE);
+        }
+    }
+}
+else
+    $catarray[] = Category::CAT_PARENT_MOVIE;
 
 $page->smarty->assign('catlist', $mtmp);
-$page->smarty->assign('category', $category);
+$page->smarty->assign('categorySearchParams', $catarray);
 
 $browsecount = $movie->getMovieCount($catarray, -1, $page->userdata["categoryexclusions"]);
 
-$offset = (isset($_REQUEST["offset"]) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST["offset"] : 0;
+$offset = (isset($_GET["offset"]) && ctype_digit($_GET['offset'])) ? $_GET["offset"] : 0;
 $ordering = $movie->getMovieOrdering();
-$orderby = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST["ob"] : '';
+$orderby = isset($_GET["ob"]) && in_array($_GET['ob'], $ordering) ? $_GET["ob"] : 'posted_desc';
 
 $results = $movies = array();
 $results = $movie->getMovieRange($catarray, $offset, ITEMS_PER_PAGE, $orderby, -1, $page->userdata["categoryexclusions"]);
@@ -41,48 +53,115 @@ foreach($results as $result) {
     $movies[] = $result;
 }
 
-$title = (isset($_REQUEST['title']) && !empty($_REQUEST['title'])) ? stripslashes($_REQUEST['title']) : '';
-$page->smarty->assign('title', stripslashes($title));
+$titleSearchParams = (isset($_GET['title']) && !empty($_GET['title'])) ? stripslashes($_GET['title']) : '';
+$browseby_link = 'title=' . urlencode($titleSearchParams) . '&amp;';
+$page->smarty->assign('titleSearchParams', stripslashes($titleSearchParams));
+if(isset($_GET['title']) && !empty($_GET['title']))
+    $resultsFiltered = true;
 
-$actors = (isset($_REQUEST['actors']) && !empty($_REQUEST['actors'])) ? stripslashes($_REQUEST['actors']) : '';
-$page->smarty->assign('actors', $actors);
+$actorsSearchParams = array();
+if (isset($_GET['actors']))
+{
+    foreach ($_GET['actors'] as $actorID)
+    {
+        if(!empty($actorID) && is_numeric($actorID))
+        {
+            $browseby_link .= 'actors%5B%5D=' . $actorID . '&amp;';
+            $actorsSearchParams[] = array( 'id' => $actorID, 'text' => $movie->getActorName($actorID));
+            $resultsFiltered = true;
 
-$director = (isset($_REQUEST['director']) && !empty($_REQUEST['director'])) ? stripslashes($_REQUEST['director']) : '';
-$page->smarty->assign('director', $director);
+        }
+    }
+}
+$page->smarty->assign('actorsSearchParams', (count($actorsSearchParams) > 0 ? json_encode($actorsSearchParams) : ''));
+
+
+$directorSearchParams = (isset($_GET['director']) && !empty($_GET['director'])) ? stripslashes($_GET['director']) : '';
+$page->smarty->assign('directorSearchParams', $directorSearchParams);
+$browseby_link .= 'director=' . urlencode($directorSearchParams) . '&amp;';
+if(isset($_GET['director']) && !empty($_GET['director']))
+    $resultsFiltered = true;
 
 $ratings = range(1, 9);
-$rating = (isset($_REQUEST['rating']) && in_array($_REQUEST['rating'], $ratings)) ? $_REQUEST['rating'] : '';
+rsort($ratings);
+$ratingSearchParams = (isset($_GET['rating']) && in_array($_GET['rating'], $ratings)) ? $_GET['rating'] : '';
 $page->smarty->assign('ratings', $ratings);
-$page->smarty->assign('rating', $rating);
+$page->smarty->assign('ratingSearchParams', $ratingSearchParams);
+$browseby_link .= 'rating=' . $ratingSearchParams . '&amp;';
+if(isset($_GET['rating']) && !empty($_GET['rating']))
+    $resultsFiltered = true;
 
 $genres = $movie->getGenres();
-$genre = (isset($_REQUEST['genre']) && in_array($_REQUEST['genre'], $genres)) ? $_REQUEST['genre'] : '';
+$genreSearchParams = array();
+if(isset($_GET['genres']))
+{
+    foreach($_GET['genres'] as $genreString)
+    {
+        if(!empty($genreString) && in_array($genreString, $genres))
+        {
+            $genreSearchParams[] = $genreString;
+            $browseby_link .= 'genres%5B%5D=' . urlencode($genreString) . '&amp;';
+            $resultsFiltered = true;
+        }
+    }
+}
 $page->smarty->assign('genres', $genres);
-$page->smarty->assign('genre', $genre);
+$page->smarty->assign('genreSearchParams', $genreSearchParams);
 
 $years = range(1903, (date("Y")+1));
 rsort($years);
-$year = (isset($_REQUEST['year']) && in_array($_REQUEST['year'], $years)) ? $_REQUEST['year'] : '';
+$yearSearchParams = array();
+if(isset($_GET['years']))
+{
+    foreach($_GET['years'] as $yearNumber)
+    {
+        if(!empty($yearNumber) && is_numeric($yearNumber) && in_array($yearNumber, $years))
+        {
+            $yearSearchParams[] = $yearNumber;
+            $browseby_link .= 'years%5B%5D=' . $yearNumber . '&amp;';
+            $resultsFiltered = true;
+        }
+    }
+}
 $page->smarty->assign('years', $years);
-$page->smarty->assign('year', $year);
+$page->smarty->assign('yearSearchParams', $yearSearchParams);
 
-$browseby_link = '&amp;title='.$title.'&amp;actors='.$actors.'&amp;director='.$director.'&amp;rating='.$rating.'&amp;genre='.$genre.'&amp;year='.$year;
+$mpaaRatings = array('G', 'PG', 'PG-13', 'R', 'NC-17', 'NR', 'TV-Y', 'TV-Y7', 'TV-G', 'TV-14', 'TV-PG', 'TV-MA', 'None');
+$mpaaSearchParams = array();
+if(isset($_GET['MPAA']))
+{
+    foreach($_GET['MPAA'] as $mpaaString)
+    {
+        if(!empty($mpaaString) && in_array($mpaaString, $mpaaRatings))
+        {
+            $mpaaSearchParams[] = $mpaaString;
+            $browseby_link .= 'MPAA%5B%5D=' . $mpaaString . '&amp;';
+            $resultsFiltered = true;
+        }
+
+    }
+}
+$page->smarty->assign('mpaaSearchParams', $mpaaSearchParams);
+
+$browseby_link .= 'action=search';
 
 $page->smarty->assign('pagertotalitems',$browsecount);
 $page->smarty->assign('pageroffset',$offset);
 $page->smarty->assign('pageritemsperpage',ITEMS_PER_PAGE);
-$page->smarty->assign('pagerquerybase', WWW_TOP."/movies?t=".$category.$browseby_link."&amp;ob=".$orderby."&amp;offset=");
+$page->smarty->assign('pagerquerybase', WWW_TOP."/movies?".$category.$browseby_link."&amp;ob=".$orderby."&amp;offset=");
 $page->smarty->assign('pagerquerysuffix', "#results");
-
+$page->smarty->assign('MPAAratings', $mpaaRatings);
+$page->smarty->assign('resultsFiltered', $resultsFiltered);
+$page->smarty->assign('orderBy', $orderby);
 $pager = $page->smarty->fetch("pager.tpl");
 $page->smarty->assign('pager', $pager);
 
-if ($category == -1)
+if ($catarray[0] == -1)
     $page->smarty->assign("catname","All");
 else
 {
     $cat = new Category();
-    $cdata = $cat->getById($category);
+    $cdata = $cat->getById($catarray[0]);
     if ($cdata)
         $page->smarty->assign('catname',$cdata["title"]);
     else
@@ -90,13 +169,13 @@ else
 }
 
 foreach($ordering as $ordertype)
-    $page->smarty->assign('orderby'.$ordertype, WWW_TOP."/movies?t=".$category.$browseby_link."&amp;ob=".$ordertype."&amp;offset=0");
+    $page->smarty->assign('orderby'.$ordertype, WWW_TOP."/movies?".$category.$browseby_link."&amp;ob=".$ordertype."&amp;offset=0");
 
 $page->smarty->assign('results',$movies);
-if($category==Category::CAT_PARENT_MOVIE)
+if($$catarray[0]==Category::CAT_PARENT_MOVIE)
     $catname = "All Movies";
 else
-    $catname = $cat->getTitle($category);
+    $catname = $cat->getTitle($category[0]);
 $page->meta_title = "Browse Movies - ".$catname;
 $page->meta_keywords = "browse,nzb,description,details,movies,downloads";
 $page->meta_description = "Browse for Movie Nzbs";

@@ -50,6 +50,18 @@ CREATE TABLE IF NOT EXISTS `movieIDtoGenre` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `movieID` (`movieID`,`genreID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+CREATE TABLE IF NOT EXISTS `movieActors` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+CREATE TABLE IF NOT EXISTS `movieIDtoActorID` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `movieID` int(11) NOT NULL,
+  `actorID` int(11) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `movieID` (`movieID`,`actorID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 ALTER TABLE  `releases` ADD  `tmdbID` INT NULL DEFAULT NULL AFTER  `imdbID` ,
     ADD  `movieID` INT NULL DEFAULT NULL AFTER  `tvairdate` ,
     CHANGE  `imdbID`  `imdbID` INT( 8 ) NULL DEFAULT NULL,
@@ -57,5 +69,6 @@ ALTER TABLE  `releases` ADD  `tmdbID` INT NULL DEFAULT NULL AFTER  `imdbID` ,
 UPDATE `site` SET `setting`='movie_search_imdb', `value`='TRUE' WHERE `setting`='movie_search_google';
 DELETE FROM `site` WHERE `setting` IN ('movie_search_yahoo', 'movie_search_bing');
 INSERT INTO `site` (`ID`, `setting`, `value`, `updateddate`) VALUES (NULL, 'movieNoYearMatchPercent', '90', CURRENT_TIMESTAMP), (NULL, 'movieWithYearMatchPercent', '80', CURRENT_TIMESTAMP);
+ALTER TABLE  `bookinfo` ADD UNIQUE (`asin`);
 UPDATE `site` SET `VALUE` = '0.7' WHERE `setting` = 'NZEDBETTER_VERSION';
 UPDATE `site` SET `VALUE` = 'v0003' WHERE `setting` = 'sqlpatch';

@@ -7,58 +7,89 @@
             </fieldset></div></div>
     <br>
 {/if}
-
+<script type="text/javascript"
+        src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/movies.js"></script>
+{if $actorsSearchParams != ''}
+    <script type="text/javascript">
+        var actorsInit = {$actorsSearchParams};
+    </script>
+{/if}
 <div class="accordion" id="searchtoggle">
     <div class="accordion-group">
         <div class="accordion-heading">
             <div class="row" style="text-align:right;margin-bottom:10px;">
                 <div class="pull-left">
-                    <a class="accordion-toggle btn btn-mini btn-info collapsed" data-toggle="collapse" data-parent="#searchtoggle" href="#searchfilter"
+                    <a class="accordion-toggle btn btn-mini {if $resultsFiltered==true}btn-success{else}btn-info{/if} collapsed" data-toggle="collapse"
+                       data-parent="#searchtoggle" href="#searchfilter"
                        style="height: 25px; padding: 2px; padding-left: 4px; padding-right: 4px;">
-                       <i class="icon-search"></i> Advanced Search</a>
+                        Advanced Search&nbsp;{if $resultsFiltered==true}(Results Currently Filtered){/if}&nbsp;<i class="icon-chevron-sign-down"></i></a>
                 </div>
                 <div class="pull-right" style="margin-right: 10px">
                     View:
                     <span><i class="icon-th-list"></i></span>&nbsp;&nbsp;
-                    <a href="{$smarty.const.WWW_TOP}/browse?t={$category}"><i class="icon-align-justify"></i></a>
+                    <a href="{$smarty.const.WWW_TOP}/browse?t={*$category[0]*}"><i class="icon-align-justify"></i></a>
                 </div>
             </div>
         </div>
-        <div class="pull-right">
 
-        </div>
         <div id="searchfilter" class="accordion-body collapse">
-            <div class="accordion-inner">
-                <form class="form-inline" name="browseby" action="movies">
-                    <input class="form-control" style="width: 150px;" id="movietitle" type="text" name="title" value="{$title}" placeholder="Title">
-                    <input class="form-control" style="width: 150px;" id="movieactors" type="text" name="actors" value="{$actors}" placeholder="Actor">
-                    <input class="form-control" style="width: 150px;" id="moviedirector" type="text" name="director" value="{$director}"  placeholder="Director">
-                    <select class="form-control" style="width: auto;" id="rating" name="rating">
-                        <option class="grouping" value="">Rating... </option>
-                        {foreach from=$ratings item=rate}
-                            <option {if $rating==$rate}selected="selected"{/if} value="{$rate}">{$rate}</option>
-                        {/foreach}
-                    </select>
-                    <select class="form-control" style="width: auto;" id="genre" name="genre" placeholder="Genre">
-                        <option class="grouping" value="">Genre... </option>
-                        {foreach from=$genres item=gen}
-                            <option {if $gen==$genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
-                        {/foreach}
-                    </select>
-                    <select class="form-control" style="width: auto;" id="year" name="year">
-                        <option class="grouping" value="">Year... </option>
-                        {foreach from=$years item=yr}
-                            <option {if $yr==$year}selected="selected"{/if} value="{$yr}">{$yr}</option>
-                        {/foreach}
-                    </select>
-                    <select class="form-control" style="width: auto;" id="category" name="t">
-                        <option class="grouping" value="2000">Category... </option>
-                        {foreach from=$catlist item=ct}
-                            <option {if $ct.ID==$category}selected="selected"{/if} value="{$ct.ID}">{$ct.title}</option>
-                        {/foreach}
-                    </select>
-                    <input class="btn btn-success" type="submit" value="Go">
-                </form>
+            <div class="accordion-inner advancedSearch" style="width: 80%;">
+                <div class="form-inline">
+                    <div class="row col-xs-12" style="margin: 5px;">
+                        <span style="width: 48%; display: inline-block; top: -8px; position: relative; margin-bottom: -8px;">
+                            <input class="form-control typeahead" id="movietitle" type="text" name="title"
+                                   value="{$titleSearchParams}" placeholder="Title">
+                        </span>
+                        <select class="form-control chosen" style="width: 30%;" id="MPAA" multiple name="MPAA"
+                                data-placeholder="MPAA Rating">
+                            <option value=""></option>
+                            {foreach from=$MPAAratings item=MPAA}
+                                <option {if in_array($MPAA, $mpaaSearchParams)}selected="selected"{/if}
+                                        value="{$MPAA}">{$MPAA}</option>
+                            {/foreach}
+                        </select>
+                        <select class="form-control chosen" style="width: 19%;" id="rating"
+                                name="rating" data-placeholder="Min Rating...">
+                            <option value=""></option>
+                            {foreach from=$ratings item=rate}
+                                <option {if $ratingSearchParams==$rate}selected="selected"{/if} value="{$rate}">{$rate}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="row col-xs-12" style="margin: 5px;">
+                        <!-- Width for the movieactors field set in movies.js -->
+                        <input class="form-control chosen" id="movieactors" type="hidden" name="actors" {if $actorsSearchParams != ''}value='-1'{/if}>
+                        <span style="width: 18%; display: inline-block; top: -8px; position: relative; margin-bottom: -8px; margin-left: -4px;">
+                            <input class="form-control typeahead"  id="moviedirector" type="text" name="director"
+                                   value="{$directorSearchParams}" placeholder="Director">
+                        </span>
+
+                    </div>
+                    <div class="row col-xs-12" style="margin: 5px;">
+
+
+                        <select class="form-control chosen" style="width: 43%;" id="genre" multiple name="genre" data-placeholder="Genres...">
+                            <option value=""></option>
+                            {foreach from=$genres item=gen}
+                                <option {if in_array($gen, $genreSearchParams)}selected="selected"{/if} value="{$gen}">{$gen}</option>
+                            {/foreach}
+                        </select>
+                        <select class="form-control chosen" style="width: 17.5%;" multiple id="year" name="year" data-placeholder="Years...">
+                            <option value=""></option>
+                            {foreach from=$years item=yr}
+                                <option {if in_array($yr, $yearSearchParams)}selected="selected"{/if} value="{$yr}">{$yr}</option>
+                            {/foreach}
+                        </select>
+                        <select class="form-control chosen" style="width: 30.5%;" multiple id="category" name="t" data-placeholder="Categories...">
+                            <option value="2000">All Movies</option>
+                            {foreach from=$catlist item=ct}
+                                <option {if in_array($ct.ID, $categorySearchParams)}selected="selected"{/if} value="{$ct.ID}">{$ct.title}</option>
+                            {/foreach}
+                        </select>
+                        <input id="orderBy" type="hidden" value="{$orderBy}">
+                        <button id="btnAdvancedSearch" class="btn btn-success" style="padding: 8px 14px;"><i class="icon-search"></i></button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -82,11 +113,18 @@
         <thead>
         <tr>
             <th><input type="checkbox" class="nzb_check_all"></th>
-            <th>title <a title="Sort Descending" href="{$orderbytitle_desc}"><i class="icon-chevron-down icon-black"></i></a><a title="Sort Ascending" href="{$orderbytitle_asc}"><i class="icon-chevron-up icon-black"></i></a>
+            <th>title <a id="sort-title_desc" title="Sort Descending" href="{$orderbytitle_desc}"><i class="icon-chevron-down icon-black"{if $orderBy=='title_desc'} style="color: #A0E01F"{/if}></i></a>
+                <a id="sort-title_asc" title="Sort Ascending" href="{$orderbytitle_asc}"><i class="icon-chevron-up icon-black"{if $orderBy=='title_asc'} style="color: #A0E01F"{/if}></i></a>
             </th>
-            <th>year <a title="Sort Descending" href="{$orderbyyear_desc}"><i class="icon-chevron-down icon-black"></i></a><a title="Sort Ascending" href="{$orderbyyear_asc}"><i class="icon-chevron-up icon-black"></i></a>
+            <th>year <a id="sort-year_desc" title="Sort Descending" href="{$orderbyyear_desc}"><i class="icon-chevron-down icon-black"{if $orderBy=='year_desc'} style="color: #A0E01F"{/if}></i></a>
+                <a id="sort-year_asc" title="Sort Ascending" href="{$orderbyyear_asc}"><i class="icon-chevron-up icon-black"{if $orderBy=='year_asc'} style="color: #A0E01F"{/if}></i></a>
             </th>
-            <th>rating <a title="Sort Descending" href="{$orderbyrating_desc}"><i class="icon-chevron-down icon-black"></i></a><a title="Sort Ascending" href="{$orderbyrating_asc}"><i class="icon-chevron-up icon-black"></i></a>
+            <th>rating <a id="sort-rating_desc" title="Sort Descending" href="{$orderbyrating_desc}"><i class="icon-chevron-down icon-black"{if $orderBy=='rating_desc'} style="color: #A0E01F"{/if}></i></a>
+                <a id="sort-rating_asc" title="Sort Ascending" href="{$orderbyrating_asc}"><i class="icon-chevron-up icon-black"{if $orderBy=='rating_asc'} style="color: #A0E01F"{/if}></i></a>
+                <span style="padding-left: 15%;">
+                    posted <a id="sort-posted_desc" title="Sort Descending" href="{$orderbyposted_desc}"><i class="icon-chevron-down icon-black"{if $orderBy=='posted_desc'} style="color: #A0E01F"{/if}></i></a>
+                    <a id="sort-posted_asc" title="Sort Ascending" href="{$orderbyposted_asc}"><i class="icon-chevron-up icon-black"{if $orderBy=='posted_asc'} style="color: #A0E01F"{/if}></i></a>
+                </span>
             </th>
         </tr>
         </thead>
@@ -114,9 +152,10 @@
                 </td>
                 <td colspan="3" class="left">
                     <h2>{$result.title|stripslashes|escape:"htmlall"} (<a class="title" title="{$result.year}" href="{$smarty.const.WWW_TOP}/movies?year={$result.year}">{$result.year}</a>) {if $result.rating != ''}{$result.rating}/10{/if}
-                        {if $result.MPAArating != null && $result.MPAArating !="APPROVED" && $result.MPAArating != "PASSED" && $result.MPAArating != "GP" && $result.MPAArating != "NOT RATED"}
-                            <img src="{$smarty.const.WWW_TOP}/themes/{$site->style}/images/MPAA/{$result.MPAArating}.png"
-                                 height="25px" style="margin-top: -5px;">
+                        {if $result.MPAArating != null && $result.MPAArating !="APPROVED" && $result.MPAArating != "PASSED" &&
+                            $result.MPAArating != "GP" && $result.MPAArating != "NOT RATED" && $result.MPAArating != "M" && $result.MPAArating != "X"}
+                            <a href="/movies?MPAA%5B%5D={$result.MPAArating}"><img src="{$smarty.const.WWW_TOP}/themes/{$site->style}/images/MPAA/{$result.MPAArating}.png"
+                                 height="25px" style="margin-top: -5px;"></a>
                         {elseif $result.MPAArating == "NOT RATED"}
                             <img src="{$smarty.const.WWW_TOP}/themes/{$site->style}/images/MPAA/NR.png"
                                  height="25px" style="margin-top: -5px;">

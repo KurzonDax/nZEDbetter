@@ -61,6 +61,7 @@ switch($page->page) {
 	case 'ajax_tvinfo':
 	case 'ajax_mediainfo':
 	case 'ajax_mymovies':
+    case 'ajax-movies':
 	case 'calendar':
 	case 'upcoming':
 		// don't show these pages if it's an API-only site

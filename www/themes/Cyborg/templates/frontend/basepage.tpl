@@ -24,15 +24,18 @@
         <link href="{$smarty.const.WWW_TOP}/themes/{$site->style}/styles/wip.css" rel="stylesheet" media="screen">
         <!-- nZEDb extras -->
         {if $site->google_adsense_acc != ''}<link href="http://www.google.com/cse/api/branding.css" rel="stylesheet" media="screen">{/if}
-        <link href="{$smarty.const.WWW_TOP}/themes/{$site->style}/styles/jquery.pnotify.default.css" rel="stylesheet" media="screen">
-        <link href="{$smarty.const.WWW_TOP}/themes/{$site->style}/styles/jquery.qtip.css" rel="stylesheet" media="screen">
+        <link href="{$smarty.const.WWW_TOP}/themes/{$site->style}/styles/plugins/jquery.pnotify.default.css" rel="stylesheet" media="screen">
+        <link href="{$smarty.const.WWW_TOP}/themes/{$site->style}/styles/plugins/jquery.qtip.css" rel="stylesheet" media="screen">
+        <link href="{$smarty.const.WWW_TOP}/themes/{$site->style}/styles/plugins/select2.css" rel="stylesheet" media="screen">
+        <link href="{$smarty.const.WWW_TOP}/themes/{$site->style}/styles/plugins/typeahead.css" rel="stylesheet" media="screen">
     {/if}
 
-    {if $site->useMinify == '1'}
+
+    {* if $site->useMinify == '1'}
         <link type="text/css" rel="stylesheet" href="/min/b=themes/{$site->style}/styles&amp;f=bootstrap.css,style.css,wip.css,jquery.pnotify.default.css,jquery.qtip.css" />
         <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
         {if $site->google_adsense_acc != ''}<link href="http://www.google.com/cse/api/branding.css" rel="stylesheet" media="screen">{/if}
-    {/if}
+    {/if *}
     <!-- Manual Adjustment for Search input fields on browse pages. -->
     <style>
         .panel .list-group { margin-top: -1px; }
@@ -81,22 +84,33 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     {if $site->useMinify == '0' || $site->useMinify == ''}
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
-        <script src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/bootstrap.min.js"></script>
-        <script src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/holder.js"></script>
-        <script src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/jquery.pnotify.min.js"></script>
-        <script src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/jquery.qtip.js"></script>
-        <script src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/jquery.autosize-min.js"></script>
-        <script src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/jquery.colorbox-min.js"></script>
-        <script src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/sorttable.js"></script>
-        <script src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/utils.js"></script>
-        <script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/jquery.autocomplete.js"></script>
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js"></script>
+        <script type="text/javascript"
+                src="{$smarty.const.WWW_TOP}/themes/{$site->style}/Bootstrap-3.0.0/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/plugins/holder.js"></script>
+        <script type="text/javascript"
+                src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/plugins/jquery.pnotify.min.js"></script>
+        <script type="text/javascript"
+                src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/plugins/jquery.qtip.min.js"></script>
+        <script type="text/javascript"
+                src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/plugins/jquery.autosize-min.js"></script>
+        <script type="text/javascript"
+                src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/plugins/jquery.colorbox-min.js"></script>
+        <script type="text/javascript"
+                src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/plugins/sorttable.js"></script>
+        <script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/utils.js"></script>
+        <script type="text/javascript"
+                src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/plugins/jquery.autocomplete.js"></script>
+        <script type="text/javascript"
+                src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/plugins/select2.min.js"></script>
+        <script type="text/javascript"
+                src="{$smarty.const.WWW_TOP}/themes/{$site->style}/scripts/plugins/typeahead.min.js"></script>
     {/if}
-
-    {if $site->useMinify == '1'}
+    {* if $site->useMinify == '1'}
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
         <script type="text/javascript" src="/min/b=themes/{$site->style}/scripts&amp;f=bootstrap.min.js,holder.js,jquery.pnotify.min.js,jquery.qtip.js,jquery.autosize-min.js,jquery.colorbox-min.js,sorttable.js,utils.js,jquery.autocomplete.js"></script>
-    {/if}
+    {/if *}
+
     {$page->head}
 
 </head>

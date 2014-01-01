@@ -108,7 +108,7 @@ class Movie
                     }
                 }
             }
-            $catsrch.= "1=2 )";
+            $catsrch .= "1=2 )";
         }
 
         if ($maxage > 0)
@@ -124,6 +124,7 @@ class Movie
                             INNER JOIN movieinfo AS m ON m.ID = r.movieID AND m.title != ''
                             WHERE r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s %s %s ",
                             $browseby, $catsrch, $maxage, $exccatlist);
+        // file_put_contents(WWW_DIR . "lib/logging/moviecount-sql.log", $sql . "\n------------------------------------------\n", FILE_APPEND);
         $res = $db->queryOneRow($sql);
         return $res["num"];
     }
@@ -196,6 +197,7 @@ class Movie
                             WHERE r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease')
                             AND %s %s %s %s GROUP BY m.ID ORDER BY %s %s " . $limit,
                         $browseby, $catsrch, $maxage, $exccatlist, $order[0], $order[1]);
+        // file_put_contents(WWW_DIR . "lib/logging/moviesearch-sql.log", $sql . "\n------------------------------------------\n", FILE_APPEND);
         return $db->query($sql);
     }
 
@@ -224,12 +226,12 @@ class Movie
 
     public function getMovieOrdering()
     {
-        return array('title_asc', 'title_desc', 'year_asc', 'year_desc', 'rating_asc', 'rating_desc');
+        return array('title_asc', 'title_desc', 'year_asc', 'year_desc', 'rating_asc', 'rating_desc', 'posted_asc', 'posted_desc');
     }
 
     public function getBrowseByOptions()
     {
-        return array('title', 'director', 'actors', 'genre', 'rating', 'year', 'imdb');
+        return array('title', 'director', 'actors', 'genre', 'rating', 'year', 'imdb', 'MPAArating');
     }
 
     public function getBrowseBy()
@@ -237,32 +239,121 @@ class Movie
         $db = new Db();
 
         $browseby = ' ';
-        $browsebyArr = $this->getBrowseByOptions();
-        foreach ($browsebyArr as $bb) {
-            if (isset($_REQUEST[$bb]) && !empty($_REQUEST[$bb])) {
-                $bbv = stripslashes($_REQUEST[$bb]);
-                if ($bb == 'rating') { $bbv .= '.'; }
-                if ($bb == 'imdb') {
-                    $browseby .= "m.{$bb}ID = $bbv AND ";
-                } else {
-                    $browseby .= "m.$bb LIKE(".$db->escapeString('%'.$bbv.'%').") AND ";
+        // $browsebyArr = $this->getBrowseByOptions();
+
+        if(isset($_GET['title']) && !empty($_GET['title']))
+            $browseby .= "m.title LIKE '%" . stripslashes($_GET['title']) . "%' AND ";
+        if (isset($_GET['director']) && !empty($_GET['director']))
+            $browseby .= "m.director LIKE '%" . stripslashes($_GET['director']) . "%' AND ";
+        if (isset($_GET['actors']) && !empty($_GET['actors']))
+        {
+            foreach($_GET['actors'] as $actorID)
+            {
+                if(!empty($actorID))
+                {
+                    $actorName = $db->queryOneRow("SELECT name FROM movieActors WHERE ID=" . $actorID);
+                    $browseby .= "m.actors LIKE '%" . $actorName['name'] . "%' AND ";
                 }
+
             }
         }
+        if (isset($_GET['genres']) && !empty($_GET['genres']))
+        {
+            $genreClause = "m.ID IN (SELECT DISTINCT(movieID) FROM movieIDtoGenre WHERE genreID IN (";
+            foreach($_GET['genres'] as $genre)
+            {
+                if(!empty($genre))
+                {
+                    $genreID = $db->queryOneRow("SELECT ID from movieGenres WHERE name = ".$db->escapeString(stripslashes($genre)));
+                    $genreClause .= $genreID['ID'] . ",";
+                }
+            }
+            $browseby .= substr($genreClause,0,-1) . ")) AND ";
+        }
+        if (isset($_GET['rating']) && !empty($_GET['rating']) && is_numeric($_GET['rating']))
+        {
+            $browseby .= "m.rating >=" . $_GET['rating'] . " AND ";
+        }
+        if (isset($_GET['years']) && !empty($_GET['years']))
+        {
+            $yearClause = "m.year IN (";
+            foreach($_GET['years'] as $year)
+            {
+                if(!empty($year))
+                    $yearClause .= stripslashes($year) . ",";
+            }
+            $browseby .= substr($yearClause, 0, -1) . ") AND ";
+        }
+        if(isset($_GET['MPAA']) && !empty($_GET['MPAA']))
+        {
+            $mpaaClause = "(m.MPAArating IN (";
+            $isNone = false;
+            foreach($_GET['MPAA'] as $mpaa)
+            {
+                if(!empty($mpaa) && $mpaa != 'None' && $mpaa != 'NR')
+                    $mpaaClause .= $db->escapeString($mpaa) . ",";
+                elseif (count($_GET['MPAA']) == 1 && $mpaa == 'None')
+                    $mpaaClause = "((m.MPAArating IS NULL ";
+                elseif($mpaa == 'None')
+                    $isNone = true;
+                elseif($mpaa == 'NR')
+                    $mpaaClause .= "'NR','UNRATED','NOT RATED',";
+
+            }
+            if($isNone)
+                $browseby .= substr($mpaaClause, 0, -1) . ") OR m.MPAArating IS NULL) AND ";
+            else
+                $browseby .= substr($mpaaClause, 0, -1) . ")) AND ";
+        }
+
         return $browseby;
+    }
+
+    public function getActorName($id)
+    {
+        $db = new DB();
+        $actorName = $db->queryOneRow("SELECT name FROM movieActors WHERE ID=" . $id);
+
+        return (isset($actorName['name']) ? $actorName['name'] : '');
+    }
+
+    public function getActorID($name)
+    {
+        $db = new DB();
+        $actorIdResult = $db->queryOneRow("SELECT ID from movieActors WHERE name=" . $db->escapeString($name));
+
+        return isset($actorIdResult['ID']) ? $actorIdResult['ID'] : '';
     }
 
     public function makeFieldLinks($data, $field)
     {
         if ($data[$field] == "")
             return "";
-
+        $fieldParamString = '';
+        switch ($field)
+        {
+            case 'actors':
+                $fieldParamString = 'actors%5B%5D';
+                break;
+            case 'genre':
+                $fieldParamString = 'genres%5B%5D';
+                break;
+            default:
+                $fieldParamString = $field;
+        }
         $tmpArr = explode(',',$data[$field]);
         $newArr = array();
         $i = 0;
         foreach($tmpArr as $ta) {
             if ($i > 5) { break; } //only use first 6
-            $newArr[] = '<a href="'.WWW_TOP.'/movies?'.$field.'='.urlencode($ta).'" title="'.$ta.'">'.$ta.'</a>';
+            if ($field == 'actors')
+            {
+                $actorID = $this->getActorID($ta);
+                if ($actorID !== '')
+                    $newArr[] = '<a href="' . WWW_TOP . '/movies?' . $fieldParamString . '=' . $actorID . '" title="' . $ta . '">' . $ta . '</a>';
+            }
+            else
+                $newArr[] = '<a href="'.WWW_TOP.'/movies?'.$fieldParamString.'='.urlencode($ta).'" title="'.$ta.'">'.$ta.'</a>';
             $i++;
         }
         return implode(', ', $newArr);
@@ -353,6 +444,21 @@ class Movie
                     {
                         $newGenre = $db->queryInsert("INSERT INTO movieGenres (name) VALUES ('" . $genre . "')");
                         $db->query("INSERT IGNORE INTO movieIDtoGENRE (movieID, genreID) VALUES (" . $movieId . ", " . $newGenre . ")");
+                    }
+                }
+            }
+            if (!is_null($movieData['actors']) && count($movieData['actors']) > 0)
+            {
+                foreach ($movieData['actors'] as $actor)
+                {
+                    $actor = trim($actor);
+                    if ($actorExists = $db->queryOneRow("SELECT ID FROM movieActors WHERE name = '" . $actor . "' OR name LIKE '" . $actor . "%'"))
+                    {
+                        $db->query("INSERT IGNORE INTO movieIDtoActorID (movieID, actorID) VALUES (" . $movieId . ", " . $actorExists['ID'] . ")");
+                    } else
+                    {
+                        $newActor = $db->queryInsert("INSERT INTO movieActors (name) VALUES ('" . $actor . "')");
+                        $db->query("INSERT IGNORE INTO movieIDtoActorID (movieID, genreID) VALUES (" . $movieId . ", " . $newActor . ")");
                     }
                 }
             }
