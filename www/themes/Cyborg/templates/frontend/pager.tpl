@@ -19,7 +19,7 @@
 
         {if ($currentpage+1) < ($pages-1) && ($currentpage+2) < $upperhalfwaypoint}<li class="active"><span>...</span></li>{/if}
 
-        {if $upperhalfwaypoint != $pages && $upperhalfwaypoint != ($currentpage+1)}<li><a href="{$pagerquerybase}{$upperhalfwaypoint*$pageritemsperpage}{$pagerquerysuffix}">{$upperhalfwaypoint}</a></li>{/if}
+        {if $upperhalfwaypoint != $pages && $upperhalfwaypoint != ($currentpage+1)}<li><a href="{$pagerquerybase}{($upperhalfwaypoint*$pageritemsperpage)-$pageritemsperpage}{$pagerquerysuffix}">{$upperhalfwaypoint}</a></li>{/if}
 
         {if ($upperhalfwaypoint+1) < $pages}<li class="active"><span>...</span></li>{/if}
 
