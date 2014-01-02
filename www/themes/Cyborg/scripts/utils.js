@@ -155,24 +155,7 @@ jQuery(function ($) {
         return false;
     });
     // This function specific to movies.tpl and books.tpl
-    $('.icon_cart_movie').click(function (e) {
-        if ($(this).hasClass('icon_cart_clicked')) {
-            return false;
-        }
-        var guid = $(this).parent().parent().attr('id').substring(4);
-        $.post(SERVERROOT + "cart?add=" + guid, function (resp) {
-            $(e.target).addClass('icon_cart_clicked').attr('title', 'Added to Cart');
 
-            $.pnotify({
-                title: 'ADDED!',
-                text: 'Its now in your Cart! ^_^',
-                type: 'success',
-                icon: 'icon-info-sign'
-            });
-
-        });
-        return false;
-    });
     // This function specific to browse.tpl
     $('.icon_cart_browse').click(function (e) {
         if ($(this).hasClass('icon_cart_clicked')) {

@@ -192,7 +192,7 @@
                             {foreach from=$msplits item=m}
                                 <tr id="guid{$mguid[$m@index]}" {if $m@index > 1}class="mlextra"{/if}>
                                     <td style="width: 27px;">
-                                        <input type="checkbox" class="nzb_check" value="{$mguid[$m@index]}">
+                                        <input id="chk-{$mguid[$m@index]}" type="checkbox" class="nzb_check" value="{$mguid[$m@index]}" data-guid="{$mguid[$m@index]}">
                                     </td>
                                     <td class="name">
                                         <a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"><b>{$mname[$m@index]|escape:"htmlall"}</b></a><br>
@@ -211,7 +211,7 @@
                                     <td class="icons" style="width:80px;">
                                         <div class="icon icon_nzb"><a title="Download Nzb" href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"></a></div>
                                         {if $sabintegrated}<div class="icon icon_sab" title="Send to my Sabnzbd"></div>{/if}
-                                        <div class="icon icon_cart_movie" title="Add to Cart"></div>
+                                        <div class="icon icon_cart_movie" title="Add to Cart" data-guid="{$mguid[$m@index]}" data-title="{$result.title}"></div>
                                     </td>
                                 </tr>
                                 {if $m@index == 1 && $m@total > 2}

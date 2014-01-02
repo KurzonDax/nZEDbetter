@@ -93,4 +93,24 @@ jQuery(function ($) {
         window.location.href = WWW_TOP + 'movies' + params;
     });
 
+    $('.icon_cart_movie').click(function (e) {
+        if ($(this).hasClass('icon_cart_clicked')) {
+            return false;
+        }
+        var guid = $(this).attr('data-guid');
+        var title = $(this).attr('data-title');
+        $.post(WWW_TOP + 'cart?add=' + guid, function (resp) {
+            $(e.target).addClass('icon_cart_clicked').attr('title', 'Added to Cart');
+
+            $.pnotify({
+                title: 'ADDED!',
+                text : title + ' is now in your Cart! ^_^',
+                type : 'success',
+                icon : 'icon-info-sign'
+            });
+
+        });
+        return false;
+    });
+
 });
