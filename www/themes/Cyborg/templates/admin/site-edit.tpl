@@ -59,7 +59,7 @@
             <tr>
                 <td><label for="footer">Footer:</label></td>
                 <td>
-                    <textarea id="footer" name="footer">{$fsite->footer}</textarea>
+                    <textarea id="footer" name="footer" style="background-color: #ffffff; color: #000000;">{$fsite->footer}</textarea>
                     <div class="hint">Displayed in the footer section of every public page.</div>
                 </td>
             </tr>
@@ -81,7 +81,7 @@
                 </td>
             </tr>
             <tr>
-                <td><label for="useMinify">Use Minify for .js and .css compression:</label></td>
+                <td><label for="useMinify">Use Minify for .js and .css compression: (Not Currently Implemented)</label></td>
                 <td>
                     {html_radios id="useMinify" name='useMinify' values=$yesno_ids output=$yesno_names selected=$fsite->useMinify separator='<br />'}
                     <div class="hint">Enabling this option will automatically minify .css and .js files on the fly, reducing bandwidth and lowering page load times.  However,
@@ -93,7 +93,7 @@
                 <td><label for="style">Theme:</label></td>
                 <td>
                     {html_options class="siteeditstyle" id="style" name='style' values=$themelist output=$themelist selected=$fsite->style}
-                    <div class="hint">The theme folder which will be loaded for css and images. (Use / for default)</div>
+                    <div class="hint">The theme folder for the front end web pages. (Cyborg is the default)</div>
                 </td>
             </tr>
 
@@ -109,7 +109,7 @@
                 <td><label for="style">Dereferrer Link:</label></td>
                 <td>
                     <input id="dereferrer_link" class="long" name="dereferrer_link" type="text" value="{$fsite->dereferrer_link}" />
-                    <div class="hint">Optional URL to prepend to external links</div>
+                    <div class="hint">Optional URL to prepend to external links.  This prevents external sites from knowing where they were linked from.</div>
                 </td>
             </tr>
 
@@ -157,7 +157,8 @@
                     {html_radios id="newgroupscanmethod" name='newgroupscanmethod' values=$yesno_ids output=$newgroupscan_names selected=$fsite->newgroupscanmethod separator='<br />'}
                     <input class="tiny" id="newgroupdaystoscan" name="newgroupdaystoscan" type="text" value="{$fsite->newgroupdaystoscan}" /> Days  or
                     <input class="medium" id="newgroupmsgstoscan" name="newgroupmsgstoscan" type="text" value="{$fsite->newgroupmsgstoscan}" /> Posts<br />
-                    <div class="hint">Scan back X (posts/days) for each new group?  Can backfill to scan further.</div>
+                    <div class="hint">Scan back X (posts/days) for each new group?  Can backfill to scan further.  Recommended to set this to 1, and then use backfill to retrieve
+                    older articles.</div>
                 </td>
             </tr>
             <tr>
@@ -173,7 +174,7 @@
                 <td><label for="safebackfilldate">Safe Backfill Date:</label></td>
                 <td>
                     <input class="small" id="safebackfilldate" name="safebackfilldate" type="text" value="{$fsite->safebackfilldate}" />
-                    <div class="hint">The target date for safe backfill. Format: YYYY-MM-DD</div>
+                    <div class="hint">The target date for safe backfill. Format: YYYY-MM-DD.  Currently, this only applies if you have 'safe' selected as the backfill method.</div>
                 </td>
             </tr>
         </table>
@@ -206,18 +207,11 @@
         <table class="input">
 
             <tr>
-                <td><label for="catlanguage">Categorize Language:</label></td>
-                <td>
-                    {html_options class="catlanguage" id="catlanguage" name='catlanguage' values=$langlist_ids output=$langlist_names selected=$fsite->catlanguage}
-                    <div class="hint">Which category.php file to use. (This is WIP, looking for people to help with this. So right now I suggest sticking to english.)</div>
-                </td>
-            </tr>
-
-            <tr>
                 <td><label for="categorizeforeign">Categorize Foreign:</label></td>
                 <td>
                     {html_radios id="categorizeforeign" name='categorizeforeign' values=$yesno_ids output=$yesno_names selected=$fsite->categorizeforeign separator='<br />'}
-                    <div class="hint">This only works if the above is set to english. Whether to send foreign movies/tv to foreign sections or not. If set to true they will go in foreign categories.</div>
+                    <div class="hint">Whether to categorize foreign releases in to foreign sections or not. If set to true, nZEDbetter will make a best guess at determining if
+                        a release is 'foreign' or not.  If so, they will be categorized as such.</div>
                 </td>
             </tr>
 
@@ -225,7 +219,8 @@
                 <td><label for="catwebdl">Categorize WEB-DL:</label></td>
                 <td>
                     {html_radios id="catwebdl" name='catwebdl' values=$yesno_ids output=$yesno_names selected=$fsite->catwebdl separator='<br />'}
-                    <div class="hint">Whether to send WEB-DL to the WEB-DL section or not. If set to true they will go in WEB-DL category, false will send them in HD TV.</div>
+                    <div class="hint">Whether to send WEB-DL to the WEB-DL section or not. If set to true they will go in WEB-DL category.  Setting this to false will result in
+                        assigning them to HD TV.</div>
                 </td>
             </tr>
 
@@ -233,7 +228,8 @@
                 <td><label for="imdburl">IMDB.com:</label></td>
                 <td>
                     {html_options class="imdburl" id="imdburl" name='imdburl' values=$imdb_urls output=$imdburl_names selected=$fsite->imdburl}
-                    <div class="hint">Akas.imdb.com returns titles in their original title, imdb.com returns titles based on your IP address (if you are in france, you will get french titles).</div>
+                    <div class="hint">This option is currently non-functional and ignored.  It will be reinstated in a future release.
+                        Akas.imdb.com returns titles in their original title, imdb.com returns titles based on your IP address (if you are in france, you will get french titles).</div>
                 </td>
             </tr>
 
@@ -315,7 +311,9 @@
                 <td style="width:160px;"><label for="tmdbkey">TMDB Key:</label></td>
                 <td>
                     <input id="tmdbkey" class="long" name="tmdbkey" type="text" value="{$fsite->tmdbkey}" />
-                    <div class="hint">The api key used for access to tmdb.</div>
+                    <div class="hint">The api key used for access to tmdb.  This is required if you plan to have movie releases automatically identified using
+                    The Movie Database (<a href="http://www.themoviedb.org" target="_blank">www.themoviedb.org</a>).  You can request an api key for free by creating
+                    a free account at The Movie Database, and then visiting your <a href="https://www.themoviedb.org/account" target="_blank">account page</a>.</div>
                 </td>
             </tr>
 
@@ -323,7 +321,9 @@
                 <td style="width:160px;"><label for="rottentomatokey">Rotten Tomatoes Key:</label></td>
                 <td>
                     <input id="rottentomatokey" class="long" name="rottentomatokey" type="text" value="{$fsite->rottentomatokey}" />
-                    <div class="hint">The api key used for access to rotten tomatoes.</div>
+                    <div class="hint">The api key used for access to rotten tomatoes.  Rotten Tomatos is used for TV Show and episode look ups.  Request a free
+                    API key by <a href="http://developer.rottentomatoes.com/member/register" target="_blank">registering</a> for an account, and then
+                    <a href="http://developer.rottentomatoes.com/apps/register" target="_blank">applying</a> for a key.</div>
                 </td>
             </tr>
 
@@ -331,7 +331,9 @@
                 <td><label for="amazonpubkey">Amazon Public Key:</label></td>
                 <td>
                     <input id="amazonpubkey" class="long" name="amazonpubkey" type="text" value="{$fsite->amazonpubkey}" />
-                    <div class="hint">The amazon public api key. Used for music/book lookups.</div>
+                    <div class="hint">The amazon public api key. Used for music, book, and console games lookups.  You will need to visit the
+                    <a href="https://affiliate-program.amazon.com/" target="_blank">Amazon Affiliate</a> website to obtain more information. Amazon
+                    provides the keys for free.  However, you may need to have a registered domain name and a functional web site.</div>
                 </td>
             </tr>
 
@@ -355,7 +357,9 @@
                 <td><label for="trakttvkey">Trakt.tv API key:</label></td>
                 <td>
                     <input id="trakttvkey" class="long" name="trakttvkey" type="text" value="{$fsite->trakttvkey}" />
-                    <div class="hint">The trakt.tv api key. Used for movie and tv lookups.</div>
+                    <div class="hint">The trakt.tv api key. Used for looking up TV Shows and episodes.  You will need to sign up for a
+                    free account at <a href="http://trak.tv" target="_blank">trak.tv</a>, after which, you will need to go to the
+                    <a href="http://trakt.tv/settings/api" target="_blank">API Settings</a> section of your profile on trak.tv.</div>
                 </td>
             </tr>
 
@@ -451,7 +455,7 @@
                 <td>
                     <input id="ffmpegpath" class="long" name="ffmpegpath" type="text" value="{$fsite->ffmpegpath}" />
                     <div class="hint">The path to the <a href="http://www.ffmpeg.org/">ffmpeg</a> binary. Used for thumbnailing. Use empty path to disable thumbnailing.
-                        <br/>Use forward slashes in windows <span style="font-family:courier;">c:/path/to/ffmpeg.exe</span></div>
+                        </div>
                 </td>
             </tr>
 
@@ -468,7 +472,7 @@
             <tr>
                 <td><label for="nzbsplitlevel">Nzb File Path Level Deep:</label></td>
                 <td>
-                    <input id="nzbsplitlevel" class="tiny" name="nzbsplitlevel" type="text" value="{$fsite->nzbsplitlevel}" />
+                    <input id="nzbsplitlevel" class="medium" name="nzbsplitlevel" type="text" value="{$fsite->nzbsplitlevel}" />
                     <div class="hint">Levels deep to store the nzb Files.</div>
                 </td>
             </tr>
@@ -476,7 +480,7 @@
             <tr>
                 <td><label for="releaseretentiondays">Release Retention:</label></td>
                 <td>
-                    <input class="tiny" id="releasedays" name="releaseretentiondays" type="text" value="{$fsite->releaseretentiondays}" />
+                    <input class="medium" id="releasedays" name="releaseretentiondays" type="text" value="{$fsite->releaseretentiondays}" />
                     <div class="hint">!!THIS IS NOT HEADER RETENTION!! The number of days releases will be retained for use throughout site. Set to 0 to disable.</div>
                 </td>
             </tr>
@@ -484,7 +488,7 @@
             <tr>
                 <td><label for="partretentionhours">Part Retention Hours:</label></td>
                 <td>
-                    <input class="tiny" id="parthours" name="partretentionhours" type="text" value="{$fsite->partretentionhours}" />
+                    <input class="medium" id="parthours" name="partretentionhours" type="text" value="{$fsite->partretentionhours}" />
                     <div class="hint">The number of hours incomplete parts and binaries will be retained.</div>
                 </td>
             </tr>
@@ -492,7 +496,7 @@
             <tr>
                 <td><label for="miscotherretentionhours">Misc->Other Retention Hours:</label></td>
                 <td>
-                    <input class="tiny" id="miscotherhours" name="miscotherretentionhours" type="text" value="{$fsite->miscotherretentionhours}" />
+                    <input class="medium" id="miscotherhours" name="miscotherretentionhours" type="text" value="{$fsite->miscotherretentionhours}" />
                     <div class="hint">The number of hours releases categorized as Misc->Other will be retained.  Set to 0 to disable.</div>
                 </td>
             </tr>
@@ -500,14 +504,14 @@
             <tr>
                 <td><label for="hashedRetentionHours">Hashed Release Retention Hours:</label></td>
                 <td>
-                    <input class="tiny" id="hashedRetentionHours" name="hashedRetentionHours" type="text" value="{$fsite->hashedRetentionHours}" />
+                    <input class="medium" id="hashedRetentionHours" name="hashedRetentionHours" type="text" value="{$fsite->hashedRetentionHours}" />
                     <div class="hint">The number of hours releases categorized as Misc->Hashed will be retained.  Set to 0 to disable.</div>
                 </td>
             </tr>
             <tr>
                 <td><label for="releasecompletion">Release Completion:</label></td>
                 <td>
-                    <input class="tiny" id="releasecompletion" name="releasecompletion" type="text" value="{$fsite->releasecompletion}" />
+                    <input class="medium" id="releasecompletion" name="releasecompletion" type="text" value="{$fsite->releasecompletion}" />
                     <div class="hint">The minimum completion % to keep a release. Set to 0 to disable.</div>
                 </td>
             </tr>
@@ -515,7 +519,7 @@
             <tr>
                 <td><label for="crossposttime">Crossposted Time Check:</label></td>
                 <td>
-                    <input class="tiny" id="crossposttime" name="crossposttime" type="text" value="{$fsite->crossposttime}" />
+                    <input class="medium" id="crossposttime" name="crossposttime" type="text" value="{$fsite->crossposttime}" />
                     <div class="hint">The time in hours to check for crossposted releases.</div>
                 </td>
             </tr>
@@ -523,16 +527,16 @@
             <tr>
                 <td><label for="maxmssgs">Max Messages:</label></td>
                 <td>
-                    <input class="tiny" id="maxmssgs" name="maxmssgs" type="text" value="{$fsite->maxmssgs}" />
-                    <div class="hint">The maximum number of messages to fetch at a time from the server. Only raise this if you have PHP set up correctly and at least 32MB RAM.
-                    The general idea here is that you want to have a balance between updating/backfilling groups efficiently, but not overwhelming the database with large transactions.</div>
+                    <input class="medium" id="maxmssgs" name="maxmssgs" type="text" value="{$fsite->maxmssgs}" />
+                    <div class="hint">The maximum number of messages to fetch at a time from the server. Only raise this if you have PHP set up correctly and at least 32GB RAM.
+                    The general idea here is that you need to have a balance between updating/backfilling groups efficiently, but not overwhelming the database with large transactions.</div>
                 </td>
             </tr>
 
             <tr>
                 <td><label for="maxnzbsprocessed">Maximum NZBs stage5:</label></td>
                 <td>
-                    <input class="tiny" id="maxnzbsprocessed" name="maxnzbsprocessed" type="text" value="{$fsite->maxnzbsprocessed}" />
+                    <input class="medium" id="maxnzbsprocessed" name="maxnzbsprocessed" type="text" value="{$fsite->maxnzbsprocessed}" />
                     <div class="hint">The maximum number of NZB files to create during stage 5 in update_releases.</div>
                 </td>
             </tr>
@@ -540,7 +544,7 @@
             <tr>
                 <td><label for="maxpartrepair">Maximum repair per run:</label></td>
                 <td>
-                    <input class="tiny" id="maxpartrepair" name="maxpartrepair" type="text" value="{$fsite->maxpartrepair}" />
+                    <input class="medium" id="maxpartrepair" name="maxpartrepair" type="text" value="{$fsite->maxpartrepair}" />
                     <div class="hint">The maximum amount of articles to attempt to repair at a time.</div>
                 </td>
             </tr>
@@ -591,15 +595,15 @@
             <tr>
                 <td><label for="minfilestoformrelease">Minimum Files to Make a Release:</label></td>
                 <td>
-                    <input class="tiny" id="minfilestoformrelease" name="minfilestoformrelease" type="text" value="{$fsite->minfilestoformrelease}" />
-                    <div class="hint">The minimum number of files to make a release. i.e. if set to two, then releases which only contain one file will not be created.</div>
+                    <input class="medium" id="minfilestoformrelease" name="minfilestoformrelease" type="text" value="{$fsite->minfilestoformrelease}" />
+                    <div class="hint">The minimum number of files required to make a release. i.e. if set to two, then releases which only contain one file will not be created.</div>
                 </td>
             </tr>
 
             <tr>
                 <td><label for="minsizetoformrelease">Minimum File Size to Make a Release:</label></td>
                 <td>
-                    <input class="small" id="minsizetoformrelease" name="minsizetoformrelease" type="text" value="{$fsite->minsizetoformrelease}" /> Bytes
+                    <input class="medium" id="minsizetoformrelease" name="minsizetoformrelease" type="text" value="{$fsite->minsizetoformrelease}" /> Bytes
                     <div class="hint">The minimum total size in bytes to make a release. If set to 0, then ignored. Only deletes during release creation.</div>
                 </td>
             </tr>
@@ -607,21 +611,21 @@
             <tr>
                 <td><label for="maxsizetoformrelease">Maximum File Size to Make a Release:</label></td>
                 <td>
-                    <input class="small" id="maxsizetoformrelease" name="maxsizetoformrelease" type="text" value="{$fsite->maxsizetoformrelease}" /> Bytes
+                    <input class="medium" id="maxsizetoformrelease" name="maxsizetoformrelease" type="text" value="{$fsite->maxsizetoformrelease}" /> Bytes
                     <div class="hint">The maximum total size in bytes to make a release. If set to 0, then ignored. Only deletes during release creation.</div>
                 </td>
             </tr>
             <tr>
                 <td><label for="maxsizetopostprocess">Maximum File Size to Postprocess:</label></td>
                 <td>
-                    <input class="tiny" id="maxsizetopostprocess" name="maxsizetopostprocess" type="text" value="{$fsite->maxsizetopostprocess}" /> Gigabytes
+                    <input class="medium" id="maxsizetopostprocess" name="maxsizetopostprocess" type="text" value="{$fsite->maxsizetopostprocess}" /> Gigabytes
                     <div class="hint">The maximum size in gigabytes to postprocess a release. If set to 0, then ignored.</div>
                 </td>
             </tr>
             <tr>
                 <td><label for="maxaddprocessed">Maximum add PP per run:</label></td>
                 <td>
-                    <input class="tiny" id="maxaddprocessed" name="maxaddprocessed" type="text" value="{$fsite->maxaddprocessed}" />
+                    <input class="medium" id="maxaddprocessed" name="maxaddprocessed" type="text" value="{$fsite->maxaddprocessed}" />
                     <div class="hint">The maximum amount of releases to process for passwords/previews/mediainfo per run. Every release gets processed here. This uses NNTP an connection, 1 per thread. This does not query Amazon.</div>
                 </td>
             </tr>
@@ -671,7 +675,7 @@
             <tr>
                 <td><label for="maxpartsprocessed">Maximum add PP parts downloaded:</label></td>
                 <td>
-                    <input class="tiny" id="maxpartsprocessed" name="maxpartsprocessed" type="text" value="{$fsite->maxpartsprocessed}" />
+                    <input class="medium" id="maxpartsprocessed" name="maxpartsprocessed" type="text" value="{$fsite->maxpartsprocessed}" />
                     <div class="hint">If a part fails to download while post processing, this will retry up to the amount you set, then give up.</div>
                 </td>
             </tr>
@@ -679,7 +683,7 @@
             <tr>
                 <td><label for="passchkattempts">Maximum add PP parts checked:</label></td>
                 <td>
-                    <input class="tiny" id="passchkattempts" name="passchkattempts" type="text" value="{$fsite->passchkattempts}" />
+                    <input class="medium" id="passchkattempts" name="passchkattempts" type="text" value="{$fsite->passchkattempts}" />
                     <div class="hint">This overrides the above setting if set above 1. How many parts to check for a password before giving up. This slows down post processing massively, better to leave it 1.</div>
                 </td>
             </tr>
@@ -702,7 +706,7 @@
             <tr>
                 <td><label for="segmentstodownload">Number of Segments to download for video samples:</label></td>
                 <td>
-                    <input class="tiny" id="segmentstodownload" name="segmentstodownload" type="text" value="{$fsite->segmentstodownload}" />
+                    <input class="medium" id="segmentstodownload" name="segmentstodownload" type="text" value="{$fsite->segmentstodownload}" />
                     <div class="hint">The maximum number of segments to download to generate the sample video file. (Default 2)</div>
                 </td>
             </tr>
@@ -710,7 +714,7 @@
             <tr>
                 <td><label for="ffmpeg_duration">Video sample file duration for ffmpeg:</label></td>
                 <td>
-                    <input class="tiny" id="ffmpeg_duration" name="ffmpeg_duration" type="text" value="{$fsite->ffmpeg_duration}" />
+                    <input class="medium" id="ffmpeg_duration" name="ffmpeg_duration" type="text" value="{$fsite->ffmpeg_duration}" />
                     <div class="hint">The maximum duration (In Seconds) for ffmpeg to generate the sample for. (Default 5)</div>
                 </td>
             </tr>
@@ -734,7 +738,7 @@
             <tr>
                 <td><label for="maxnfoprocessed">Maximum NFO files per run:</label></td>
                 <td>
-                    <input class="tiny" id="maxnfoprocessed" name="maxnfoprocessed" type="text" value="{$fsite->maxnfoprocessed}" />
+                    <input class="medium" id="maxnfoprocessed" name="maxnfoprocessed" type="text" value="{$fsite->maxnfoprocessed}" />
                     <div class="hint">The maximum amount of NFO files to process per run. This uses NNTP an connection, 1 per thread. This does not query Amazon.</div>
                 </td>
             </tr>
@@ -758,7 +762,7 @@
             <tr>
                 <td><label for="maxrageprocessed">Maximum TVRage per run:</label></td>
                 <td>
-                    <input class="tiny" id="maxrageprocessed" name="maxrageprocessed" type="text" value="{$fsite->maxrageprocessed}" />
+                    <input class="medium" id="maxrageprocessed" name="maxrageprocessed" type="text" value="{$fsite->maxrageprocessed}" />
                     <div class="hint">The maximum amount of TV shows to process with TVRage per run. This does not use an NNTP connection or query Amazon.</div>
                 </td>
             </tr>
@@ -779,7 +783,7 @@
             <tr>
                 <td><label for="maximdbprocessed">Maximum movies per run:</label></td>
                 <td>
-                    <input class="tiny" id="maximdbprocessed" name="maximdbprocessed" type="text" value="{$fsite->maximdbprocessed}" />
+                    <input class="medium" id="maximdbprocessed" name="maximdbprocessed" type="text" value="{$fsite->maximdbprocessed}" />
                     <div class="hint">The maximum amount of movies to process per run. This does not use an NNTP connection or query Amazon.</div>
                 </td>
             </tr>
@@ -795,30 +799,16 @@
                 <td><label for="movie_search_tmdb">Use TheMovieDB for lookups:</label></td>
                 <td>
                     {html_radios id="movie_search_tmdb" name='movie_search_tmdb' values=$trueFalse output=$trueFalse selected=$fsite->movie_search_tmdb separator='<br />'}
-                    <div class="hint">Generally, this is the most accurate lookup method.  The other lookup options below may result in more matches, but also result in many
-                     more releases that are matched to an incorrect movie.  You must reqquest an API key (free of charge) at <a href="http://www.themoviedb.org/">http://www.themoviedb.org/</a> </div>
+                    <div class="hint">Generally, this is the most accurate lookup method, when combined with IMDB lookups.  You must reqquest an API
+                        key (free of charge) at <a href="http://www.themoviedb.org/">http://www.themoviedb.org/</a> </div>
                 </td>
             </tr>
             <tr>
-                <td><label for="movie_search_google">Use Google for lookups:</label></td>
+                <td><label for="movie_search_imdb">Use IMDB for lookups:</label></td>
                 <td>
-                    {html_radios id="movie_search_google" name='movie_search_google' values=$trueFalse output=$trueFalse selected=$fsite->movie_search_google separator='<br />'}
-                    <div class="hint">Somewhat accurate lookup method, however, using this option may be a violation of Google's terms of service.  This can result in
-                     your IP address being temporarily banned from performing any Google searches.</div>
-                </td>
-            </tr>
-            <tr>
-                <td><label for="movie_search_bing">Use Bing for lookups:</label></td>
-                <td>
-                    {html_radios id="movie_search_bing" name='movie_search_bing' values=$trueFalse output=$trueFalse selected=$fsite->movie_search_bing separator='<br />'}
-                    <div class="hint">Somewhat accurate lookup method. </div>
-                </td>
-            </tr>
-            <tr>
-                <td><label for="movie_search_yahoo">Use Yahoo for lookups:</label></td>
-                <td>
-                    {html_radios id="movie_search_yahoo" name='movie_search_yahoo' values=$trueFalse output=$trueFalse selected=$fsite->movie_search_yahoo separator='<br />'}
-                    <div class="hint">Somewhat accurate lookup method.</div>
+                    {html_radios id="movie_search_imdb" name='movie_search_imdb' values=$trueFalse output=$trueFalse selected=$fsite->movie_search_imdb separator='<br />'}
+                    <div class="hint">If you plan to have nZEDbetter attempt to automatically identify movie releases, it is strongly recommended that you use both
+                    IMDB and The Movie Database (above).</div>
                 </td>
             </tr>
             <tr>
@@ -838,7 +828,7 @@
             <tr>
                 <td><label for="maxanidbprocessed">Maximum anidb per run:</label></td>
                 <td>
-                    <input class="tiny" id="maxanidbprocessed" name="maxanidbprocessed" type="text" value="{$fsite->maxanidbprocessed}" />
+                    <input class="medium" id="maxanidbprocessed" name="maxanidbprocessed" type="text" value="{$fsite->maxanidbprocessed}" />
                     <div class="hint">The maximum amount of anime to process with anidb per run. This does not use an NNTP connection or query Amazon.</div>
                 </td>
             </tr>
@@ -856,7 +846,7 @@
                 </td>
             </tr>
             <tr>
-                <td><label for="lookupmusicMB">Lookup music using a MusicBrainz server:</label></td>
+                <td><label for="lookupmusicMB">Lookup music using a MusicBrainz server: (not currently working)</label></td>
                 <td>
                     {html_radios id="music_search_MB" name='music_search_MB' values=$yesno_ids output=$yesno_names selected=$fsite->music_search_MB separator='<br />'}
                     <div class="hint">Whether to attempt to lookup music information from a MusicBrainz server when processing binaries.</div>
@@ -877,7 +867,7 @@
             <tr>
                 <td><label for="maxmusicprocessed">Maximum music per run:</label></td>
                 <td>
-                    <input class="tiny" id="maxmusicprocessed" name="maxmusicprocessed" type="text" value="{$fsite->maxmusicprocessed}" />
+                    <input class="medium" id="maxmusicprocessed" name="maxmusicprocessed" type="text" value="{$fsite->maxmusicprocessed}" />
                     <div class="hint">The maximum amount of music to process with amazon per run. This does not use an NNTP connection.</div>
                 </td>
             </tr>
@@ -891,7 +881,7 @@
             <tr>
                 <td><label for="maxgamesprocessed">Maximum games per run:</label></td>
                 <td>
-                    <input class="tiny" id="maxgamesprocessed" name="maxgamesprocessed" type="text" value="{$fsite->maxgamesprocessed}" />
+                    <input class="medium" id="maxgamesprocessed" name="maxgamesprocessed" type="text" value="{$fsite->maxgamesprocessed}" />
                     <div class="hint">The maximum amount of games to process with amazon per run. This does not use an NNTP connection.</div>
                 </td>
             </tr>
@@ -905,7 +895,7 @@
             <tr>
                 <td><label for="maxbooksprocessed">Maximum books per run:</label></td>
                 <td>
-                    <input class="tiny" id="maxbooksprocessed" name="maxbooksprocessed" type="text" value="{$fsite->maxbooksprocessed}" />
+                    <input class="medium" id="maxbooksprocessed" name="maxbooksprocessed" type="text" value="{$fsite->maxbooksprocessed}" />
                     <div class="hint">The maximum amount of books to process with amazon per run. This does not use an NNTP connection</div>
                 </td>
             </tr>
@@ -920,7 +910,7 @@
             <tr>
                 <td><label for="amazonsleep">Amazon sleep time:</label></td>
                 <td>
-                    <input class="tiny" id="amazonsleep" name="amazonsleep" type="text" value="{$fsite->amazonsleep}" />
+                    <input class="medium" id="amazonsleep" name="amazonsleep" type="text" value="{$fsite->amazonsleep}" />
                     <div class="hint">Sleep time in milliseconds to wait in between amazon requests. If you thread post-proc, multiply by the number of threads. ie Postprocessing Threads = 12, Amazon sleep time = 12000<br /><a href="https://affiliate-program.amazon.com/gp/advertising/api/detail/faq.html">https://affiliate-program.amazon.com/gp/advertising/api/detail/faq.html</a></div>
                 </td>
             </tr>
@@ -954,7 +944,7 @@
             <tr>
                 <td><label for="postthreads">Postprocessing Additional Threads:</label></td>
                 <td>
-                    <input class="tiny" id="postthreads" name="postthreads" type="text" value="{$fsite->postthreads}" />
+                    <input class="medium" id="postthreads" name="postthreads" type="text" value="{$fsite->postthreads}" />
                     <div class="hint">The number of threads for additional postprocessing. This includes deep rar inspection, preview and sample creation and nfo processing.</div>
                 </td>
             </tr>
@@ -970,7 +960,7 @@
             <tr>
                 <td><label for="postthreadsamazon">Postprocessing Amazon Threads:</label></td>
                 <td>
-                    <input class="tiny" id="postthreadsamazon" name="postthreadsamazon" type="text" value="{$fsite->postthreadsamazon}" />
+                    <input class="medium" id="postthreadsamazon" name="postthreadsamazon" type="text" value="{$fsite->postthreadsamazon}" />
                     <div class="hint">The number of threads for amazon postprocessing. This includes books, music and games lookups.</div>
                 </td>
             </tr>
@@ -978,7 +968,7 @@
             <tr>
                 <td><label for="postthreadsnon">Postprocessing Non-Amazon Threads:</label></td>
                 <td>
-                    <input class="tiny" id="postthreadsnon" name="postthreadsnon" type="text" value="{$fsite->postthreadsnon}" />
+                    <input class="medium" id="postthreadsnon" name="postthreadsnon" type="text" value="{$fsite->postthreadsnon}" />
                     <div class="hint">The number of threads for non-amazon postprocessing. This includes movies, anime and tv lookups.</div>
                 </td>
             </tr>
@@ -986,7 +976,7 @@
             <tr>
                 <td><label for="postdelay">Postprocessing Threads Delay:</label></td>
                 <td>
-                    <input class="tiny" id="postdelay" name="postdelay" type="text" value="{$fsite->postdelay}" />
+                    <input class="medium" id="postdelay" name="postdelay" type="text" value="{$fsite->postdelay}" />
                     <div class="hint">The time in milliseconds to delay postprocessing threaded startup. This will reduce bursting to mysql.</div>
                 </td>
             </tr>
@@ -994,7 +984,7 @@
             <tr>
                 <td><label for="binarythreads">Update Binaries Threads:</label></td>
                 <td>
-                    <input class="tiny" id="binarythreads" name="binarythreads" type="text" value="{$fsite->binarythreads}" />
+                    <input class="medium" id="binarythreads" name="binarythreads" type="text" value="{$fsite->binarythreads}" />
                     <div class="hint">The number of threads for update_binaries.</div>
                 </td>
             </tr>
@@ -1002,7 +992,7 @@
             <tr>
                 <td><label for="backfillthreads">Backfill Threads:</label></td>
                 <td>
-                    <input class="tiny" id="backfillthreads" name="backfillthreads" type="text" value="{$fsite->backfillthreads}" />
+                    <input class="medium" id="backfillthreads" name="backfillthreads" type="text" value="{$fsite->backfillthreads}" />
                     <div class="hint">The number of threads for backfill.</div>
                 </td>
             </tr>
@@ -1010,7 +1000,7 @@
             <tr>
                 <td><label for="nzbthreads">Import-nzb Threads:</label></td>
                 <td>
-                    <input class="tiny" id="nzbthreads" name="nzbthreads" type="text" value="{$fsite->nzbthreads}" />
+                    <input class="medium" id="nzbthreads" name="nzbthreads" type="text" value="{$fsite->nzbthreads}" />
                     <div class="hint">The number of threads for import-nzb(bulk). This will thread each subfolder.</div>
                 </td>
             </tr>
@@ -1018,7 +1008,7 @@
             <tr>
                 <td><label for="nzbthreads">Grab NZB Threads:</label></td>
                 <td>
-                    <input class="tiny" id="grabnzbthreads" name="grabnzbthreads" type="text" value="{$fsite->grabnzbthreads}" />
+                    <input class="medium" id="grabnzbthreads" name="grabnzbthreads" type="text" value="{$fsite->grabnzbthreads}" />
                     <div class="hint">The number of threads for Grab NZBs.</div>
                 </td>
             </tr>

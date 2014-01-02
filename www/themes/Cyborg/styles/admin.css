@@ -25,13 +25,19 @@ ul {margin-top: 5px; margin-bottom: 5px;}
 #sidebar li li a {padding: 0 0 0 20px; font-weight: normal; color: rgb(178, 34, 34); text-decoration: none;}
 #sidebar li li a:hover {text-decoration: underline; color: rgb(178, 34, 34);}
 #sidebar li li:hover { cursor:pointer; background-color:#EEE; background-image: url('../images/bullet_hov.png');}
-div.hint, div.hint a {
+div.hint {
     font-size: 13px;
     font-style: italic;
     color: #04A;
     word-wrap: break-word;
     margin-bottom: 10px;
     margin-right: 20px;
+}
+div.hint a {
+    font-size: 13px;
+    font-style: italic;
+    color: darkred;
+    margin-right: 2px;
 }
 div.explanation {
     padding: 5px 5px 5px 5px;
