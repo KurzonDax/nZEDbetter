@@ -136,45 +136,11 @@ jQuery(function ($) {
     });
 
     // console.tpl, music.tpl
-    $('.icon_cart').click(function (e) {
-        if ($(this).hasClass('icon_cart_clicked')) {
-            return false;
-        }
-        var guid = $(this).parent().parent().parent().attr('id').substring(4);
-        $.post(SERVERROOT + "cart?add=" + guid, function (resp) {
-            $(e.target).addClass('icon_cart_clicked').attr('title', 'Added to Cart');
 
-            $.pnotify({
-                title: 'ADDED!',
-                text: 'Its now in your Cart! ^_^',
-                type: 'success',
-                icon: 'icon-info-sign'
-            });
-
-        });
-        return false;
-    });
     // This function specific to movies.tpl and books.tpl
 
     // This function specific to browse.tpl
-    $('.icon_cart_browse').click(function (e) {
-        if ($(this).hasClass('icon_cart_clicked')) {
-            return false;
-        }
-        var guid = $(this).parent().parent().attr('id').substring(4);
-        $.post(SERVERROOT + "cart?add=" + guid, function (resp) {
-            $(e.target).addClass('icon_cart_clicked').attr('title', 'Added to Cart');
 
-            $.pnotify({
-                title: 'ADDED!',
-                text: 'Its now in your Cart! ^_^',
-                type: 'success',
-                icon: 'icon-info-sign'
-            });
-
-        });
-        return false;
-    });
     $('.icon_sab').click(function (e) { // replace with cookies?
         if ($(this).hasClass('icon_sab_clicked')) {
             return false;

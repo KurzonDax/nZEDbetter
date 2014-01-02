@@ -211,7 +211,7 @@
                                     <td class="icons" style="width:80px;">
                                         <div class="icon icon_nzb"><a title="Download Nzb" href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"></a></div>
                                         {if $sabintegrated}<div class="icon icon_sab" title="Send to my Sabnzbd"></div>{/if}
-                                        <div id="cart-{$mguid[$m@index]}" class="icon icon_cart_movie" title="Add to Cart" data-guid="{$mguid[$m@index]}" data-title="{$result.title}"></div>
+                                        <div id="cart-{$mguid[$m@index]}" class="icon icon_cart" title="Add to Cart" data-guid="{$mguid[$m@index]}" data-title="{$result.title}"></div>
                                     </td>
                                 </tr>
                                 {if $m@index == 1 && $m@total > 2}

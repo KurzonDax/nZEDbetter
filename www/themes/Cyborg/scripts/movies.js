@@ -93,24 +93,35 @@ jQuery(function ($) {
         window.location.href = WWW_TOP + 'movies' + params;
     });
 
-    $('.icon_cart_movie').click(function (e) {
+    $('div[id|=cart]').click(function (e) {
         if ($(this).hasClass('icon_cart_clicked')) {
             return false;
         }
         var guid = $(this).attr('data-guid');
         var title = $(this).attr('data-title');
         $.post(WWW_TOP + 'cart?add=' + guid, function (resp) {
-            $(e.target).addClass('icon_cart_clicked').attr('title', 'Added to Cart');
-
-            $.pnotify({
-                title: 'ADDED!',
-                text : title + ' is now in your Cart! ^_^',
-                type : 'success',
-                icon : 'icon-info-sign'
-            });
-
+            $(e.target).addClass('icon_cart_clicked').removeClass('icon_cart') .attr('title', 'Added to Cart').hide().show();
+            displayNotification( '"' + title + '" has been added to your Cart.', 'Release Added to Cart');
         });
         return false;
     });
 
+    function displayNotification(text, title, type, icon) {
+        title = typeof title !== 'undefined' ? title : 'Operation Successful';
+        type = typeof type !== 'undefined' ? type : 'success';
+        icon = typeof icon !== 'undefined' ? icon : 'icon-ok-circle';
+        $.pnotify({
+            title    : title,
+            text     : text,
+            type     : type,
+            history  : false,
+            opacity  : .9,
+            icon     : icon,
+            addclass : "stack-bottomright",
+            stack    : stack_bottomright,
+            animation: 'show',
+            delay    : 12000,
+            width    : '400px'
+        });
+    }
 });

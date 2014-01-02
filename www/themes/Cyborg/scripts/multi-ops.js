@@ -28,7 +28,7 @@ jQuery( function($) {
         $('table.data input[type="checkbox"]:checked').each(function () {
             var guid = $(this).data('guid');
             if (guid && $('#cart-'+guid).hasClass('icon_cart_clicked') === false) {
-                $('#cart-' + guid).addClass('icon_cart_clicked').attr('title', 'Already Added to Cart');
+                $('#cart-' + guid).addClass('icon_cart_clicked').removeClass('icon_cart').attr('title', 'Already Added to Cart').hide().show();
                 guids.push(guid);
                 names += $(this).data('searchname') + '<br />';
                 counter ++;

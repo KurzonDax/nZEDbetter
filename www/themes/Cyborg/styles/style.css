@@ -19,7 +19,7 @@ h3.heading{ margin-top: 0; }
 div.icon { width:16px; height:16px; background-repeat:no-repeat; cursor:pointer; position:relative; float:left; margin:2px; }
 .data .icons .icon { opacity:.30; }
 .icon_cart           { background-image:url('../images/icons/cartdown.png'); }
-.icon_cart_clicked   { background-image:url('../images/icons/cartup.png'); }
+.icon_cart_clicked   { background-image:url('../images/icons/check.png'); }
 .icon_nzb            { background-image:url('../images/icons/nzbdown.png'); }
 .icon_nzb_clicked    { background-image:url('../images/icons/nzbup.png'); }
 .icon_nzb a          { text-decoration:none; padding-bottom:2px; padding-right:12px; }
