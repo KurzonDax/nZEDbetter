@@ -3,6 +3,16 @@ require_once(WWW_DIR."/lib/releases.php");
 
 if (!$users->isLoggedIn())
 	$page->show403();
+if(isset($_POST['add']))
+{
+    $releases = new Releases;
+    $data = $releases->getByGuid($_POST['add']);
+    if (!$data)
+        $page->show404();
+
+    foreach ($data as $d)
+        $users->addCart($users->currentUserId(), $d["ID"]);
+}
 
 if (isset($_GET["add"]))
 {

@@ -24,7 +24,7 @@
 
 {if $results|@count > 0}
 
-    <form id="nzb_multi_operations_form" action="get">
+
         <div class="nzb_multi_operations">
             <div class="row" style="text-align:right;margin-bottom:5px;">
                 {if $covergrp != ''}View:
@@ -58,7 +58,8 @@
             {*<tr class="{if $lastvisit|strtotime<$result.adddate|strtotime}success{/if}" id="guid{$result.guid}">*}
                 <tr class="" id="guid{$result.guid}">
                     <td style="width:26px;text-align:center;white-space:nowrap;">
-                        <input id="chk{$result.guid|substr:0:7}" type="checkbox" class="nzb_check" value="{$result.guid}">
+                        <input id="chk{$result.guid|substr:0:7}" type="checkbox" class="nzb_check" value="{$result.guid}"
+                               data-guid="{$result.guid}" data-searchname="{$result.searchname|escape:"htmlall"}">
                     </td>
                     <td style="width:100%;text-align:left;">
                         <a class="title" title="View details"  href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}"><strong>{$result.searchname|escape:"htmlall"|replace:".":" "}</strong></a>
@@ -122,7 +123,7 @@
                     <td class="icons" style="width:80px;text-align:center;white-space:nowrap;">
                         <div class="icon icon_nzb"><a title="Download Nzb" href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}"></a></div>
                         {if $sabintegrated}<div class="icon icon_sab" title="Send to my Sabnzbd"></div>{/if}
-                        <div class="icon icon_cart_browse" title="Add to Cart"></div>
+                        <div id="cart-{$result.guid}" class="icon icon_cart_browse" title="Add to Cart"></div>
                     </td>
                 </tr>
             {/foreach}
@@ -134,7 +135,7 @@
                 {include file='multi-operations.tpl'}
             </div>
         {/if}
-    </form>
+
 {else}
     <div class="alert alert-link" style="vertical-align:middle;">
         <button type="button" class="close" data-dismiss="alert">&times;</button>

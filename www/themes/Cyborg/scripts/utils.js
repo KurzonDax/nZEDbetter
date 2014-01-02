@@ -272,55 +272,7 @@ jQuery(function ($) {
     });
 
 
-    $('#nzb_multi_operations_form').submit(function () {return false;});
-    $('input.nzb_multi_operations_download').click(function () {
-        var ids = "";
-        $("table.data INPUT[type='checkbox']:checked").each( function (i, row) {
-            if ($(row).val()!="on")
-                ids += $(row).val()+',';
-        });
-        ids = ids.substring(0,ids.length-1);
-        if (ids)
-            window.location = SERVERROOT + "getnzb?zip=1&id="+ids;
-    });
-    $('input.nzb_multi_operations_cart').click(function () {
-        var guids = [];
-        $("table.data INPUT[type='checkbox']:checked").each( function (i, row) {
-            var guid = $(row).val();
-            var $cartIcon = $(row).parent().parent().children('td.icons').children('.icon_cart');
-            if (guid && !$cartIcon.hasClass('icon_cart_clicked')){
-                $cartIcon.addClass('icon_cart_clicked').attr('title','Added to Cart');    // consider doing this only upon success
-                guids.push(guid);
-                $.pnotify({
-                    title: 'ADDED!',
-                    text: 'Its now in your Cart! ^_^',
-                    type: 'success',
-                    icon: 'fa-icon-info-sign'
-                });
-            }
-            $(this).attr('checked', false);
-        });
-        $.post( SERVERROOT + "cart?add", { 'add': guids });
-    });
-    $('input.nzb_multi_operations_sab').click(function () {
-        $("table.data INPUT[type='checkbox']:checked").each( function (i, row) {
-            var $sabIcon = $(row).parent().parent().children('td.icons').children('.icon_sab');
-            var guid = $(row).val();
-            if (guid && !$sabIcon.hasClass('icon_sab_clicked')) {
-                var nzburl = SERVERROOT + "sendtosab/" + guid;
-                $.post( nzburl, function (resp) {
-                    $sabIcon.addClass('icon_sab_clicked').attr('title','Added to Queue');
-                            $.pnotify({
-                                    title: 'ADDED TO SAB!',
-                                    text: 'Its now in the queue!! ^_^',
-                                    type: 'info',
-                                    icon: 'fa-icon-info-sign'
-                                });
-                });
-            }
-            $(this).attr('checked', false);
-        });
-    });
+
     //front end admin functions
     $('input.nzb_multi_operations_edit').click(function () {
         var ids = "";

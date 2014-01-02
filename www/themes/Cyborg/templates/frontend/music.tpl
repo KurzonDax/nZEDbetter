@@ -58,7 +58,7 @@
 
 {if $results|@count > 0}
 
-    <form id="nzb_multi_operations_form" action="get">
+
     <div class="nzb_multi_operations">
         <div class="row" style="text-align:right;margin-bottom:5px;">
             {if $isadmin || $ismod}
@@ -121,9 +121,11 @@
                     <div class="relextra">
                         <b>{$result.searchname|escape:"htmlall"}</b>
                         <div class="container">
-                            <div class="icon"><input type="checkbox" class="nzb_check" value="{$result.guid}" /></div>
+                            <div class="icon"><input type="checkbox" class="nzb_check" value="{$result.guid}"
+                                                     data-guid="{$result.guid}"
+                                                     data-searchname="{$result.searchname|escape:"htmlall"}"/></div>
                             <div class="icon icon_nzb"><a title="Download Nzb" href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}">&nbsp;</a></div>
-                            <div class="icon icon_cart" title="Add to Cart"></div>
+                            <div id="cart-{$result.guid}" class="icon icon_cart" title="Add to Cart"></div>
                             {if $sabintegrated}<div class="icon icon_sab" title="Send to my Sabnzbd"></div>{/if}
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             Posted {$result.postdate|timeago}, {$result.size|fsize_format:"MB"}, <a title="View file list" href="{$smarty.const.WWW_TOP}/filelist/{$result.guid}">{$result.totalpart}</a> <i class="icon-file"></i>, <a title="View comments for {$result.searchname|escape:"htmlall"}" href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments">{$result.comments}</a> <i class="icon-comments-alt"></i>, {$result.grabs} <i class="icon-download-alt"></i>
@@ -140,7 +142,7 @@
         <div class="nzb_multi_operations">
             {include file='multi-operations.tpl'}
         </div>
-        </form>
+
     {/if}
 
 {else}

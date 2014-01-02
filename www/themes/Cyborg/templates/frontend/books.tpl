@@ -52,7 +52,7 @@
 
 {if $results|@count > 0}
 
-    <form id="nzb_multi_operations_form" action="get">
+
         <div class="nzb_multi_operations">
             <div class="row" style="text-align:right;margin-bottom:5px;">
                 {if $isadmin || $ismod}
@@ -134,9 +134,11 @@
                             <b>{$result.searchname|escape:"htmlall"}</b>
                             <br />
                             <b style="margin-left: 10px">Info:</b> {$result.postdate|timeago},  {$result.size|fsize_format:"MB"},  <a title="View file list" href="{$smarty.const.WWW_TOP}/filelist/{$result.guid}">{$result.totalpart} files</a>,  <a title="View comments for {$result.searchname|escape:"htmlall"}" href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}#comments">{$result.comments} cmt{if $result.comments != 1}s{/if}</a>, {$result.grabs} grab{if $result.grabs != 1}s{/if}
-                            <div class="icon"><input type="checkbox" class="nzb_check" value="{$result.guid}" /></div>
+                            <div class="icon"><input type="checkbox" class="nzb_check" value="{$result.guid}"
+                                                     data-guid="{$result.guid}"
+                                                     data-searchname="{$result.searchname|escape:"htmlall"}" /></div>
                             <div class="icon icon_nzb"><a title="Download Nzb" href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}">&nbsp;</a></div>
-                            <div class="icon icon_cart_movie" title="Add to Cart"></div>
+                            <div id="cart-{$result.guid}"class="icon icon_cart_movie" title="Add to Cart"></div>
                             {if $sabintegrated}<div class="icon icon_sab" title="Send to my Sabnzbd"></div>{/if}
 
                         </div>
@@ -151,7 +153,7 @@
                 {include file='multi-operations.tpl'}
             </div>
         {/if}
-    </form>
+
 
 {else}
     <div class="alert">
