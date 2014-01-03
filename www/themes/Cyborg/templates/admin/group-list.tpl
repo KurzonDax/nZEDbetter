@@ -105,7 +105,7 @@
                         <i id="minSize_ASC" class="icon-chevron-up sort-icons"></i>
                         <i id="minSize_DESC" class="icon-chevron-down sort-icons"></i>
                         <i class="icon-question-sign table-help-icon" id="minSizeHelp" data-toggle="popover" data-title="Minimum Size"
-                           data-content="The Minimum Size value represents the minimum total size (in bytes) required for a collection to be turned
+                           data-content="The Minimum Size value represents the minimum total size (in MB) required for a collection to be turned
                            into a release.  For example, in a newsgroup that is focused on movies, you might set Minimum Size to a relatively larger value to
                            help prevent any spam or virus binaries from being inserted in to your database as a release. A setting
                            of 0 will cause nZEDbetter to use the site-wide setting for the group.  Double click on the value to edit it."></i></th>

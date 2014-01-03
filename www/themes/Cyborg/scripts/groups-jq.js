@@ -1069,7 +1069,7 @@ jQuery(function($){
             event       : "dblclick",
             tooltip     : "Double click to edit minimum size",
             select      : true,
-            data        : function (e) { return (e.replace(/,| MB/g, '') * 1048576); },
+            data        : function (e) { return (e.replace(/,| MB/g, '')); },
             submitdata  : {action : "edit"}
         });
 

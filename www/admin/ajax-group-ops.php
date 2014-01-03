@@ -95,8 +95,10 @@ if(isset($_POST['action']) && $_POST['action']=='edit')
             }
             elseif(empty($_POST['size']) || is_numeric($_POST['size']) || $_POST['size']=="0")
             {
-                $db->query("UPDATE groups SET minsizetoformrelease=".$_POST['size']." WHERE ID=".$groupID);
-                $textSize = number_format($_POST['size'] / 1048576, 2)." MB";
+                //Assume MegaBytes if the POST value has no unit
+                $numSize = $_POST['size'] * 1048576;
+                $db->query("UPDATE groups SET minsizetoformrelease=".$numSize." WHERE ID=".$groupID);
+                $textSize = number_format($_POST['size'], 2)." MB";
                 print $textSize;
             }
             else
