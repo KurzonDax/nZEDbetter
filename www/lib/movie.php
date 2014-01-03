@@ -552,6 +552,7 @@ class Movie
          * -3 = Failure to find any matches from either service
          * -4 = Unable to parse the searchname
          * -5 = An error occurred inserting/updating movieinfo table
+         * -6 = Foreign movie, but foreign movie lookups turned off
          *
          */
 
@@ -599,8 +600,11 @@ class Movie
             foreach ($res as $arr)
             {
                 if($this->processForeignMovies == 'FALSE' && $arr['categoryID'] == Category::CAT_MOVIE_FOREIGN)
+                {
+                    $db->query("UPDATE releases SET movieID=-6, imdbID=-6, tmdbID=-6 WHERE ID=".$arr['ID']);
+                    echo "\033[01;33mSkipping foreign movie: " . $arr['searchname'] . "\033[01;37m\n";
                     continue;
-
+                }
                 if($cleanName = $this->parseMovieSearchName($nameCleaning->movieCleaner($arr['searchname'])))
                 {
                     if(isset($cleanName['TVSeries']) && $cleanName['TVSeries'] == 'TRUE')
@@ -715,27 +719,31 @@ class Movie
 
     public function parseMovieSearchName($releasename)
     {
-        $cat = new Category();
-        if (!$cat->isMovieForeign($releasename))
-        {
-            if(preg_match('/S\d{1,2}E\d{1,2}| S\d{1,2} | D\d{1,2} |Episode \d{1,2} |Season \d{1,2}|NBA |NFL| NHL| MLB/i', $releasename))
-            {
-                echo "\033[01;36mAppears to be TV Series, changing category: " . $releasename . "\n";
-                return array('TVSeries' => 'TRUE');
-            }
-            preg_match('/^(?P<name>.*)[\.\-_\( ](?P<year>19\d{2}|20\d{2})/i', $releasename, $matches);
-            if (!isset($matches['year']))
-            {
-                preg_match('/^(?P<name>.*)[\.\-_ ](?:dvdrip|ntsc|dvdr|bdrip|brrip|bluray|hdtv|divx|xvid|hdrip|dvdscreener|proper|repack|real\.proper|sub\.?fix|sub\.?pack|ac3d|unrated|1080i|1080p|720p)/i', $releasename, $matches);
-            }
 
-            if (isset($matches['name']))
+        if(preg_match('/S\d{1,2}E\d{1,2}| S\d{1,2} | D\d{1,2} |Episode \d{1,2} |Season \d{1,2}|NBA |NFL| NHL| MLB/i', $releasename))
+        {
+            echo "\033[01;36mAppears to be TV Series, changing category: " . $releasename . "\n";
+            return array('TVSeries' => 'TRUE');
+        }
+        preg_match('/^(?P<name>.+?)[\.\-_\(\[ ](?:dvdrip|ntsc|dvdr|bdrip|brrip|bluray|hdtv|divx|xvid|hdrip|dvdscreener|proper|repack|real\.proper|sub\.?fix|sub\.?pack|ac3d|unrated|avchd|pal |1080i|1080p|720p|19\d{2}|20\d{2})/i', $releasename, $matches);
+        $testYear = preg_match('/19\d\d|20\d\d/', $releasename, $years);
+
+        $year = null;
+        if($testYear > 0)
+        {
+            foreach($years as $yr)
             {
-                $name = preg_replace('/\(.*?\)|\.|_/i', ' ', $matches['name']);
-                $year = (isset($matches['year'])) ? $matches['year'] : null;
-                return array('name' => $name, 'year' => $year);
+                if($yr > $year)
+                    $year = $yr;
             }
         }
+        if (isset($matches['name']))
+        {
+            $name = preg_replace('/\(.*?\)|\.|_/i', ' ', $matches['name']);
+            $year = (!is_null($year)) ? $year : null;
+            return array('name' => $name, 'year' => $year);
+        }
+
         return false;
     }
 

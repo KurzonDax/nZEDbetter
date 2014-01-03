@@ -160,7 +160,7 @@ class nameCleaning
             echo "5 - ".$cleanerName."\n";
         //Replaces some characters with 1 space.
         // Removed the apostrophe - 0827
-        $cleanerName = str_replace(array(".", "_", '-', "|", "<", ">", '"', "=", '[', "]", "(", ")", "{", "}", "*", ";", ":", ",", "~", "/", "&", "+"), " ", $cleanerName);
+        $cleanerName = str_replace(array("!!!",".", "_", '-', "|", "<", ">", '"', "=", '[', "]", "(", ")", "{", "}", "*", ";", ":", ",", "~", "/", "&", "+"), " ", $cleanerName);
         if($debug)
             echo "6 - ".$cleanerName."\n";
         // More unwanted crap
@@ -168,7 +168,8 @@ class nameCleaning
         if($debug)
             echo "7 - ".$cleanerName."\n";
         // Remove web site ads
-        $cleanerName = preg_replace('/#scnzb@efnet|Troll HD |tvp|www .+ (org|com|info|net) |sponsored by \w+ |town\s+(tv|music|movie|pr0n|anime)|art of usenet/i', '', $cleanerName);
+        $cleanerName = preg_replace('/http dream of usenet info|#scnzb@efnet|Troll HD |tvp|www .+ (org|com|info|net) |sponsored by \w+ |town\s+(tv|music|movie|pr0n|anime)|art of usenet/i', '', $cleanerName);
+		$cleanerName = preg_replace('/http nzbroyalty com|Powered by https|http Sponsored by|quot |@efnet|Old but Sold|www newsconnection eu/i', '', $cleanerName);
 		// Trying to dump the leading two sets of digits that happen from part counts in the original name: [01/30] or (14/34)
         $cleanerName = preg_replace('/^\s*\d{1,2}\s+\d{1,2}\s+/', '', $cleanerName);
         //Change [pw] to passworded.
@@ -262,15 +263,23 @@ class nameCleaning
         if( $text == NULL || $text == '')
             return false;
         // First group is case insensitive
-        $text = preg_replace('/^\d{1,2} \d{1,2} |^have fun|http lostmoviearchives com( movie)?( thumbs)?|walt disney|walt disney.s|director s cut|directors cut|TGS|E4S|RE UP |^RS |mp4a|unrated |repack |dubbed |subtitled |extended cut |x264 \w+$|x264 |englisch/i', '', $text);
-        $text = preg_replace('/MOViEONLY|uncut|DVD(5|9)|F0RFUN|www allyourbasearebelongtous pw |ANiPUNK(.+)?|Mayhem|AN0NYM0US(.+)?|EwDp|unrated|norbit|www drlecter tk | R\d|(\-)?ironclub/i', '', $text);
-        $text = preg_replace('/DAMiANA|1098JHWOTNGS|(\-)?AN0NYM0US( CD)?|sample|R E L E A S E |Pontypandy Gone Wild|color [#A-Za-z0-9]+ b |color [A-Za-z]+ size \d{1,2}|Ltu PRESENTS/i', '', $text);
-        $text = preg_replace('/hallo |Untouched|BluRay|AC3|DualAudio|xWiKi|thanks for sharing|file xyz|(\d\dth )?(special )?(collectors|special|deluxe?) edition|u4a|RiffTrax| ae /i', '', $text);
+        $text = preg_replace('/^\d{1,2} \d{1,2} |^have fun|\d\dth |http lostmoviearchives com( movie)?( thumbs)?|walt disney|walt disney.s|director s cut|directors cut|TGS|E4S|RE UP |^RS |mp4a|unrated |repack |dubbed |subtitled |extended cut |x264 \w+$|x264 |englisch/i', '', $text);
+        $text = preg_replace('/\s\s+/', ' ', $text);
+        $text = preg_replace('/MOViEONLY|Movie name|uncut|DVD(5|9)|F0RFUN|nospam@nzbworld me |www allyourbasearebelongtous pw |ANiPUNK(.+)?|Mayhem|AN0NYM0US(.+)?|EwDp|unrated|norbit|www drlecter tk | R\d|(\-)?ironclub/i', '', $text);
+        $text = preg_replace('/\s\s+/', ' ', $text);
+        $text = preg_replace('/DAMiANA|1098JHWOTNGS|(\-)?AN0NYM0US( CD)?|No Subs |NZBForum|VHSRip|sample|R E L E A S E |color [A-Za-z]+ size \d{1,2}( b)?|color [#A-Za-z0-9]+ (b |Source color)|Ltu PRESENTS/i', '', $text);
+        $text = preg_replace('/\s\s+/', ' ', $text);
+        $text = preg_replace('/hallo |rand0m|u4all eu |Untouched|BluRay|AC3|DualAudio|xWiKi|thanks for sharing|file xyz|(\d\dth )?(special )?(collectors|special|deluxe?) edition|u4a|RiffTrax| ae /i', '', $text);
         // Second group is case sensitive
-        $text = preg_replace('/^Title |KOREAN|CHINESE|EXTENDED|PePPeP|Bin Poster (\d+)?|TiTLE|TOWN MOVIE|RELEASE|TOWN |Release Name|FILL|AmA (DIVX|XviD)|PROPER |1080p|720p|480p|AVC(HD)?|(H|h)264|PAL|iNT|COMPLETE|LIMITED/', '', $text);
-        $text = preg_replace('/ENJOY|MASTER|iOM|SAM|RETAIL|MADE|NZBGRABIT LOWERS TONE AGAIN PAY PER DOWNLOAD|ip$|U+ |mOViE|[A-Z]{3,12} /', '', $text);
+        $text = preg_replace('/\s\s+/', ' ', $text);
+        $text = preg_replace('/^Title |\bll eu\b|KOREAN|CHINESE|EXTENDED|PePPeP|Bin Poster (\d+)?|TiTLE|TOWN MOVIE|RELEASE|TOWN |Release Name|FILL|AmA (DIVX|XviD)|PROPER|1080p|720p|480p|AVC(HD)?|(H|h)264|PAL|iNT|COMPLETE|LIMITED/', '', $text);
+        $text = preg_replace('/\s\s+/', ' ', $text);
+        $text = preg_replace('/\bb |\bo |ENJOY|MASTER|iOM|SAM|RETAIL|MADE|NZBGRABIT LOWERS TONE AGAIN PAY PER DOWNLOAD|ip$|U+ |mOViE/', '', $text);
+        $text = trim($text);
+        if(!preg_match('/^[A-Z0-9 ]+$/', $text))
+            preg_replace('/[A-Z]{4,12} /', '', $text);
         // Remove extra spaces
-        $text = preg_replace('/\s\s/', ' ', $text);
+        $text = preg_replace('/\s\s+/', ' ', $text);
         return trim($text);
 
     }
