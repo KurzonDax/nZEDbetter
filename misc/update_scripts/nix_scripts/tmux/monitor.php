@@ -7,7 +7,7 @@ require_once(WWW_DIR."lib/site.php");
 
 // TODO: fix the percentage calculation for the XXX line in monitor
 
-$version="2.0r0003";
+$version="2.0r0005";
 
 $db = new DB();
 $DIR = MISC_DIR;
@@ -40,7 +40,7 @@ $qry = "SELECT
 // Took foreign out of the movies to work section.  May need to make this an option.
 $proc_work = "SELECT
 	( SELECT COUNT( * ) FROM releases WHERE rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv,
-	( SELECT COUNT( * ) FROM releases WHERE imdbID IS NULL and categoryID BETWEEN 2020 AND 2999 ) AS movies,
+	( SELECT COUNT( * ) FROM releases WHERE movieID IS NULL and categoryID BETWEEN 2020 AND 2999 ) AS movies,
 	( SELECT COUNT( * ) FROM releases WHERE musicinfoID IS NULL and relnamestatus != 0 and categoryID in (3010, 3040, 3050) ) AS audio,
 	( SELECT COUNT( * ) FROM releases WHERE consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console,
 	( SELECT COUNT( * ) FROM releases WHERE bookinfoID IS NULL and categoryID = 8010 ) AS book,

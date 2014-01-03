@@ -725,7 +725,7 @@ class Movie
             echo "\033[01;36mAppears to be TV Series, changing category: " . $releasename . "\n";
             return array('TVSeries' => 'TRUE');
         }
-        preg_match('/^(?P<name>.+?)[\.\-_\(\[ ](?:dvdrip|ntsc|dvdr|bdrip|brrip|bluray|hdtv|divx|xvid|hdrip|dvdscreener|proper|repack|real\.proper|sub\.?fix|sub\.?pack|ac3d|unrated|avchd|pal |1080i|1080p|720p|19\d{2}|20\d{2})/i', $releasename, $matches);
+        preg_match('/^(?P<name>.+?)[\.\-_\(\[ ](?:dvd(rip)?|ntsc|dvdr|bdrip|brrip|bluray|hdtv|divx|xvid|hdrip|dvdscreener|proper|repack|real\.proper|sub\.?fix|sub\.?pack|ac3d|unrated|avchd|pal |1080i|1080p|720p|19\d{2}|20\d{2})/i', $releasename, $matches);
         $testYear = preg_match('/19\d\d|20\d\d/', $releasename, $years);
 
         $year = null;
@@ -739,8 +739,10 @@ class Movie
         }
         if (isset($matches['name']))
         {
-            $name = preg_replace('/\(.*?\)|\.|_/i', ' ', $matches['name']);
-            $year = (!is_null($year)) ? $year : null;
+            $name = $matches['name'];
+            $name = preg_replace('/\bhes\b/i', "he's", $name);
+            $name = preg_replace('/\bshes\b/i', "she's", $name);
+            $name = preg_replace('/\btheres\b/i', "there's", $name);
             return array('name' => $name, 'year' => $year);
         }
 
