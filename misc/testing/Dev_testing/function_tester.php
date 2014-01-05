@@ -26,8 +26,8 @@ $stop = false;
 do
 {
     $inputText = $consoletools->getUserInput("Enter text to clean: ");
-    echo "\n".$namecleaner->releaseCleaner($inputText);
-    echo "\n".$namecleaner->removeDoubleName($inputText)."\n\n";
+    echo "\n".$namecleaner->musicCleaner($inputText, true);
+    //echo "\n".$namecleaner->removeDoubleName($inputText)."\n\n";
     unset($inputText);
 } while ($stop != true);
 

@@ -284,25 +284,55 @@ class nameCleaning
 
     }
 
-    public function musicCleaner($text)
+    public function musicCleaner($text, $debug=false)
     {
+        if ($debug)
+            echo "\nCleaning Search Name\n";
 
-        $newname = preg_replace('/^\d{1,2} \d{1,2} | \d{3,4} ?(kbps|cbr)|(\d{1,2} \d{1,2} )?(Bootleg|Boxset|Clean.+Version|Compiled by.+|\d{1,2}CDs?|Digipak|DIRFIX|DVBS|FLAC|(Ltd )?(Deluxe|Limited|Special).+Edition|Promo|PROOF|Reissue|Remastered|REPACK|RETAIL(.+UK)?|SACD|Sampler|SAT|Summer.+Mag|UK.+Import|Deluxe.+Version|VINYL|WEB)/i', ' ', $text);
+        $newname = preg_replace('/(^| )\d{1,2} \d{1,2} | \d{3,4} ?(kbps|cbr)|(\d{1,2} \d{1,2} )?(Bootleg|Boxset|Clean.+Version|Compiled by.+|\d{1,2}CDs?|Digipak|DIRFIX|DVBS|FLAC|(Ltd )?(Deluxe|Limited|Special).+Edition|Promo|PROOF|Reissue|Remastered|REPACK|RETAIL(.+UK)?|SACD|Sampler|\bSAT\b|Summer.+Mag|UK.+Import|Deluxe.+Version|VINYL|WEB)/i', ' ', $text);
+        if($debug)
+            echo "1 - " . $newname . "\n";
         $newname = preg_replace('/ ([a-z]+[0-9]+[a-z]+[0-9]+.+|[a-z]{2,}[0-9]{2,}?.+|3FM|B00[a-z0-9]+|BRC482012|H056|UXM1DW086|(4WCD|ATL|bigFM|CDP|DST|ERE|FIM|MBZZ|MSOne|MVRD|QEDCD|RNB|SBD|SFT|ZYX) \d.+)/i', ' ', $newname);
+        if ($debug)
+            echo "2 - " . $newname . "\n";
         $newname = preg_replace('/ (\d{1,2} \d{1,2} )?([A-Z])( ?$)|[0-9]{8,}| (CABLE|FREEWEB|LINE|MAG|MCD|YMRSMILES)/', ' ', $newname);
-        $newname = preg_replace('/VA( |-)/', 'Various Artists ', $newname);
-        $newname = preg_replace('/ (\d{1,2} \d{1,2} )?(DAB|DE|DVBC|EP|FIX|IT|Jap|NL|PL|(Pure )?FM|SSL|VLS) |\d{1,2} \d{1,2}$/i', ' ', $newname);
-        $newname = preg_replace('/ (\d{1,2} \d{1,2} )?(CD(A|EP|M|R|S)?|QEDCD|SBD) |Uploader Presents/i', ' ', $newname);
-
-        $newname = trim(preg_replace('/ [a-z]{2}$| [a-z]{3} \d{2,}$|\d{5,} \d{5,}$/i', '', $newname));
+        if ($debug)
+            echo "3 - " . $newname . "\n";
+        $newname = preg_replace('/VA( |-)((P|p)romo?)?(tion)?/', 'Various Artists ', $newname);
+        if ($debug)
+            echo "4 - " . $newname . "\n";
+        $newname = preg_replace('/ (\d{1,2} \d{1,2} )?(DAB|DE|DVBC|EP|FIX|IT|Jap|NL|PL|(Pure )?FM|SSL|VLS) |\d{1,2} \d{1,2}$|\((?!19\d\d|20\d\d).+\)/i', ' ', $newname);
+        if ($debug)
+            echo "5 - " . $newname . "\n";
+        $newname = preg_replace('/ (\d{1,2} \d{1,2} )?(CD(A|EP|M|R|S)?|QEDCD|SBD) |Uploader Presents|[ \-_]12"/i', ' ', $newname);
+        if ($debug)
+            echo "6 - " . $newname . "\n";
+        $newname = trim(preg_replace('/ (60s|70s|80s|90s) | (EP|LP)$| [a-z]{3} \d{2,}$|\d{5,} \d{5,}$/i', '', $newname));
+        if ($debug)
+            echo "7 - " . $newname . "\n";
         // Below tries to catch a lot of the crap that shows up before and after the title
-        $newname = trim(preg_replace('/music$/i', '', $newname));
+        $newname = trim(preg_replace('/music$|oldtimer post|320$/i', '', $newname));
+        if ($debug)
+            echo "8 - " . $newname . "\n";
         $newname = trim(preg_replace('/_|\./', ' ', $newname));
-        $newname = trim(preg_replace('/download all our files with|illuminatenboard org|MP3|#a b|inner sanctum@EFNET|[a-z]{1,10}@EFNET|Gate [0-9]{1,2} [0-9]{2,12}|kere ws|#altbin@EFNet|www Thunder News org|usenet of inferno us|TOWN|SEK9 FLAC Hip Hop|SEK9 FLAC [A-Za-z]{4,10}|powerd by getnzb com|Wildrose [0-9]{3,6}|DREAM OF USENET INFO|http dream of usenet info/', '', $newname));
-        $newname = trim(preg_replace('/ \( |CD FLAC|[A-Z]{3,12}| 0{2,4}| proof| dl| m3u|2Eleven|[A-Z]{1,8}[0-9]{1,3}|by Secretusenet|[ \-_][0-9]{3}[ \-_]|DeVOiD|k4|FiH|LoKET|SPiEL|[A-Z]{3,}[0-9]{1,4}CD|flacme|nmr@VBR apex 00|12 Vinyl|[0-9]{2,3} kbps|CBR 00/', '', $newname));
-        $newname = trim(preg_replace('/-[A-Za-z]{3}-[0-9]{2}-[0-9]{2}-|--[0-9]{2}-[0-9]{2}|\w{2}-[A-Za-z]{2,3}-[0-9]{2}-[0-9]{2}|\d\d-\d\d-|-cd-|\(Proton Radio\)|\(Pure FM\)|-[A-Za-z]{2,3}-web-|-web-|\(Maxima FM\)|trtk|Complete Sun records singles|-FM-\d{1,2}-\d{1,2}/i', '', $newname));
+        if ($debug)
+            echo "9 - " . $newname . "\n";
+        $newname = trim(preg_replace('/ [a-z]\d\d|download all our files with|illuminatenboard org|(MP|mp)3|#a b|inner sanctum@EFNET|[a-z]{1,10}@EFNET|Gate [0-9]{1,2} [0-9]{2,12}|kere ws|#altbin@EFNet|www Thunder News org|usenet of inferno us|TOWN|SEK9 FLAC Hip Hop|SEK9 FLAC [A-Za-z]{4,10}|powerd by getnzb com|Wildrose [0-9]{3,6}|DREAM OF USENET INFO|http dream of usenet info| EAC/', '', $newname));
+        $newname = trim(preg_replace('/Attn \w+ (here are some of your missings)?( I think )?/i', '', $newname));
+        if ($debug)
+            echo "A - " . $newname . "\n";
+        $newname = trim(preg_replace('/ \( |CD FLAC|(?<!^|[A-Z ])[A-Z]{3,12}| 0{2,4}| proof|ATRium| dl| m3u|2Eleven|[A-Z]{1,8}[0-9]{1,3}|by Secretusenet|[ \-_][0-9]{3}[ \-_]|DeVOiD|k4|FiH|LoKET|SPiEL|[A-Z]{3,}[0-9]{1,4}CD|flacme|nmr@VBR apex 00|12 Vinyl|[0-9]{2,3} kbps|CBR 00 |ENJOY(!+)?/', '', $newname));
+        if ($debug)
+            echo "B - " . $newname . "\n";
+        $newname = trim(preg_replace('/-[A-Za-z]{3}-[0-9]{2}-[0-9]{2}-|--[0-9]{2}-[0-9]{2}|\w{2}-[A-Za-z]{2,3}-[0-9]{2}-[0-9]{2}|\d\d-\d\d-|-cd-|\(Proton Radio\)|\(Pure FM\)|-[A-Za-z]{2,3}-web-|-web-|\(Maxima FM\)|trtk|Complete Sun records singles|-FM-\d{1,2}-\d{1,2}|\b320\b/i', '', $newname));
+        if ($debug)
+            echo "C - " . $newname . "\n";
         $newname = trim(preg_replace('/\($/', '', $newname));  // Get rid of extra trailing '(' that shows up for some reason
-        $newname = trim(preg_replace('/\s\s+/', ' ', $newname));
+        if ($debug)
+            echo "D - " . $newname . "\n";
+        $newname = trim(preg_replace('/\s\s+|@/', ' ', $newname));
+        if ($debug)
+            echo "E - " . $newname . "\n";
         // End crap trimming
         return trim($newname);
 

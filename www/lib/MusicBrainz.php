@@ -56,7 +56,8 @@ class MusicBrainz {
                 /* parse XML */
                 $parsed_xml = @simplexml_load_string($xml_response);
                 curl_close($ch);
-                return ($parsed_xml === false) ? false :  json_decode(json_encode($parsed_xml), 1);
+                // return ($parsed_xml === false) ? false :  json_decode(json_encode($parsed_xml), 1);
+                return $parsed_xml;
             }
         }
         else
