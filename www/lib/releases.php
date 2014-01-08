@@ -2066,6 +2066,7 @@ class Releases
             }
 
             $db->setAutoCommit(false);
+
             while ($currentCol=$db->fetchAssoc($completeCols))
             {
                 $colsDeleted++;
@@ -2078,6 +2079,10 @@ class Releases
 
                 $db->queryDirect("DELETE binaries FROM binaries WHERE collectionID=".$currentCol['ID']);
                 $binsDeleted += $db->getAffectedRows();
+                // Added following to help prevent enormous transactions from stalling the database
+                // at the end of the purge cycle.
+                if($colsDeleted % 100 == 0)
+                    $db->Commit();
 
             }
             $db->Commit();
@@ -2088,6 +2093,9 @@ class Releases
             $loopTime = microtime(true) - $loopTime;
             if ($colsDeleted>0)
                 $avgDeleteTime = $loopTime/$colsDeleted;
+
+            if ($partsDeleted>0)
+                $avgPartDeleteTime = ($loopTime/$partsDeleted) * 1000;
             if ($echooutput)
             {
                 echo "\n\033[00;36mTotal Objects Removed:\n";
@@ -2096,7 +2104,8 @@ class Releases
                 echo "Binaries:     ".number_format($binsDeleted)."\n";
                 echo "Parts:        ".number_format($partsDeleted)."\n\n";
                 echo "Processing completed in ".number_format($loopTime, 2)." seconds.\n";
-                echo "Average per collection: ".number_format($avgDeleteTime,4)." seconds\n\033[00;37m";
+                echo "Average per collection: ".number_format($avgDeleteTime,4)." seconds\n";
+                echo "Average per part: ".number_format($avgPartDeleteTime, 4)." microseconds\n\n\033[00;37m";
                 // Adding sleep here to give MySQL time to purge changes
                 sleep(5);
             }
