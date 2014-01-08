@@ -2113,7 +2113,7 @@ class Releases
                 // Adding sleep here to give MySQL time to purge changes
                 sleep(5);
             }
-        } while (($colsDeleted>0 && $fastAndFurious == 'TRUE') || $totalColsPurged >= $this->maxColsPurgePerLoop);
+        } while ($colsDeleted>0 && $fastAndFurious == 'TRUE' && $totalColsPurged <= $this->maxColsPurgePerLoop);
 
         if(((time()>=$this->nextCrosspostCheck) || $this->nextCrosspostCheck==0))
         {
@@ -2727,9 +2727,10 @@ class Releases
             {
                 while($releaseRow=$db->fetchAssoc($resReleases))
                 {
+                    $completionCount++;
                     $consoleTools->overWrite("Deleting releases ".$consoleTools->percentString($completionCount,$releaseCount));
                     $this->fastDelete($releaseRow['ID'], $releaseRow['guid'], $this->site);
-                    $completionCount++;
+
                 }
 
             if($echoOutput)
