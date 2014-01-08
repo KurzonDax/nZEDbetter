@@ -46,85 +46,200 @@ while($musicRow = $db->fetchAssoc($musicReleases))
 {
     if(preg_match('/bootleg/i', $musicRow['name']) === 1)
     {
-        echo "Skipping bootleg release: " . $musicRow['name'] . "\n";
-        $consoleTools->getUserInput('Press enter to continue...');
+        if(DEBUG_ECHO)
+        {
+            echo "Skipping bootleg release: " . $musicRow['name'] . "\n";
+            $consoleTools->getUserInput('Press enter to continue...');
+        }
         continue;
     }
     $cleanSearchName = $nameCleaning->musicCleaner($musicRow['searchname']);
     $query = cleanQuery($cleanSearchName);
     $artist = false;
     $recording = false;
-    preg_match('/\(?(19|20)\d\d\)?(?!.+(19|20)\d\d)/', $musicRow['searchname'], $year);
+    if(preg_match('/\(?(19|20)\d\d\)?(?!.+(19|20)\d\d)(?!kbps|x)/', $musicRow['searchname'], $year) === 0)
+        preg_match('/\(?(19|20)\d\d\)?(?!.+(19|20)\d\d)(?!kbps|x)/', $musicRow['name'], $year);
+
+    echo "\nRelease ID:     " . $musicRow['ID'] . "\n";
+    echo   "Release name:   " . $musicRow['name'] . "\n\n";
+    echo   "Search Name:    " . $musicRow['searchname'] . "\n";
+    echo   "Release Year:   " . (isset($year[0]) ? $year[0] : "Not Found") . "\n";
+    echo   "Query String:   " . $query . "\n";
 
     $singleTitle = isSingle($musicRow['name']);
 
+    $artistSearchArray[] = $musicRow['searchname'];
+    $artistSearchArray[] = normalizeString($musicRow['searchname']);
+    $artistSearchArray[] = normalizeString($musicRow['searchname'], true);
+    $artistSearchArray[] = $musicRow['name'];
+    $artistSearchArray[] = normalizeString($musicRow['name']);
+    $artistSearchArray[] = normalizeString($musicRow['name'], true);
+
     if(!is_array($singleTitle))
     {
-        $result = getReleaseName($query, $artist, $cleanSearchName, (isset($year[0]) ? $year[0] : null));
-        if($result)
+        $artistResult = getArtist($query, $artistSearchArray);
+        if($artistResult)
         {
-            echo "\n\nRelease name match: ".$result['title']."\nMB ID: ".$result['mbID']."\n";
-            echo "Artist: ".$result['artist']."\n";
-            echo "Artist ID: ".$result['artistID']."\n";
-            $matchedReleases ++;
+
+            $query = trim(preg_replace('/\b' . $artistResult['matchString'] . '\b/i', '', $query));
+            $releaseSearchArr = array();
+
+            $releaseSearchArr = __buildReleaseSearchArray($musicRow['searchname'], $releaseSearchArr);
+            $releaseSearchArr = __buildReleaseSearchArray($musicRow['name'], $releaseSearchArr);
+
+            $result = getReleaseName($query, $artistResult, $releaseSearchArr, (isset($year[0]) ? $year[0] : null));
+            if($result)
+            {
+                echo "\n\nRelease name match: ".$result['title']."\nMB ID: ".$result['mbID']."\n";
+                echo "Artist: ".$result['artist']."\n";
+                echo "Artist ID: ".$result['artistID']."\n";
+                $matchedReleases ++;
+            }
+            else
+                echo "\n\nNo release name matches found\n";
         }
         else
-            echo "\n\nNo release name matches found\n";
+            echo "\n\nArtist could not be determined for release\n";
 
     }
     else
     {
-        echo "Song Track: ".$singleTitle['track']." ".$singleTitle['title']."\n";
-        $singleReleases ++;
+        $singleReleases++;
         $prefix = isset($singleTitle['disc']) ? (string)$singleTitle['disc'] . (string)$singleTitle['track'] : $singleTitle['track'];
         $query = preg_replace('/^' . $prefix . '/', '', $query);
-        $result = getArtist((isset($singleTitle['artist']) ? $singleTitle['artist'] : $query), $musicRow['searchname'], $musicRow['name']);
-        if($result)
-        {
-            // $recording = getRecording($singleTitle[2], $result['name'], false, $musicRow['name']);
-            echo "\nArtist Name: ".$result['name']."\n";
-            echo "Artist ID:    ".$result['id']."\n";
-            echo "Percent Match: ".$result['percentMatch']."\n";
-        }
-        else
-            echo "\n\nUnable to match an artist for this single.\n\n";
+
+        $artistResult = getArtist((isset($singleTitle['artist']) ? $singleTitle['artist'] : $query), $artistSearchArray);
 
         echo "Song " . (isset($singleTitle['disc']) ? "Disc: " . $singleTitle['disc'] . " " : '') . "Track: " . (isset($singleTitle['track']) ? $singleTitle['track'] : "Not Found") . "\n";
         echo "Song Title:   " . $singleTitle['title'] . "\n";
         echo "Song Release: " . (isset($singleTitle['release']) ? $singleTitle['release'] : "Not Found") . "\n";
         echo "Song Artist:  " . (isset($singleTitle['artist']) ? $singleTitle['artist'] : 'Not Found') . "\n";
+
+        if($artistResult)
+        {
+
+            echo "\nArtist Name:    ".$artistResult['name']."\n";
+            echo   "Artist ID:      ".$artistResult['id']."\n";
+            echo   "Percent Match:  ".$artistResult['percentMatch']."\n";
+            if(isset($year[0]))
+                $singleTitle['year'] = $year[0];
+            $singleTitle['releaseID'] = $musicRow['ID'];
+            $recording = getRecording($singleTitle, $artistResult, $musicRow['name']);
+            if($recording)
+            {
+                echo "\nRecording Title:   " . $recording['title'] . "\n";
+                echo   "Recording mbID:    " . $recording['mbID'] . "\n";
+                echo   "Recording Release: " . ($recording['release'] !== false ? $recording['release']['title'] : "Not Found") . "\n";
+                echo   "Recording Rel ID:  " . ($recording['release'] !== false ? $recording['release']['mbID'] : "Not Found") . "\n";
+            }
+            else
+            {
+                echo "\nUnable to find a match for this single.\n";
+            }
+        }
+        else
+            echo "\n\nUnable to match an artist for this single.\n";
+
+
     }
-    echo "\nRelease ID: " . $musicRow['ID'] . "\n";
-    echo "Release name: " . $musicRow['name'] . "\n\n";
-    echo "Search Name:  " . $musicRow['searchname'] . "\n";
-    echo "Release Year: " . (isset($year[0]) ? $year[0] : "Not Found") . "\n";
-    echo "Clean Name:   " . $cleanSearchName . "\n";
-    echo "Query String: " . $query . "\n";
+
 
     // if(DEBUG_ECHO)
         $consoleTools->getUserInput("\nPress enter to continue: ");
 }
-echo "\nSuspected Singles Found: ".$singleReleases;
+echo "\nSingles Found: ".$singleReleases;
 echo "\nTotal Releases Matched: ".$matchedReleases."\n";
 echo "Match Percentage: ".($totalReleases > 0 ? (($matchedReleases/($totalReleases-$singleReleases)*100)) : '0%')."\n";
 exit ("\nThanks for playing...\n");
 
+
 /**
- * @param string $query
- * @param string $orgSearchName
- * @param string $releaseName
+ * @param string    $text           text to use as base
+ * @param array     $searchArray    Array to append results to
+ *                                  
+ * @return array
+ *
+ * This function builds an array of strings based on rules defined within the
+ * function.  The array is then used to compare release search results against.
+ */
+function __buildReleaseSearchArray($text, $searchArray)
+{
+    $searchArray[] = $text;
+    $searchArray[] = normalizeString($text);
+    $searchArray[] = normalizeString($text, true);
+
+    // Remove the word "volume" because many entries in MusicBrainz don't include it
+    // i.e. instead of Great Music Volume 1, MB will have Great Music 1
+    if (preg_match('/\bVolume\b/i', $text))
+        $searchArray[] = preg_replace('/\bVolume\b/i', ' ', $text);
+    // Replace ordinal numbers with roman numerals
+    preg_match('/\bVolume[ \-_\.](\d)\b/i', $text, $matches);
+    switch ($matches[1])
+    {
+        case '1':
+            $searchArray[] = preg_replace('\bVolume[ \-_\.]1\b', ' Volume I ', $text);
+            $searchArray[] = preg_replace('\bVolume[ \-_\.]1\b', ' I ', $text);
+            break;
+        case '2':
+            $searchArray[] = preg_replace('\bVolume[ \-_\.]2\b', ' Volume II ', $text);
+            $searchArray[] = preg_replace('\bVolume[ \-_\.]2\b', ' II ', $text);
+            break;
+        case '3':
+            $searchArray[] = preg_replace('\bVolume[ \-_\.]3\b', ' Volume III ', $text);
+            $searchArray[] = preg_replace('\bVolume[ \-_\.]3\b', ' III ', $text);
+            break;
+        case '4':
+            $searchArray[] = preg_replace('\bVolume[ \-_\.]4\b', ' Volume IV ', $text);
+            $searchArray[] = preg_replace('\bVolume[ \-_\.]4\b', ' IV ', $text);
+            break;
+        case '5':
+            $searchArray[] = preg_replace('\bVolume[ \-_\.]5\b', ' Volume V ', $text);
+            $searchArray[] = preg_replace('\bVolume[ \-_\.]5\b', ' V ', $text);
+            break;
+    }
+
+    // Get rid of extra spaces in all values
+    foreach ($searchArray as $key => $value)
+    {
+        $searchArray[$key] = preg_replace('/\s{2,}/', ' ', $value);
+    }
+
+    return $searchArray;
+}
+
+/**
+ * @param string        $query          Search string to be sent to MusicBrainz
+ * @param string|array  $searchArray    String or array of strings that results should be matched against
  *
  * @return array|bool
  */
-function getArtist($query, $orgSearchName, $releaseName = '')
+function getArtist($query, $searchArray)
 {
     $musicBrainz = new MusicBrainz();
-    $orgSearchName = normalizeString($orgSearchName);
+
+    if(!is_array($searchArray))
+    {
+        $temp = $searchArray;
+        unset($searchArray);
+        $searchArray = array();
+        $searchArray[] = $temp;
+        $searchArray[] = normalizeString($temp);
+        $searchArray[] = normalizeString($temp, true);
+    }
+
     $return = false;
     $results = $musicBrainz->searchArtist($query, '', 50);
 
     $wordCount = count(explode(' ', $query));
+    if($query == 'VA')
+    {
+        $return['name'] = 'Various Artists';
+        $return['id'] = '89ad4ac3-39f7-470e-963a-56509c546377';
+        $return['matchString'] = 'VA';
+        $return['percentMatch'] = '100';
 
+        return $return;
+    }
     //if($results['artist-list']['@attributes']['count'] == '0')
     $resultsAttr = isset($results->{'artist-list'}) ? $results->{'artist-list'}->attributes() : array();
     if(isset($resultsAttr['count']) && $resultsAttr['count'] == '0')
@@ -147,14 +262,18 @@ function getArtist($query, $orgSearchName, $releaseName = '')
     foreach($results->{'artist-list'}->artist as $artist)
     {
 
-        $artistCheck = checkArtistName($artist, $orgSearchName, false, (((30-$i) / 30) * 10));
+        $artistCheck = checkArtistName($artist, $searchArray, false, (((30-$i) / 30) * 10));
         if($artistCheck && $artistCheck['percentMatch'] > $percentMatch)
         {
             // The following helps to prevent single-word artists from matching an artist
             // with a similar full name (i.e Pink should not match Pink Floyd)
             // Obviously only works if the query string is two words or less
             if($wordCount < 3 && count(explode(' ' , $artistCheck['name'])) != $wordCount)
+            {
+                if(DEBUG_ECHO)
+                    echo "Matching artist name too short: " . $artistCheck['name'] . "\n";
                 continue;
+            }
             $return = $artistCheck;
             $percentMatch = $artistCheck['percentMatch'];
         }
@@ -166,8 +285,8 @@ function getArtist($query, $orgSearchName, $releaseName = '')
 
 /**
  * @param string            $query          searchname after musicCleaner and cleanQuery
- * @param string            $artist         Name of artist
- * @param string            $orgSearchName  nZEDbetter searchname after musicCleaner
+ * @param array|bool        $artist         Array with 'name' and 'mbID' of artist or false
+ * @param array             $searchArray    array of strings to compare results against
  * @param integer|null      $year           Year of release
  *
  * @return array|bool
@@ -175,37 +294,10 @@ function getArtist($query, $orgSearchName, $releaseName = '')
  * NOTE: If an artist is provided, better results will be obtained if the artist
  * name is removed from the $query string
  */
-function getReleaseName($query, $artist, $orgSearchName, $year=null)
+function getReleaseName($query, $artist, $searchArray, $year=null)
 {
-    $orgSearchName = normalizeString($orgSearchName);
-    $searchNameArr = array();
-    $searchNameArr[] = $orgSearchName;
-    if(substr_count($orgSearchName, ' Volume '))
-        $searchNameArr[] = str_ireplace(' Volume ',' ',$orgSearchName);
-    preg_match('/Volume (\d)\b/i', $orgSearchName, $matches);
-    switch ($matches[1])
-    {
-        case '1':
-            $searchNameArr[] = str_ireplace(' Volume 1',' Volume I',$orgSearchName);
-            $searchNameArr[] = str_ireplace(' Volume 1',' I',$orgSearchName);
-            break;
-        case '2':
-            $searchNameArr[] = str_ireplace(' Volume 2',' Volume II',$orgSearchName);
-            $searchNameArr[] = str_ireplace(' Volume 2',' II',$orgSearchName);
-            break;
-        case '3':
-            $searchNameArr[] = str_ireplace(' Volume 3',' Volume III',$orgSearchName);
-            $searchNameArr[] = str_ireplace(' Volume 3',' III',$orgSearchName);
-            break;
-        case '4':
-            $searchNameArr[] = str_ireplace(' Volume 4',' Volume IV',$orgSearchName);
-            $searchNameArr[] = str_ireplace(' Volume 4',' IV',$orgSearchName);
-            break;
-        case '5':
-            $searchNameArr[] = str_ireplace(' Volume 5',' Volume V',$orgSearchName);
-            $searchNameArr[] = str_ireplace(' Volume 5',' V',$orgSearchName);
-            break;
-    }
+    // enforce artist requirement
+    // check all occurrences of $searchArray, fix $searchNameArr to use $searchArray
 
     $query = normalizeString($query);
     $musicBrainz = new MusicBrainz();
@@ -220,8 +312,8 @@ function getReleaseName($query, $artist, $orgSearchName, $year=null)
     }
     else
     {
-        $artistArr['name'] = $artist;
-        $results = $musicBrainz->searchRelease($query, 'release', normalizeString($artist), 'artistname');
+        $artistArr = $artist;
+        $results = $musicBrainz->searchRelease($query, 'release', normalizeString($artistArr['name']), 'artistname');
     }
     if(!isset($results->{'release-list'}->attributes()->count))
         print_r($results);
@@ -238,7 +330,7 @@ function getReleaseName($query, $artist, $orgSearchName, $year=null)
     if($results->{'release-list'}->attributes()->count == '1')
     {
         $matchFound = false;
-        foreach($searchNameArr as $searchName)
+        foreach($searchArray as $searchName)
         {
             if(stripos($searchName, normalizeString($results->{'release-list'}->release->title)) === false &&
                 stripos(normalizeString($searchName, true), normalizeString($results->{'release-list'}->release->title, true)) === false)
@@ -262,13 +354,13 @@ function getReleaseName($query, $artist, $orgSearchName, $year=null)
             $return['mbID'] = $results->{'release-list'}->release->attributes()->id;
         }
     }
-    else
+    else // More than 1 release was found
     {
         foreach($results->{'release-list'}->release as $release)
         {
             $matchFound = false;
             $matchedSearchName = '';
-            foreach($searchNameArr as $searchName)
+            foreach($searchArray as $searchName)
             {
                 if(stripos($searchName, normalizeString($release->title)) === false &&
                     stripos(normalizeString($searchName, true), normalizeString($release->title, true)) === false)
@@ -288,7 +380,7 @@ function getReleaseName($query, $artist, $orgSearchName, $year=null)
             }
             else
             {
-                similar_text(normalizeString($release->title), $orgSearchName, $tempMatch);
+                similar_text(normalizeString($release->title), $matchedSearchName, $tempMatch);
                 if(DEBUG_ECHO)
                     echo "Checking release: ".$release->title."\n";
                 if(!$artist && isset($release->{'artist-credit'}->{'name-credit'}))
@@ -298,9 +390,9 @@ function getReleaseName($query, $artist, $orgSearchName, $year=null)
                     foreach($release->{'artist-credit'}->{'name-credit'} as $relArtist)
                     {
                         if(isset($relArtist->name))
-                            $artistArr = checkArtistName($relArtist, $orgSearchName, false, (((30 - $i) / 30) * 10));
+                            $artistArr = checkArtistName($relArtist, $searchArray, false, (((30 - $i) / 30) * 10));
                         else
-                            $artistArr = checkArtistName($relArtist->artist, $orgSearchName, false, (((30 - $i) / 30) * 10));
+                            $artistArr = checkArtistName($relArtist->artist, $searchArray, false, (((30 - $i) / 30) * 10));
                         if($artistArr && stripos($query, normalizeString($artistArr['name'])) !== false)
                         {
                             $tempMatch += 25;
@@ -325,7 +417,8 @@ function getReleaseName($query, $artist, $orgSearchName, $year=null)
                         echo "Artist name and release title are the same, but not looking for self-titled release\n";
                     continue;
                 }
-                elseif(stripos(trim(preg_replace('/'.normalizeString($artistArr['name'], true).'/', '', normalizeString($matchedSearchName, true), 1)), trim(normalizeString($release->title, true))) === false)
+                elseif(stripos(trim(preg_replace('/'.normalizeString($artistArr['name'], true).'/', '', normalizeString($matchedSearchName, true), 1)),
+                        trim(normalizeString($release->title, true))) === false)
                 {
                     if(DEBUG_ECHO)
                         echo "Title no longer matched after extracting artist's name.\n";
@@ -374,14 +467,12 @@ function getReleaseName($query, $artist, $orgSearchName, $year=null)
 }
 
 /**
- * @param string        $query          query string
- * @param bool|array    $artistArr      false or name=>Artist Name or null, id=>MB Artist ID or null
- * @param string        $orgSearchName  nZEDbetter release name
- * @param string|int    $trackNumber    Optional, Track Number of Song
+ * @param array     $query                  query array containing artist (required), title (required), release, track, year
+ * @param bool      $requireReleaseMatch    Whether or not to only match the title if the release matches as well
  *
  * @return bool|array
  */
-function getRecording($query, $artistArr, $orgSearchName, $trackNumber='')
+function getRecording($query, $requireReleaseMatch = false)
 {
     /*      searchRecording Possible Fields
      *      arid 			artist id
@@ -395,26 +486,253 @@ function getRecording($query, $artistArr, $orgSearchName, $trackNumber='')
     $return = false;
     $results = array();
 
-    if(!$artistArr)
+    // Experimental - remove text inside parenthesis.  Usually contains a second artist, i.e. (featuring John Doe), but
+    // seems to cause a lot of non-matches, or mismatches
+    $query = preg_replace('/\([\w\s\.\-]+\)/', '', $query);
+
+    if(is_array($query) && isset($query['title']))
     {
-        $results = $musicBrainz->searchRecording($query);
+            $results = $musicBrainz->searchRecording($query['title'], 'recording', $query['artist'], 'artistname');
     }
-    elseif(!is_null($artistArr['id']))
+
+    if (!isset($results->{'recording-list'}->attributes()->count))
+        print_r($results);
+    if ($results->{'recording-list'}->attributes()->count == '0')
     {
-        $results = $musicBrainz->searchRecording($query, 'recording', $artistArr['id'], 'arid');
-    }
-    elseif(!is_null($artistArr['name']))
+        if (DEBUG_ECHO)
+            echo "Recording search returned no results\n";
+
+        return $return;
+    } else
+        if (DEBUG_ECHO)
+            echo "Recordings Found: " . $results->{'recording-list'}->attributes()->count . "\n";
+
+
+    $normalizedTitleArr = array();
+    $normalizedTitleArr[] = isset($query['title']) ? normalizeString($query['title']) : normalizeString($query);
+    $normalizedTitleArr[] = isset($query['title']) ? normalizeString($query['title'], true) : normalizeString($query, true);
+
+/*    if ($results->{'recording-list'}->attributes()->count == '1')
     {
-        $results = $musicBrainz->searchRecording($query, 'recording', $artistArr['name'], 'artist');
+        $matchFound = false;
+        foreach ($normalizedTitleArr as $normalizedTitle)
+        {
+            if(DEBUG_ECHO)
+            {
+                echo "Checking Title: " . $normalizedTitle . "\n";
+                echo "Against Title:  " . normalizeString($results->{'recording-list'}->recording->title) . "\n";
+            }
+            if (stripos($normalizedTitle, normalizeString($results->{'recording-list'}->recording->title)) === false &&
+                stripos($normalizedTitle, normalizeString($results->{'recording-list'}->recording->title, true)) === false &&
+                stripos(normalizeString($results->{'recording-list'}->recording->title), $normalizedTitle) === false &&
+                stripos(normalizeString($results->{'recording-list'}->recording->title, true), $normalizedTitle) === false &&
+                $normalizedTitle != normalizeString($results->{'recording-list'}->recording->title))
+                    continue;
+            else
+            {
+                $matchFound = true;
+                break;
+            }
+        }
+        if (!$matchFound)
+        {
+            if (DEBUG_ECHO)
+                echo "Non-matching recording: " . $results->{'recording-list'}->recording->title . "\n";
+
+            return false;
+        }
+        else // The single result matched the query
+        {
+            // Check for a matching release for the recording
+            $releaseMatchFound = false;
+            if (isset($query['release']) && isset($results->{'recording-list'}->recording->{'release-list'}))
+            {
+                if($releaseArr = __getRecordingRelease($query, $results->{'recording-list'}->recording->{'release-list'})) // release loop
+                    $releaseMatchFound = true;
+            }
+            else // query['release'] is not set, or there was not a release list in the results
+            {
+                $releaseMatchFound = true; //Simplifies coding to fake a release match
+                $releaseArr = false; // But the release array won't contain anything
+            }
+
+            if (!$releaseMatchFound && $requireReleaseMatch)
+            {
+                if (DEBUG_ECHO)
+                    echo "No matching release for matched title.\n";
+                return false;
+            }
+            else
+            {
+                similar_text((isset($query['title']) ? $query['title'] : $query), $results->{'recording-list'}->recording->title, $tempPercentMatch);
+                if (!is_array($return))
+                    $return = array();
+                $return['title'] = $results->{'recording-list'}->recording->title;
+                $return['mbID'] = $results->{'recording-list'}->recording->attributes()->id;
+                $return['percentMatch'] = $percentMatch = $tempPercentMatch;
+                $return['release'] = $releaseArr;
+
+            } // Release match is true
+        }  // The single result matched the query
     }
+    else // More than 1 recording was found
+    {*/
+        $i = 0;     // Recording result counter, used for weighting results
+        $percentMatch = -1000;
+        foreach($results->{'recording-list'}->recording as $recording)
+        {
+            $matchFound = false;
+            $releaseArr = false;
+            foreach ($normalizedTitleArr as $normalizedTitle)
+            {
+                if (DEBUG_ECHO)
+                {
+                    echo "Checking Title: " . $normalizedTitle . "\n";
+                    echo "Against Title:  " . normalizeString($recording->title) . "\n";
+                }
+                if (stripos($normalizedTitle, normalizeString($recording->title)) === false &&
+                    stripos($normalizedTitle, normalizeString($recording->title, true)) === false &&
+                    stripos(normalizeString($recording->title), $normalizedTitle) === false &&
+                    stripos(normalizeString($recording->title, true), $normalizedTitle) === false &&
+                    $normalizedTitle != normalizeString($recording->title))
+                    continue;
+                else
+                {
+                    $matchFound = true;
+                    break;
+                }
+            }
+            if($matchFound)
+            {
+                // Check for a matching release for the recording
+                $releaseMatchFound = false;
+                if(isset($query['release']) && isset($recording->{'release-list'}))
+                {
+                    if($releaseArr = __getRecordingRelease($query, $recording->{'release-list'}))   // release loop
+                        $releaseMatchFound = true;
+                }
+                else // query['release'] is not set, or there was not a release list in the results
+                {
+                    $releaseMatchFound = true; //Simplifies coding to fake a release match
+                    $releaseArr = false; // But the release array won't contain anything
+                }
+                if(!$releaseMatchFound && $requireReleaseMatch)
+                {
+                    if(DEBUG_ECHO)
+                        echo "No matching release for matched title.\n";
+                    continue;
+                }
+                else
+                {
+                    similar_text((isset($query['title']) ? $query['title'] : $query), $recording->title, $tempPercentMatch);
+                    $tempPercentMatch += (((30 - $i) / 30) * 10); // matches weighted based on position in results list
+                    $tempPercentMatch += ($releaseMatchFound && isset($recording->{'release-list'}) ? 15 : 0);  //Weight recordings for which the release matched
+                    if($tempPercentMatch > $percentMatch)
+                    {
+                        if (!is_array($return))
+                            $return = array();
+                        $return['title'] = $recording->title;
+                        $return['mbID'] = $recording->attributes()->id;
+                        $return['percentMatch'] = $percentMatch = $tempPercentMatch;
+                        $return['release'] = $releaseArr;
+                    }
+                } // Release match is true
+            } // Title match found
+            else
+            {
+                if(DEBUG_ECHO)
+                    echo "Non-matching recording title: " . $recording->title . "\n";
+            }
+            $i ++; // Increment the recording result counter
+        }   // Recording result loop
+    //}   // More than one result
+
+    ob_start();
     print_r($results);
+    $resultsString = ob_get_clean();
+    file_put_contents(WWW_DIR . 'lib/logging/vardump/'.$query['releaseID'].'-'.$query['artist'].'-'.$query['title'].'.log', $resultsString);
+
 
     return $return;
 }
 
 /**
- * @param $text
+ * @param $query
+ * @param $releaseList
  *
+ * @return array
+ */
+function __getRecordingRelease($query, $releaseList)
+{
+    $releaseMatchFound = false;
+    $x = 0;
+    $releasePercentMatch = $tempReleasePercentMatch = -1000;
+    $releaseArr = false;
+
+    if (isset($query['release']))
+    {
+        $normalizedReleaseArr = array();
+        $normalizedReleaseArr[] = normalizeString($query['release']);
+        $normalizedReleaseArr[] = normalizeString($query['release'], true);
+
+    } else
+        $normalizedReleaseArr = null;
+
+    foreach ($releaseList->release as $release)
+    {
+        echo "Check release:    " . $release->title . "\n";
+        foreach ($normalizedReleaseArr as $normalizedRelease)
+        {
+            if (stripos($normalizedRelease, normalizeString($release->title)) === false &&
+                stripos($normalizedRelease, normalizeString($release->title, true)) === false &&
+                stripos(normalizeString($release->title), $normalizedRelease) === false &&
+                stripos(normalizeString($release->title, true), $normalizedRelease) === false &&
+                $normalizedRelease != normalizeString($release->title)
+            )
+                continue;
+            else
+            {
+                $releaseMatchFound = true;
+                break;
+            }
+        }
+
+        if ($releaseMatchFound && isset($query['year']) && (isset($release->date) || isset($release->{'release-event-list'}->{'release-event'}->date)))
+        {
+            echo "Checking year of release: " . $query['year'] . "\n";
+            preg_match('/(19\d\d|20\d\d)/', (isset($release->date) ? $release->date : $release->{'release-event-list'}->{'release-event'}->date), $releaseYear);
+            if (isset($releaseYear[0]))
+            {
+                if ($query['year'] >= $releaseYear[0] - 1 && $query['year'] <= $releaseYear[0] + 1)
+                    $releaseMatchFound = true;
+                else
+                    $releaseMatchFound = false; // Reject match if the year isn't within + or - 1 year
+            }
+        }
+
+        if ($releaseMatchFound)
+        {
+            echo "Release match found: " . $release->title . "\n";
+            similar_text($query['title'], $release->title, $tempReleasePercentMatch);
+            $tempReleasePercentMatch += (((30 - $x) / 30) * 10); // matches weighted based on position in results list
+
+            if ($tempReleasePercentMatch > $releasePercentMatch)
+            {
+                $releaseArr['title'] = $release->title;
+                $releaseArr['mbID'] = $release->attributes()->id;
+                $releaseArr['percentMatch'] = $releasePercentMatch = $tempReleasePercentMatch;
+            }
+        }
+        // Increment the release result counter
+        $x++;
+    }
+
+    return $releaseArr;
+}
+
+/**
+ * @param string    $text       query text to be cleaned
+ * @param bool      $debug      default: false, don't print debug output
  * @return mixed
  */
 function cleanQuery($text, $debug=false)
@@ -464,15 +782,17 @@ function normalizeString($text, $includeArticles=false)
 
 /**
  * @param array     $relArtist          array containing artist results from MB
- * @param string    $orgSearchName      normalized nZEDbetter release name
+ * @param array     $query              Array containing values to compare against
  * @param bool      $skipVariousCheck   Defaults to false, skip check for Various Artists
  * @param int|float $weight             Precalcualted weight to add to percentmatch
  *
  * @return array|bool
  */
-function checkArtistName($relArtist, $orgSearchName, $skipVariousCheck=false, $weight=0)
+function checkArtistName($relArtist, $query, $skipVariousCheck=false, $weight=0)
 {
-    echo "Checking artist: " . $relArtist->name . "\n";
+    $queryText = '';
+    if(DEBUG_ECHO)
+        echo "Checking artist: " . $relArtist->name . "\n";
     $percentMatch = 0;
     $artistArr = array();
     $artistFound = false;
@@ -482,103 +802,105 @@ function checkArtistName($relArtist, $orgSearchName, $skipVariousCheck=false, $w
     {
         $artistArr['name'] = 'Various Artists';
         $artistArr['id'] = '89ad4ac3-39f7-470e-963a-56509c546377';
-        $artistFound = true;
+        $artistFound = 'Various Artists';
+        $queryText = $query[0];
     }
-    elseif(preg_match('/\b'.normalizeString($relArtist->name).'\b/', $orgSearchName)=== 0)
+
+    foreach($query as $stringToMatch)
     {
-        if( preg_match('/\b'.trim(str_ireplace('Group', '', normalizeString($relArtist->name, true))).'\b/', $orgSearchName) === 1)
+        $queryText = $stringToMatch;
+        if (preg_match('/\b' . normalizeString($relArtist->name) . '\b/i', $stringToMatch) === 0 &&
+            preg_match('/\b' . normalizeString($relArtist->name, true) . '\b/i', $stringToMatch) === 0)
         {
-            if(DEBUG_ECHO)
-                echo "Artist name matched: ".$relArtist->name." (weight = $weight)\n";
-            $artistArr['name'] = $relArtist->name;
-            $artistArr['id'] = $relArtist->attributes()->id;
-            similar_text($orgSearchName, normalizeString($relArtist->name), $percentMatch);
-            $artistArr['percentMatch'] = $percentMatch + $weight;
-            $artistFound = true;
-        }
-        elseif(isset($relArtist->{'sort-name'}) && preg_match('/\b'.normalizeString($relArtist->{'sort-name'}).'\b/', $orgSearchName) === 1)
-        {
-            if (DEBUG_ECHO)
-                echo "Artist sort name matched: " . $relArtist->name . " (weight = $weight)\n";
-            $artistArr['name'] = $relArtist->name;
-            $artistArr['id'] = $relArtist->attributes()->id;
-            similar_text($orgSearchName, normalizeString($relArtist->{'sort-name'}), $percentMatch);
-            $artistArr['percentMatch'] = $percentMatch + $weight;
-            $artistFound = true;
-        }
-        else
-        {
-            if(DEBUG_ECHO)
-                echo "Artist name not matched: ".$relArtist->name." (weight = $weight)\n";
-            if(isset($relArtist->{'alias-list'}))
+            if (preg_match('/\b' . trim(str_ireplace('Group', '', normalizeString($relArtist->name, true))) . '\b/i', $stringToMatch) === 1)
             {
-                if(DEBUG_ECHO)
-                    echo "Checking aliases...\n";
-                foreach($relArtist->{'alias-list'}->alias as $alias)
+                $artistFound = trim(str_ireplace('Group', '', normalizeString($relArtist->name, true)));
+                break;
+            }
+            elseif (isset($relArtist->{'sort-name'}) && preg_match('/\b' . normalizeString($relArtist->{'sort-name'}) . '\b/i', $stringToMatch) === 1)
+            {
+                $artistFound = normalizeString($relArtist->{'sort-name'});
+                break;
+            }
+            else
+            {
+                if (DEBUG_ECHO)
+                    echo "Artist name not matched: " . $relArtist->name . " (weight = $weight)\n";
+                if (isset($relArtist->{'alias-list'}))
                 {
-                    if(is_array($alias))
+                    if (DEBUG_ECHO)
+                        echo "Checking aliases...\n";
+                    foreach ($relArtist->{'alias-list'}->alias as $alias)
                     {
-                        if (DEBUG_ECHO)
-                            echo "\nAlias is an array\n";
-                        foreach($alias as $aliasName)
+                        if (is_array($alias))
                         {
-                            if(isset($aliasName['locale']) && $aliasName->attributes()->locale == 'ja')
-                                continue;
-                            if(preg_match('/\b'.normalizeString($aliasName).'\b/', $orgSearchName) === 0)
+                            if (DEBUG_ECHO)
+                                echo "\nAlias is an array\n";
+                            foreach ($alias as $aliasName)
                             {
-                                if(DEBUG_ECHO)
-                                    echo "Alias did not match: ".$aliasName." (weight = $weight)\n";
+                                if (isset($aliasName['locale']) && $aliasName->attributes()->locale == 'ja')
+                                    continue;
+                                if (preg_match('/\b' . normalizeString($aliasName) . '\b/i', $stringToMatch) === 0)
+                                {
+                                    if (DEBUG_ECHO)
+                                        echo "Alias did not match: " . $aliasName . " (weight = $weight)\n";
+                                    continue;
+                                }
+                                else
+                                {
+                                    // if(DEBUG_ECHO)
+                                    $artistFound = normalizeString($aliasName);
+                                    break;
+                                }
+                            }
+                            if ($artistFound)
+                                break;
+                        }
+                        else
+                        {
+                            if (isset($alias['locale']) && $alias->attributes()->locale == 'ja')
+                                continue;
+                            if (preg_match('/\b' . normalizeString($alias) . '\b/i', $stringToMatch) === 0)
+                            {
+                                if (DEBUG_ECHO)
+                                    echo "Alias did not match: " . $alias . " (weight = $weight)\n";
                                 continue;
                             }
                             else
                             {
-                                // if(DEBUG_ECHO)
-                                echo "Alias matched: ".$aliasName->alias."\n";
-                                $artistArr['name'] = $relArtist->name;
-                                $artistArr['id'] = $relArtist->attributes()->id;
-                                similar_text($orgSearchName, normalizeString($aliasName), $percentMatch);
-                                $artistArr['percentMatch'] = $percentMatch + $weight;
-                                $artistFound = true;
+                                if (DEBUG_ECHO)
+                                    echo "Alias matched: " . $alias . " (weight = $weight)\n";
+                                $artistFound = normalizeString($alias);
                                 break;
                             }
                         }
-                        if($artistFound) {break;}
-                    }
-                    else
-                    {
-                        if(isset($alias['locale']) && $alias->attributes()->locale == 'ja')
-                            continue;
-                        if(preg_match('/\b'.normalizeString($alias).'\b/', $orgSearchName)===0)
-                        {
-                            if(DEBUG_ECHO)
-                                echo "Alias did not match: ".$alias." (weight = $weight)\n";
-                            continue;
-                        }
-                        else
-                        {
-                            if(DEBUG_ECHO)
-                                echo "Alias matched: ".$alias." (weight = $weight)\n";
-                            $artistArr['name'] = $relArtist->name;
-                            $artistArr['id'] = $relArtist->attributes()->id;
-                            similar_text($orgSearchName, normalizeString($alias), $percentMatch);
-                            $artistArr['percentMatch'] = $percentMatch + $weight;
-                            $artistFound = true;
+                        if($artistFound)
                             break;
-                        }
                     }
                 }
+                if ($artistFound)
+                    break;
             }
+            if ($artistFound)
+                break;
+        }
+        else
+        {
+            $artistFound = normalizeString($relArtist->name);
+            break;
         }
     }
-    else
+
+    if($artistFound)
     {
-        if(DEBUG_ECHO)
-            echo "Artist name matched: ".$relArtist->name." (weight = $weight)\n";
+
         $artistArr['name'] = $relArtist->name;
         $artistArr['id'] = $relArtist->attributes()->id;
-        similar_text($orgSearchName, normalizeString($relArtist->name), $percentMatch);
+        $artistArr['matchString'] = $artistFound;
+        similar_text($queryText, normalizeString($relArtist->name), $percentMatch);
         $artistArr['percentMatch'] = $percentMatch + $weight;
-        $artistFound = true;
+        if (DEBUG_ECHO)
+            echo "Artist name matched: " . $artistArr['name'] . " (percentMatch = ".$artistArr['percentMatch']. ")\n";
     }
 
     if($artistFound && $artistArr['percentMatch'] > 15)
@@ -599,20 +921,30 @@ function isSingle($releaseName)
     if(empty($releaseName) || $releaseName == null)
         return false;
 
+    // Remove years and file/part counts
+    $releaseName = trim(preg_replace('/\(?\[?19\d\d\]?\)?|\(?\[?20\d\d\]?\)?|\(?\[?\d\d?\/\d\d?\]?\)?/', '', $releaseName));
     // Perform some very basic cleaning on the release name before matching
-    $releaseName = trim(preg_replace('/by req:? |attn:?| 320 | EAC/i', '', $releaseName));
+    $releaseName = trim(preg_replace('/by req:? |attn:? [\w\s_]+| 320 | EAC/i', '', $releaseName));
+    // Normalize spacing
     $releaseName = trim(preg_replace('/\s{2,}/', ' ', $releaseName));
 
-    // The 'track' group will not match tracks numbered above 19 to prevent matching a year
-    // Probably won't be much of an issue because track numbers that high are rare.
-    // The alternative is the regex would be much more strict in what would be identified as a track number.
-    preg_match('/(^|["\- ])(?P<artist>[\w\s\']+?) ?(19\d\d|20\d\d)? ?-?(?P<release>[\w\s\']+)-?([\(\[ ](19\d\d|20\d\d)[\)\] ])?(?![\(\[ ](19\d\d|20\d\d))(?P<track> ?(?!\(|\[|19\d\d|20\d\d)[0-2][0-9]\d?\d?).+?(?!-)(?P<title>[\(\)\w _\']+)\.(?:mp3|wav|ogg|wma|mpa|rar|par|aac|m4a|flac)/i', $releaseName, $matches);
+    echo "Cleaned Single Release Name: " . $releaseName . "\n";
 
+    // If it's a blatantly obvious 'various artist' release, use the following pattern
+    if(substr($releaseName, 0, 2) == 'VA')
+        preg_match('/VA ?- ?(?P<release>[\w\s\' ]+?)- ?(19\d\d|20\d\d)? ?-?(?![\(\[ ](19\d\d|20\d\d))(?P<track> ?(?!\(|\[|19\d\d|20\d\d)[0-2][0-9]\d?\d?) ?- ?(?P<artist>[\w\s\'\.]+?) ?- ?(?P<title>[\(\)\w _\']+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac)/', $releaseName, $matches);
+    else
+    {
+        // The 'track' group will not match tracks numbered above 19 to prevent matching a year
+        // Probably won't be much of an issue because track numbers that high are rare.
+        // The alternative is the regex would be much more strict in what would be identified as a track number.
+        preg_match('/(?:^|["\- ])(?P<artist>[\w\s\'_]+)[ \-]*?[ \-]*?(?P<release>[\w\s\'_\(\)\-\d]+)[ \-"]*?(?P<track> ?(?!\(|\[|19\d\d|20\d\d)[0-2][0-9]\d?\d?).+?(?!-)(?P<title>[\(\)\w _\']+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac)/i', $releaseName, $matches);
+    }
     if(!isset($matches[0]) || (!isset($matches['artist']) && !isset($matches['release']) && !isset($matches['track']) && !isset($matches['title'])))
-        preg_match('/(?P<track>["\- ](?!\(|\[|19\d\d|20\d\d)[0-2][0-9]\d?\d?)(?<!\(|\[|19\d\d|20\d\d)(?P<artist>( |-).+-)* ?-? ?(?P<title>[\(\)\w \-_\']+)\.(?:mp3|wav|ogg|wma|mpa|rar|par|aac|m4a|flac)/i', $releaseName, $matches);
+        preg_match('/(?P<track>["\- ](?!\(|\[|19\d\d|20\d\d)[0-2][0-9]\d?\d?)(?<!\(|\[|19\d\d|20\d\d)(?P<artist>( |-).+-)* ?-? ?(?P<title>[\(\)\w \-_\']+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac)/i', $releaseName, $matches);
 
     if (!isset($matches[0]))
-        preg_match('/("|-) ?"?(?P<artist> ?.+-)* ?-? ?(?P<title>[\(\)\w \-_\']+)\.(?:mp3|wav|ogg|wma|mpa|rar|par|aac|m4a|flac)/i', $releaseName, $matches);
+        preg_match('/("|-) ?"?(?P<artist> ?.+-)* ?-? ?(?P<title>[\(\)\w \-_\']+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac)/i', $releaseName, $matches);
 
     if(!isset($matches[0]))
         return false;
@@ -621,18 +953,21 @@ function isSingle($releaseName)
     {
         $matches['artist'] = trim(str_ireplace(array('-', '_', '"'), ' ', $matches['artist']));
         $matches['artist'] = preg_replace('/\s{2,}/', ' ', $matches['artist']);
+        if(preg_match('/^\d+$/', $matches['artist']))
+            return false;
     }
 
     if(isset($matches['release']))
     {
         $matches['release'] = trim(str_ireplace(array('-', '_', '"'), ' ', $matches['release']));
-        $matches['release'] = preg_replace('/\s{2,}/', ' ', $matches['release']);
+        $matches['release'] = trim(preg_replace('/- ?\([\w\d\s]+\) ?-/', '', $matches['release']));
+        $matches['release'] = trim(preg_replace('/\s{2,}/', ' ', $matches['release']));
     }
 
     if(isset($matches['title']))
     {
         $matches['title'] = trim(str_ireplace(array('-', '_', '"'), ' ', $matches['title']));
-        $matches['title'] = preg_replace('/\s{2,}/', ' ', $matches['title']);
+        $matches['title'] = trim(preg_replace('/\s{2,}/', ' ', $matches['title']));
     }
     if(isset($matches['track']))
         $matches['track'] = trim(str_ireplace(array('"', ' ', '-'), '', $matches['track']));
@@ -644,5 +979,5 @@ function isSingle($releaseName)
     }
 
 
-    return ((isset($matches['track']) && isset($matches['title'])) || (isset($matches['artist']) && isset($matches['title'])) ) ? $matches : false;
+    return (isset($matches['artist']) && isset($matches['title'])) ? $matches : false;
 }

@@ -32,7 +32,7 @@ class MusicBrainz {
     {
 
 
-        $url = MusicBrainz::API_SCHEME.$this->MBserver.'/ws/'.MusicBrainz::API_VERSION.'/'.$searchFunction.'/?query='.($field=='' ? '' : $field.':').rawurlencode($query)."&limit=".$limit;
+        $url = MusicBrainz::API_SCHEME.$this->MBserver.'/ws/'.MusicBrainz::API_VERSION.'/'.$searchFunction.'?query='.($field=='' ? '' : $field.'%3A').rawurlencode($query)."&limit=".$limit;
 
         if(MusicBrainz::DEBUG_MODE)
             echo "\nURL: ".$url."\n";
