@@ -51,6 +51,7 @@ class Releases
         $this->siteMaxFileSize = ($this->site->maxsizetoformrelease) ? $this->site->maxsizetoformrelease : 0;
 	    $this->lastFullCollectionCheck = ($this->site->lastFullCollectionCheck) ? $this->site->lastFullCollectionCheck : 0;
         $this->nextCrosspostCheck = ($this->site->nextCrosspostCheck == "0") ? 0 : $this->site->nextCrosspostCheck;
+        $this->maxColsPurgePerLoop = (!empty($this->tmux->MAX_PURGE_PER_LOOP)) ? $this->tmux->MAX_PURGE_PER_LOOP : 1500;
     }
 
 	public function get()
@@ -2044,6 +2045,7 @@ class Releases
             $colsDeleted = 0;
             $binsDeleted = 0;
             $partsDeleted = 0;
+            $totalColsPurged = 0;
             // Using thread ID to mark the collections to delete will allow us to multi-thread this function in the future if desired.
             $threadID = $db->queryOneRow("SELECT connection_ID() as thread_ID");
             if($threadID['thread_ID']<1000)
@@ -2070,6 +2072,8 @@ class Releases
             while ($currentCol=$db->fetchAssoc($completeCols))
             {
                 $colsDeleted++;
+                if($fastAndFurious == 'TRUE')
+                    $totalColsPurged ++;
                 if ($echooutput)
                     $consoletools->overWrite("Processing collection ".$consoletools->percentString($colsDeleted,$colsToDelete));
 
@@ -2109,7 +2113,7 @@ class Releases
                 // Adding sleep here to give MySQL time to purge changes
                 sleep(5);
             }
-        } while ($colsDeleted>0 && $fastAndFurious == 'TRUE');
+        } while (($colsDeleted>0 && $fastAndFurious == 'TRUE') || $totalColsPurged >= $this->maxColsPurgePerLoop);
 
         if(((time()>=$this->nextCrosspostCheck) || $this->nextCrosspostCheck==0))
         {

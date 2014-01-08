@@ -372,10 +372,10 @@
             </td>
         </tr>
         <tr>
-            <td style="width:160px;"><label for="PURGE_MAX_COLS">Max number of collections to purge each run:</label></td>
+            <td style="width:160px;"><label for="PURGE_MAX_COLS">Max number of collections to purge in each batch:</label></td>
             <td>
                 <input id="PURGE_MAX_COLS" name="PURGE_MAX_COLS" class="medium" type="text" value="{$ftmux->PURGE_MAX_COLS}" /><br />
-                <div class="hint">This setting determines how many collections will be purged each time the script runs.  It is <b>highly
+                <div class="hint">This setting determines how many collections will be purged each time purge process runs.  It is <b>highly
                         recommended</b> to leave this at the default of 500, unless you have a lot of RAM (more than 32GB) and
                     you have MySQL configured appropriately to use lots of RAM.  Even then, it is not recommended to go
                     above 1000, unless you are not running update_binaries, backfill, or update_releases.
@@ -390,6 +390,20 @@
                     that are ready to be purged have been deleted.  Set this to TRUE while doing your initial update_binaries for all of your groups.
                     Leave it set to true until all groups have been backfilled. After that, it's up to you.  It doesn't
                     hurt anything to leave it enabled.
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width:160px;"><label for="MAX_PURGE_PER_LOOP">Max number of collections to purge each run:</label>
+            </td>
+            <td>
+                <input id="MAX_PURGE_PER_LOOP" name="MAX_PURGE_PER_LOOP" class="medium" type="text"
+                       value="{$ftmux->MAX_PURGE_PER_LOOP}"/><br/>
+
+                <div class="hint">This setting only takes effect if you are using the Furious Purge setting above.  This acts as a safety valve
+                    to prevent the collection purge process from running non-stop, and preventing other much needed purge operations from
+                    triggering, i.e. stale collection checks.  Generally, a value of 3x to 4x the Max number of collections to purge per batch is
+                    good, although you can set this higher or lower if desired.
                 </div>
             </td>
         </tr>

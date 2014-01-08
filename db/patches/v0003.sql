@@ -69,6 +69,7 @@ ALTER TABLE  `releases` ADD  `tmdbID` INT NULL DEFAULT NULL AFTER  `imdbID` ,
 UPDATE `site` SET `setting`='movie_search_imdb', `value`='TRUE' WHERE `setting`='movie_search_google';
 DELETE FROM `site` WHERE `setting` IN ('movie_search_yahoo', 'movie_search_bing');
 INSERT INTO `site` (`ID`, `setting`, `value`, `updateddate`) VALUES (NULL, 'movieNoYearMatchPercent', '90', CURRENT_TIMESTAMP), (NULL, 'movieWithYearMatchPercent', '80', CURRENT_TIMESTAMP);
+INSERT INTO `tmux` (`ID`, `setting`, `value`, `updateddate`) VALUES (NULL, 'MAX_PURGE_PER_LOOP', '2000', CURRENT_TIMESTAMP);
 ALTER TABLE  `bookinfo` ADD UNIQUE (`asin`);
 UPDATE `site` SET `VALUE` = '0.7' WHERE `setting` = 'NZEDBETTER_VERSION';
 UPDATE `site` SET `VALUE` = 'v0003' WHERE `setting` = 'sqlpatch';
