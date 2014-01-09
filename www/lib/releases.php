@@ -2025,6 +2025,7 @@ class Releases
 
 		$where = (!empty($groupID)) ? " AND collections.groupID = " . $groupID : "";
         $furiousPurge = $db->queryOneRow("SELECT VALUE as furious FROM tmux WHERE setting='FURIOUS_PURGE'");
+        $next_dead_check = $db->queryOneRow("SELECT VALUE AS next_dead_check FROM `tmux` WHERE SETTING = 'NEXT_DEAD_COLLECTION_CHECK'");
         $fastAndFurious = $furiousPurge['furious'];
 
 		// Delete old releases and finished collections.
@@ -2038,14 +2039,15 @@ class Releases
 		//				  FROM collections INNER JOIN binaries ON collections.ID = binaries.collectionID INNER JOIN parts on binaries.ID = parts.binaryID
 		//				  WHERE collections.filecheck = 5 " . $where));
 		// $reccount = $db->getAffectedRows();
-
+        $totalColsPurged = 0;
+        $break = false;
         do
         {
             $loopTime = microtime(true);
             $colsDeleted = 0;
             $binsDeleted = 0;
             $partsDeleted = 0;
-            $totalColsPurged = 0;
+
             // Using thread ID to mark the collections to delete will allow us to multi-thread this function in the future if desired.
             $threadID = $db->queryOneRow("SELECT connection_ID() as thread_ID");
             if($threadID['thread_ID']<1000)
@@ -2113,7 +2115,12 @@ class Releases
                 // Adding sleep here to give MySQL time to purge changes
                 sleep(5);
             }
-        } while ($colsDeleted>0 && $fastAndFurious == 'TRUE' && $totalColsPurged <= $this->maxColsPurgePerLoop);
+            if($fastAndFurious == 'TRUE' && time() > $next_dead_check['next_dead_check'])
+            {
+                echo "\n\033[01;31mHalting purge process to perform stale collection check.\n";
+                $break = true;
+            }
+        } while ($colsDeleted>0 && $fastAndFurious == 'TRUE' && $totalColsPurged <= $this->maxColsPurgePerLoop && $break != true);
 
         if(((time()>=$this->nextCrosspostCheck) || $this->nextCrosspostCheck==0))
         {
@@ -2715,7 +2722,7 @@ class Releases
     public function removeIncompleteReleases($echoOutput)
     {
         // Releases below completion %.
-        $completionCount = 1;
+        $completionCount = 0;
         $db = new DB();
         $consoleTools = new ConsoleTools();
         if ($this->completion > 1) {
