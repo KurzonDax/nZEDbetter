@@ -64,12 +64,71 @@ CREATE TABLE IF NOT EXISTS `movieIDtoActorID` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 ALTER TABLE  `releases` ADD  `tmdbID` INT NULL DEFAULT NULL AFTER  `imdbID` ,
     ADD  `movieID` INT NULL DEFAULT NULL AFTER  `tvairdate` ,
+    ADD  `mbAlbumID` VARCHAR(40) NULL DEFAULT NULL AFTER  `musicinfoID` ,
+	ADD  `mbTrackID` VARCHAR(40) NULL DEFAULT NULL AFTER `mbAlbumID` ,
     CHANGE  `imdbID`  `imdbID` INT( 8 ) NULL DEFAULT NULL,
+    ADD INDEX ( `mbAlbumID` ) ,
+	ADD INDEX ( `mbTrackID` ) ,
     ADD INDEX ( `tmdbID` );
 UPDATE `site` SET `setting`='movie_search_imdb', `value`='TRUE' WHERE `setting`='movie_search_google';
 DELETE FROM `site` WHERE `setting` IN ('movie_search_yahoo', 'movie_search_bing');
 INSERT INTO `site` (`ID`, `setting`, `value`, `updateddate`) VALUES (NULL, 'movieNoYearMatchPercent', '90', CURRENT_TIMESTAMP), (NULL, 'movieWithYearMatchPercent', '80', CURRENT_TIMESTAMP);
 INSERT INTO `tmux` (`ID`, `setting`, `value`, `updateddate`) VALUES (NULL, 'MAX_PURGE_PER_LOOP', '2000', CURRENT_TIMESTAMP);
 ALTER TABLE  `bookinfo` ADD UNIQUE (`asin`);
+CREATE TABLE IF NOT EXISTS `mbTracks` (
+  `mbID` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `albumID` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `artistID` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `year` smallint(4) unsigned zerofill NOT NULL,
+  `trackNumber` smallint(4) NOT NULL DEFAULT '0',
+  `title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  `length` int(8) unsigned NOT NULL DEFAULT '0',
+  `createDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`mbID`),
+  KEY `ix_albumID_trackNumber` (`albumID`,`trackNumber`),
+  KEY `ix_artistID` (`artistID`),
+  KEY `ix_year` (`year`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE IF NOT EXISTS `mbAlbums` (
+  `mbID` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `artistID` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `title` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  `year` smallint(4) unsigned zerofill NOT NULL,
+  `releaseDate` date DEFAULT NULL,
+  `releaseGroupID` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `description` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tracks` tinyint(4) NOT NULL,
+  `genreID` int(8) NOT NULL,
+  `cover` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `rating` float DEFAULT NULL,
+  `asin` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `createDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`mbID`),
+  KEY `ix_artistID` (`artistID`),
+  KEY `ix_year` (`year`),
+  KEY `ix_releaseGroupID` (`releaseGroupID`),
+  KEY `ix_genreID` (`genreID`),
+  KEY `ix_rating` (`rating`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE IF NOT EXISTS `mbArtists` (
+  `mbID` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `name` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
+  `type` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `description` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `genreID` int(8) NOT NULL,
+  `country` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `rating` float DEFAULT NULL,
+  `beginDate` date DEFAULT NULL,
+  `endDate` date DEFAULT NULL,
+  `createDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`mbID`),
+  KEY `ix_type` (`type`),
+  KEY `ix_genreID` (`genreID`),
+  KEY `ix_country` (`country`),
+  KEY `ix_rating` (`rating`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 UPDATE `site` SET `VALUE` = '0.7' WHERE `setting` = 'NZEDBETTER_VERSION';
 UPDATE `site` SET `VALUE` = 'v0003' WHERE `setting` = 'sqlpatch';
