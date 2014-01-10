@@ -12,22 +12,27 @@ $privkey = $site->amazonprivkey;
 $asstag = $site->amazonassociatetag;
 $consoletools = new ConsoleTools();
 
-// $searchText = $consoletools->getUserInput("Enter text to search for on Amazon: ");
-$searchText = "Susan Stephens The Accidental Heir Royal Baby Collection";
+$searchText = $consoletools->getUserInput("Enter text to search for on Amazon: ");
+// $searchText = "Susan Stephens The Accidental Heir Royal Baby Collection";
 $obj = new AmazonProductAPI($pubkey, $privkey, $asstag);
-try{$result = $obj->searchProducts($searchText, AmazonProductAPI::BOOKS, "TITLE");}
+try{$result = $obj->getItemByAsin($searchText, "com", "ItemAttributes,Images");}
 catch(Exception $e){$result = false;}
-if($result->Items->Item->CustomerReviews->HasReviews == 'true')
-    $rating = $obj->getAmazonCustomerRating($result->Items->Item->CustomerReviews->IFrameURL);
+//if($result->Items->Item->CustomerReviews->HasReviews == 'true')
+//    $rating = $obj->getAmazonCustomerRating($result->Items->Item->CustomerReviews->IFrameURL);
+
+if(isset($result->Items->Item->ImageSets->ImageSet->LargeImage->URL) && !empty($result->Items->Item->ImageSets->ImageSet->LargeImage->URL))
+    $imageURL = $result->Items->Item->ImageSets->ImageSet->LargeImage->URL;
 
 if ($result !== false)
 {
-	print_r($result);
-	exit("\nLooks like it is working alright.\nThe average customer rating is: ".(isset($rating) ? $rating : "not available")."\n");
+
+	echo "\nLooks like it is working alright.\n";
+    echo "Image URL: " . $imageURL . "\n";
+    // echo "Rating: " . $rating . "\n";
 }
 else
 {
 	print_r($e);
 	exit("\nThere was a problem attemtping to query amazon. Maybe your keys or wrong, or you are being throttled.\n");
 }
-?>
+exit("\n");

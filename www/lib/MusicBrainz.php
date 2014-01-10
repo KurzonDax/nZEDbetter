@@ -1,6 +1,6 @@
 <?php
 /**
- * Project: nZEDb
+ * Project: nZEDbetter
  * User: Randy
  * Date: 9/7/13
  * Time: 2:00 PM
@@ -8,8 +8,14 @@
  * Class for retrieving music info from a MusicBrainz replication server.  To configure your own
  * replication server, see http://nzedbetter.org/index.php?title=MusicBrainz
  */
-require_once(WWW_DIR."lib/site.php");
-require_once(WWW_DIR."lib/framework/db.php");
+require_once(WWW_DIR . "lib/site.php");
+require_once(WWW_DIR . "lib/framework/db.php");
+require_once(WWW_DIR . "lib/releaseimage.php");
+require_once(WWW_DIR . "lib/amazon.php");
+require_once(WWW_DIR . "lib/MusicBrainz/mb_base.php");
+require_once(WWW_DIR . "lib/MusicBrainz/mbArtist.php");
+require_once(WWW_DIR . "lib/MusicBrainz/mbRelease.php");
+require_once(WWW_DIR . "lib/MusicBrainz/mbTrack.php");
 
 class MusicBrainz {
 
@@ -18,52 +24,59 @@ class MusicBrainz {
     const HEAD = 'head';
     const API_VERSION = '2';
     const API_SCHEME = "http://";
-    const DEBUG_MODE = true;
+    const DEBUG_MODE = false;
+    const COVER_ART_BASE_URL = "http://coverartarchive.org/release/";
 
-    function MusicBrainz()
+    private $_MBserver = '';
+    private $_throttleRequests = false;
+    private $_applicationName = 'nZEDbetter';
+    private $_applicationVersion = '';
+    private $_email = null;
+    private $_imageSavePath = '';
+    private $_isAmazonValid = false;
+    private $_amazonPublicKey = '';
+    private $_amazonPrivateKey = '';
+    private $_amazonTag = '';
+
+    function construct()
     {
         $s = new Sites();
         $site = $s->get();
-        $this->MBserver = (!empty($site->musicBrainzServer)) ? $site->musicBrainzServer : "musicbrainz.org";
+        $this->_MBserver = (!empty($site->musicBrainzServer)) ? $site->musicBrainzServer : "musicbrainz.org";
+        $this->_email = !empty($site->email) ? $site->email : null;
+        $this->_applicationVersion = $site->NZEDBETTER_VERSION;
+        $this->_imageSavePath = WWW_DIR . "covers/music/";
+        $this->_amazonPrivateKey = !empty($site->amazonprivkey) ? $site->amazonprivkey : '';
+        $this->_amazonPublicKey = !empty($site->amazonpubkey) ? $site->amazonpubkey : '';
+        $this->_amazonTag = !empty($site->amazonassociatetag) ? $site->amazonassociatetag : '';
 
-    }
+        if($this->_amazonPrivateKey != '' && $this->_amazonPublicKey != '' && $this->_amazonTag != '')
+            $this->_isAmazonValid = true;
 
-    private function _makeSearchCall($searchFunction, $field = '' , $query = '', $limit=10)
-    {
-
-
-        $url = MusicBrainz::API_SCHEME.$this->MBserver.'/ws/'.MusicBrainz::API_VERSION.'/'.$searchFunction.'?query='.($field=='' ? '' : $field.'%3A').rawurlencode($query)."&limit=".$limit;
-
-        if(MusicBrainz::DEBUG_MODE)
-            echo "\nURL: ".$url."\n";
-
-        if (extension_loaded('curl'))
+        if(stripos($this->_MBserver, 'musicbrainz.org') === false)
         {
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL,$url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-
-            $xml_response = curl_exec($ch);
-            if ($xml_response === false)
-            {
-                curl_close($ch);
-                return false;
-            }
-            else
-            {
-                /* parse XML */
-                $parsed_xml = @simplexml_load_string($xml_response);
-                curl_close($ch);
-                // return ($parsed_xml === false) ? false :  json_decode(json_encode($parsed_xml), 1);
-                return $parsed_xml;
-            }
+            $this->_throttleRequests = false;
         }
         else
         {
-            throw new MBException('CURL-extension not loaded');
+            $this->_throttleRequests = true;
+            if(is_null($this->_email) ||
+            preg_match('/[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum)\b/i', $this->_email) === 0)
+            {
+                echo "\n\033[01;31mALERT!!! You have not set a valid email address in Admin->Site Settings.\n";
+                echo "The MusicBrainz integration will not function until this is corrected.\n\n";
+                throw new MBException('Invalid email address');
+            }
         }
+
+    }
+
+    private function __makeSearchCall($searchFunction, $field = '' , $query = '', $limit=10)
+    {
+
+        $url = MusicBrainz::API_SCHEME.$this->_MBserver.'/ws/'.MusicBrainz::API_VERSION.'/'.$searchFunction.'?query='.($field=='' ? '' : $field.'%3A').rawurlencode($query)."&limit=".$limit;
+
+        return $this->__getResponse($url);
 
     }
 
@@ -79,34 +92,9 @@ class MusicBrainz {
         if(!in_array($entity, $validEntities))
             return false;
 
-        $url = MusicBrainz::API_SCHEME.$this->MBserver.'/ws/'.MusicBrainz::API_VERSION.'/'.$entity.'/'.$mbid;
+        $url = MusicBrainz::API_SCHEME.$this->_MBserver.'/ws/'.MusicBrainz::API_VERSION.'/'.$entity.'/'.$mbid;
 
-        if (extension_loaded('curl'))
-        {
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL,$url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-
-            $xml_response = curl_exec($ch);
-            if ($xml_response === False)
-            {
-                curl_close($ch);
-                return False;
-            }
-            else
-            {
-                /* parse XML */
-                $parsed_xml = @simplexml_load_string($xml_response);
-                curl_close($ch);
-                return ($parsed_xml === False) ? False : $parsed_xml;
-            }
-        }
-        else
-        {
-            throw new MBException('CURL-extension not loaded');
-        }
+        return $this->__getResponse($url);
 
     }
 
@@ -135,7 +123,7 @@ class MusicBrainz {
         if(empty($query) || is_null($query))
             return false;
         else
-            return $this->_makeSearchCall('artist', $field, $query, $limit);
+            return $this->__makeSearchCall('artist', $field, $query, $limit);
 
     }
 
@@ -155,7 +143,7 @@ class MusicBrainz {
         if(empty($query) || is_null($query))
             return false;
         else
-            return $this->_makeSearchCall('cdstub', $field, $query, $limit);
+            return $this->__makeSearchCall('cdstub', $field, $query, $limit);
 
     }
 
@@ -186,7 +174,7 @@ class MusicBrainz {
         if(empty($query) || is_null($query))
             return false;
         else
-            return $this->_makeSearchCall('label', $field, $query, $limit);
+            return $this->__makeSearchCall('label', $field, $query, $limit);
 
     }
 
@@ -233,7 +221,7 @@ class MusicBrainz {
         else
         {
             $query=$query1.(($query2 != '') ? " AND ".$field2.":".$query2 : '');
-            return $this->_makeSearchCall('recording', $field1, $query, $limit);
+            return $this->__makeSearchCall('recording', $field1, $query, $limit);
         }
     }
 
@@ -263,7 +251,7 @@ class MusicBrainz {
         if(empty($query) || is_null($query))
             return false;
         else
-            return $this->_makeSearchCall('release-group', $field, $query, $limit);
+            return $this->__makeSearchCall('release-group', $field, $query, $limit);
     }
 
     public function searchRelease($query1, $field1='release', $query2='', $field2='artistname',$limit=10)
@@ -311,7 +299,7 @@ class MusicBrainz {
         else
         {
             $query=$query1.(($query2 != '') ? " AND ".$field2.":".$query2 : '');
-            return $this->_makeSearchCall('release', $field1, $query, $limit);
+            return $this->__makeSearchCall('release', $field1, $query, $limit);
         }
     }
 
@@ -343,11 +331,251 @@ class MusicBrainz {
         if(empty($query) || is_null($query))
             return false;
         else
-            return $this->_makeSearchCall('work', $field, $query, $limit);
+            return $this->__makeSearchCall('work', $field, $query, $limit);
 
     }
 
+    public  function normalizeString($text, $includeArticles = false)
+    {
+        $text = strtolower($text);
+        if ($includeArticles)
+            $text = preg_replace('/\b(a|an|the)\b/i', ' ', $text);
+        $text = str_replace(array(".", "_", '-', "|", "<", ">", '"', "=", "~", '[', "]", "(", ")", "{", "}", "*", ";", ":", ",", "~", "/", "+", "'s "), " ", $text);
+        $text = str_ireplace(' vol ', ' Volume ', $text);
+        $text = str_ireplace('&', 'and', $text);
+        $text = preg_replace('/\s{2,}/', ' ', $text);
+        $text = trim($text);
 
+        return $text;
+    }
+
+    public function cleanQuery($text, $debug = false)
+    {
+        // Remove year
+        if ($debug)
+            echo "\nStrip Search Name - " . $text . "\n";
+        $text = preg_replace('/\((19|20)\d\d\)|(?<!top|part|vol|volume)[ \-_]\d{1,3}[ \-_]|\d{3,4} ?kbps| cd ?\d{1,2} /i', ' ', $text);
+        if ($debug)
+            echo "1 - " . $text . "\n";
+        // Remove extraneous format identifiers
+        $text = str_replace(array('MP3', 'FLAC', 'WMA', 'WEB', "cd's", ' cd ', ' FM '), ' ', $text);
+        if ($debug)
+            echo "2 - " . $text . "\n";
+        $text = str_ireplace(' vol ', ' Volume ', $text);
+        if ($debug)
+            echo "3 - " . $text . "\n";
+        // Remove extra punctuation and non alphanumeric
+        $text = str_replace(array(".", "_", '-', "|", "<", ">", '"', "=", "~", '[', "]", "(", ")", "{", "}", "*", ";", ":", ",", "~", "/", "+", "!"), " ", $text);
+        if ($debug)
+            echo "4 - " . $text . "\n";
+        $text = preg_replace('/\s{2,}/', ' ', $text);
+        if ($debug)
+            echo "5 - " . $text . "\n";
+
+        return $text;
+    }
+
+    /**
+     * @param string $text        text to use as base
+     * @param array  $searchArray Array to append results to
+     *
+     * @return array
+     *
+     * This function builds an array of strings based on rules defined within the
+     * function.  The array is then used to compare release search results against.
+     */
+    public function buildReleaseSearchArray($text, $searchArray)
+    {
+        $searchArray[] = $text;
+        $searchArray[] = $this->normalizeString($text);
+        $searchArray[] = $this->normalizeString($text, true);
+
+        // Remove the word "volume" because many entries in MusicBrainz don't include it
+        // i.e. instead of Great Music Volume 1, MB will have Great Music 1
+        if (preg_match('/\bVolume\b/i', $text))
+            $searchArray[] = preg_replace('/\bVolume\b/i', ' ', $text);
+        // Replace ordinal numbers with roman numerals
+        preg_match('/\bVolume[ \-_\.](\d)\b/i', $text, $matches);
+        switch ($matches[1])
+        {
+            case '1':
+                $searchArray[] = preg_replace('\bVolume[ \-_\.]1\b', ' Volume I ', $text);
+                $searchArray[] = preg_replace('\bVolume[ \-_\.]1\b', ' I ', $text);
+                break;
+            case '2':
+                $searchArray[] = preg_replace('\bVolume[ \-_\.]2\b', ' Volume II ', $text);
+                $searchArray[] = preg_replace('\bVolume[ \-_\.]2\b', ' II ', $text);
+                break;
+            case '3':
+                $searchArray[] = preg_replace('\bVolume[ \-_\.]3\b', ' Volume III ', $text);
+                $searchArray[] = preg_replace('\bVolume[ \-_\.]3\b', ' III ', $text);
+                break;
+            case '4':
+                $searchArray[] = preg_replace('\bVolume[ \-_\.]4\b', ' Volume IV ', $text);
+                $searchArray[] = preg_replace('\bVolume[ \-_\.]4\b', ' IV ', $text);
+                break;
+            case '5':
+                $searchArray[] = preg_replace('\bVolume[ \-_\.]5\b', ' Volume V ', $text);
+                $searchArray[] = preg_replace('\bVolume[ \-_\.]5\b', ' V ', $text);
+                break;
+        }
+
+        // Get rid of extra spaces in all values
+        foreach ($searchArray as $key => $value)
+        {
+            $searchArray[$key] = preg_replace('/\s{2,}/', ' ', $value);
+        }
+
+        return $searchArray;
+    }
+
+    public function updateArtist(mbArtist $artist)
+    {
+
+        $db = new DB();
+        if($artist->getMbID() == '' || is_null($artist->getMbID()))
+            return false;
+
+        $searchExisting = $db->queryOneRow("SELECT mbID FROM mbArtists WHERE mbID=" . $db->escapeString($artist->getMbID()));
+        if(!$searchExisting)
+        {
+            $sql = "INSERT INTO mbArtists (mbID, name, type, description, genreID, country, rating, beginDate, endDate) VALUES (" .
+                     $db->escapeString($artist->getMbID()) . ", " . $db->escapeString($artist->getName()) . ", " . $db->escapeString($artist->getType()) . ", " .
+                     $db->escapeString($artist->getDescription()) . ", " . $db->escapeString(implode(", ", $artist->getTags())) . ", " . $db->escapeString($artist->getCountry()) . ", " .
+                     $artist->getRating() . "," . $db->escapeString($artist->getBeginDate()) . "," . $db->escapeString($artist->getEndDate()) . ")";
+
+            return $db->queryInsert($sql);
+        }
+        else
+        {
+            $sql = "UPDATE mbArtists SET name=" . $db->escapeString($artist->getName()) . ", type=" . $db->escapeString($artist->getType()) . ", description=" . $db->escapeString($artist->getDescription()) .
+                    ", genres=" . $db->escapeString(implode(", ", $artist->getTags())) . ", country=" . $db->escapeString($artist->getCountry()) . ", rating=" . $artist->getRating() .
+                    ", beginDate=" . $db->escapeString($artist->getBeginDate()) . ", endDate=" . $db->escapeString($artist->getEndDate()) . ", updateDate=" . time() .
+                    " WHERE mbID=" . $db->escapeString($artist->getMbID());
+
+            return $db->queryDirect($sql);
+        }
+    }
+
+    public function updateAlbum(mbRelease $release)
+    {
+
+        if($release->getMbID() == '' || is_null($release->getMbID()))
+            return false;
+
+        $db = new DB();
+        $searchExisting = $db->queryOneRow("SELECT mbID FROM mbAlbums WHERE mbID=" . $db->escapeString($release->getMbID()));
+        if(!$searchExisting)
+        {
+            $this->__getCoverArt($release);
+
+            $sql = "INSERT INTO mbAlbums (mbID, artistID, title, year, releaseDate, releaseGroupID, description, tracks, genres, cover, rating, asin) VALUES " .
+                    "(" . $db->escapeString($release->getMbID()) . ", " . $db->escapeString($release->getArtistID()) .
+                    ", " . $db->escapeString($release->getTitle()) . ", " . $db->escapeString($release->getYear()) .
+                    ", " . $db->escapeString($release->getReleaseDate()) . ", " . $db->escapeString($release->getReleaseGroupID()) .
+                    ", " . $db->escapeString($release->getDescription()) . ", " . $release->getTracks() .
+                    ", " . $db->escapeString(implode(", ", $release->getTags())) . ", " . $db->escapeString($release->getCover()) .
+                    ", " . $release->getRating() . ", " . ", " . $db->escapeString($release->getAsin());
+
+            return $db->queryInsert($sql);
+        }
+        else
+        {
+            $this->__getCoverArt($release);
+
+            $sql = "UPDATE mbAlbums SET artistID=" . $db->escapeString($release->getArtistID()) . ", title=" . $db->escapeString($release->getTitle()) .
+                    ", year=" . $db->escapeString($release->getYear()) . ", releaseDate=" . $db->escapeString($release->getReleaseDate()) .
+                    ", releaseGroupID=" . $db->escapeString($release->getReleaseGroupID()) . ", description=" . $db->escapeString($release->getDescription()) .
+                    ", tracks=" . $release->getTracks() . ", genres=" . $db->escapeString(implode(", ", $release->getTags())) .
+                    ", cover=" . $db->escapeString($release->getCover()) . ", rating=" . $release->getRating() .
+                    ", asin=" . $db->escapeString($release->getAsin()) . ", updateDate=" . time() . " WHERE mbID=" . $db->escapeString($release->getMbID());
+
+            return $db->queryDirect($sql);
+        }
+
+    }
+
+    protected  function __getResponse($url)
+    {
+
+        if (extension_loaded('curl'))
+        {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_USERAGENT, $this->_applicationName . "/" . $this->_applicationVersion . "( " . $this->_email . " )");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+
+            if ($this->_throttleRequests)
+            {
+                if (is_null($this->_email) ||
+                    preg_match('/[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum)\b/i', $this->_email) === 0)
+                {
+                    echo "\n\033[01;31mALERT!!! You have not set a valid email address in Admin->Site Settings.\n";
+                    echo "The MusicBrainz integration will not function until this is corrected.\n\n";
+                    return false;
+                }
+                else //The following is REQUIRED if using musicbrainz.com for the server, per http://musicbrainz.org/doc/XML_Web_Service/Rate_Limiting
+                    usleep(9000);
+            }
+
+            $xml_response = curl_exec($ch);
+            if ($xml_response === false)
+            {
+                curl_close($ch);
+
+                return false;
+            } else
+            {
+                /* parse XML */
+                $parsed_xml = @simplexml_load_string($xml_response);
+                curl_close($ch);
+
+                return ($parsed_xml === false) ? false : $parsed_xml;
+            }
+        }
+        else
+        {
+            throw new MBException('CURL-extension not loaded');
+        }
+    }
+
+    private function __getCoverArt(mbRelease &$release)
+    {
+        $releaseImage = new ReleaseImage();
+        if ($release->getCover() == true)
+        {
+            $imageName = "mb-" . $release->getMbID() . "-cover";
+            $imageUrl = MusicBrainz::COVER_ART_BASE_URL . $release->getMbID() . "/front";
+            $imageSave = $releaseImage->saveImage($imageName, $imageUrl, $this->_imageSavePath);
+            $release->setCover(($imageSave ? $imageName . ".jpg" : 'NULL'));
+        }
+        elseif ($release->getAsin() != false && $this->_isAmazonValid)
+        {
+            // Get from Amazon if $release->asin != false and valid Amazon keys have been provided
+            $amazon = new AmazonProductAPI($this->_amazonPublicKey, $this->_amazonPrivateKey, $this->_amazonTag);
+            try
+            {
+                $amazonResults = $amazon->getItemByAsin($release->getAsin(), "com", "ItemAttributes,Images");
+                if (isset($amazonResults->Items->Item->ImageSets->ImageSet->LargeImage->URL) && !empty($amazonResults->Items->Item->ImageSets->ImageSet->LargeImage->URL))
+                {
+                    $imageUrl = $amazonResults->Items->Item->ImageSets->ImageSet->LargeImage->URL;
+                    $imageName = "mb-" . $release->getMbID() . "-cover";
+                    $imageSave = $releaseImage->saveImage($imageName, $imageUrl, $this->_imageSavePath);
+                    $release->setCover(($imageSave ? $imageName . ".jpg" : 'NULL'));
+                }
+            }
+            catch (Exception $e)
+            {
+                $release->setCover('NULL');
+            }
+        }
+        else
+        {
+            $release->setCover('NULL');
+        }
+    }
 }
 
 class MBException extends Exception{}

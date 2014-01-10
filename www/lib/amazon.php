@@ -208,11 +208,11 @@
 		 * @param int $asin_code ASIN code of the product to search
 		 * @return mixed simpleXML object
 		 */
-		public function getItemByAsin($asin_code, $region = "com")
+		public function getItemByAsin($asin_code, $region = "com", $responseGroup = "Medium")
 		{
 			$parameters = array("Operation"	 => "ItemLookup",
 								"ItemId"		=> $asin_code,
-								"ResponseGroup" => "Medium");
+								"ResponseGroup" => $responseGroup);
 
 			$xml_response = $this->queryAmazon($parameters, $region);
 
