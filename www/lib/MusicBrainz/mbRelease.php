@@ -16,10 +16,44 @@ class mbRelease extends mb_base{
     private $_releaseGroupID = '';
     private $_description = null;
     private $_tracks = 0;
-    private $_tags = array();
     private $_cover = false;
     private $_rating = null;
     private $_asin = false;
+    private $_status = '';
+    private $_country = '';
+
+    /**
+     * @param string $country
+     */
+    public function setCountry($country)
+    {
+        $this->_country = $country;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCountry()
+    {
+        return $this->_country;
+    }
+
+
+    /**
+     * @param string $status
+     */
+    public function setStatus($status)
+    {
+        $this->_status = $status;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus()
+    {
+        return $this->_status;
+    }
 
     /**
      * @param string $artistID
@@ -145,23 +179,6 @@ class mbRelease extends mb_base{
     public function getReleaseGroupID()
     {
         return $this->_releaseGroupID;
-    }
-
-    /**
-     * @param string $tag
-     */
-    public function addTag($tag)
-    {
-        if (!in_array($tag, $this->_tags) && count($this->_tags) < 6)
-            $this->_tags[] = $tag;
-    }
-
-    /**
-     * @return array
-     */
-    public function getTags()
-    {
-        return $this->_tags;
     }
 
     /**

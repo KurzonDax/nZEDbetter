@@ -15,12 +15,44 @@ class mbArtist extends mb_base {
     private $_name = '';
     private $_type = '';
     private $_description = '';
-    private $_tags = array();
     private $_country = '';
     private $_rating = 0.0;
     private $_beginDate = '';
     private $_endDate = '';
+    private $_gender = '';
+    private $_disambiguation = '';
 
+    /**
+     * @param string $disambiguation
+     */
+    public function setDisambiguation($disambiguation)
+    {
+        $this->_disambiguation = $disambiguation;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDisambiguation()
+    {
+        return $this->_disambiguation;
+    }
+
+    /**
+     * @param string $gender
+     */
+    public function setGender($gender)
+    {
+        $this->_gender = $gender;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGender()
+    {
+        return $this->_gender;
+    }
 
     /**
      * @param string $country
@@ -85,23 +117,6 @@ class mbArtist extends mb_base {
     public function getRating()
     {
         return $this->_rating;
-    }
-
-    /**
-     * @param string $tag
-     */
-    public function addTag($tag)
-    {
-        if(!in_array($tag, $this->_tags) && count($this->_tags) < 6)
-            $this->_tags[] = $tag;
-    }
-
-    /**
-     * @return array
-     */
-    public function getTags()
-    {
-        return $this->_tags;
     }
 
     /**

@@ -7,6 +7,7 @@ require_once(WWW_DIR."/lib/site.php");
 require_once(WWW_DIR."/lib/util.php");
 require_once(WWW_DIR."/lib/releaseimage.php");
 require_once(WWW_DIR."/lib/namecleaning.php");
+require_once(WWW_DIR . "lib/MusicBrainz.php");
 
 class Music
 {
@@ -21,7 +22,7 @@ class Music
 		$this->musicqty = (!empty($site->maxmusicprocessed)) ? $site->maxmusicprocessed : 150;
 		$this->sleeptime = (!empty($site->amazonsleep)) ? $site->amazonsleep : 1000;
         $this->getAmazonRating = (!empty($site->getAmazonRating)) ? $site->getAmazonRating : 'FALSE';
-
+        $this->useMusicBrainz = (!empty($site->music_search_MB)) ? $site->music_search_MB : 0;
 		$this->imgSavePath = WWW_DIR.'covers/music/';
 	}
 
@@ -436,45 +437,56 @@ class Music
 	public function processMusicReleases($threads=1)
 	{
 		$threads--;
-		$ret = 0;
 		$db = new DB();
-		$res = $db->queryDirect(sprintf("SELECT searchname, ID from releases where musicinfoID IS NULL and nzbstatus = 1 and relnamestatus != 0 and categoryID in (3010, 3040, 3050) ORDER BY postdate desc LIMIT %d,%d",
+		$res = $db->queryDirect(sprintf("SELECT searchname, ID, name from releases where musicinfoID IS NULL and nzbstatus = 1 and relnamestatus != 0 and categoryID in (3010, 3040, 3050, 3070) ORDER BY postdate desc LIMIT %d,%d",
                 floor(max(0, $this->musicqty * $threads * 1.5)), $this->musicqty));
 		if ($db->getNumRows($res) > 0)
 		{
 			if ($this->echooutput)
 				echo "Processing ".$db->getNumRows($res)." music release(s).\n";
 
-			while ($arr = $db->fetchAssoc($res))
+			if($this->useMusicBrainz == 1)
+                $musicBrainz = new MusicBrainz();
+
+            while ($arr = $db->fetchAssoc($res))
 			{
-				$album = $this->parseArtist($arr['searchname']);
-				if ($album !== false)
-				{
-					$newname = $album["name"].' ('.$album["year"].')';
-					preg_replace('/ \( /', ' ', $newname);
-					if ($this->echooutput)
-						echo 'Looking up: '.$newname."\n";
+				if($this->useMusicBrainz == 0)
+                {
+                    $album = $this->parseArtist($arr['searchname']);
+                    if ($album !== false)
+                    {
+                        $newname = $album["name"].' ('.$album["year"].')';
+                        preg_replace('/ \( /', ' ', $newname);
+                        if ($this->echooutput)
+                            echo 'Looking up: '.$newname."\n";
 
-					$albumId = $this->updateMusicInfo($album["name"], $album['year']);
-					if ($albumId === false)
-					{
-						$albumId = -2;
-						$logfile = WWW_DIR."lib/logging/musicfailed.log";
-						file_put_contents($logfile, $arr['ID']." ".$newname."\n", FILE_APPEND);
-					}
+                        $albumId = $this->updateMusicInfo($album["name"], $album['year']);
+                        if ($albumId === false)
+                        {
+                            $albumId = -2;
+                            $logfile = WWW_DIR."lib/logging/musicfailed.log";
+                            file_put_contents($logfile, $arr['ID']." ".$newname."\n", FILE_APPEND);
+                        }
 
-					// Update release.
-					$db->query(sprintf("UPDATE releases SET musicinfoID = %d WHERE ID = %d", $albumId, $arr["ID"]));
-                    usleep($this->sleeptime*1000);
-				}
-				else
-				{
-					// No year was found in the name.  Suspect this may be a single for now.
-					$db->query(sprintf("UPDATE releases SET musicinfoID = %d, categoryID=3070 WHERE ID = %d", -2, $arr["ID"]));
-                    echo "Added ".$arr['searchname']." to Singles category.\n";
-					
-				}
+                        // Update release.
+                        $db->query(sprintf("UPDATE releases SET musicinfoID = %d WHERE ID = %d", $albumId, $arr["ID"]));
+                        usleep($this->sleeptime*1000);
+                    }
+                    else
+                    {
+                        // No year was found in the name.  Suspect this may be a single for now.
+                        $db->query(sprintf("UPDATE releases SET musicinfoID = %d, categoryID=3070 WHERE ID = %d", -2, $arr["ID"]));
+                        echo "Added ".$arr['searchname']." to Singles category.\n";
 
+                    }
+
+                }
+                else
+                {
+                    $mbResult = $musicBrainz->processMusicRelease($arr);
+                    if($mbResult === false)
+                        echo "\033[01;31mUnable to match release: " . $arr['searchname'] . "\n\033[01;37m";
+                }
 			}
 		}
 	}

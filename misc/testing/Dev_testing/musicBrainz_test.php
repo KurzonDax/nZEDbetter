@@ -512,71 +512,6 @@ function getRecording($query, $requireReleaseMatch = false)
     $normalizedTitleArr[] = isset($query['title']) ? normalizeString($query['title']) : normalizeString($query);
     $normalizedTitleArr[] = isset($query['title']) ? normalizeString($query['title'], true) : normalizeString($query, true);
 
-/*    if ($results->{'recording-list'}->attributes()->count == '1')
-    {
-        $matchFound = false;
-        foreach ($normalizedTitleArr as $normalizedTitle)
-        {
-            if(DEBUG_ECHO)
-            {
-                echo "Checking Title: " . $normalizedTitle . "\n";
-                echo "Against Title:  " . normalizeString($results->{'recording-list'}->recording->title) . "\n";
-            }
-            if (stripos($normalizedTitle, normalizeString($results->{'recording-list'}->recording->title)) === false &&
-                stripos($normalizedTitle, normalizeString($results->{'recording-list'}->recording->title, true)) === false &&
-                stripos(normalizeString($results->{'recording-list'}->recording->title), $normalizedTitle) === false &&
-                stripos(normalizeString($results->{'recording-list'}->recording->title, true), $normalizedTitle) === false &&
-                $normalizedTitle != normalizeString($results->{'recording-list'}->recording->title))
-                    continue;
-            else
-            {
-                $matchFound = true;
-                break;
-            }
-        }
-        if (!$matchFound)
-        {
-            if (DEBUG_ECHO)
-                echo "Non-matching recording: " . $results->{'recording-list'}->recording->title . "\n";
-
-            return false;
-        }
-        else // The single result matched the query
-        {
-            // Check for a matching release for the recording
-            $releaseMatchFound = false;
-            if (isset($query['release']) && isset($results->{'recording-list'}->recording->{'release-list'}))
-            {
-                if($releaseArr = __getRecordingRelease($query, $results->{'recording-list'}->recording->{'release-list'})) // release loop
-                    $releaseMatchFound = true;
-            }
-            else // query['release'] is not set, or there was not a release list in the results
-            {
-                $releaseMatchFound = true; //Simplifies coding to fake a release match
-                $releaseArr = false; // But the release array won't contain anything
-            }
-
-            if (!$releaseMatchFound && $requireReleaseMatch)
-            {
-                if (DEBUG_ECHO)
-                    echo "No matching release for matched title.\n";
-                return false;
-            }
-            else
-            {
-                similar_text((isset($query['title']) ? $query['title'] : $query), $results->{'recording-list'}->recording->title, $tempPercentMatch);
-                if (!is_array($return))
-                    $return = array();
-                $return['title'] = $results->{'recording-list'}->recording->title;
-                $return['mbID'] = $results->{'recording-list'}->recording->attributes()->id;
-                $return['percentMatch'] = $percentMatch = $tempPercentMatch;
-                $return['release'] = $releaseArr;
-
-            } // Release match is true
-        }  // The single result matched the query
-    }
-    else // More than 1 recording was found
-    {*/
         $i = 0;     // Recording result counter, used for weighting results
         $percentMatch = -1000;
         foreach($results->{'recording-list'}->recording as $recording)
@@ -784,7 +719,7 @@ function normalizeString($text, $includeArticles=false)
  * @param array     $relArtist          array containing artist results from MB
  * @param array     $query              Array containing values to compare against
  * @param bool      $skipVariousCheck   Defaults to false, skip check for Various Artists
- * @param int|float $weight             Precalcualted weight to add to percentmatch
+ * @param int|float $weight             Precalculated weight to add to percentmatch
  *
  * @return array|bool
  */

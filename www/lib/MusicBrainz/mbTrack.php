@@ -16,7 +16,7 @@ class mbTrack extends mb_base{
     private $_trackNumber = null;
     private $_title = '';
     private $_length = 0;
-
+    private $_discNumber = null;
     /**
      * @param string $albumID
      */
@@ -116,6 +116,22 @@ class mbTrack extends mb_base{
     public function getYear()
     {
         return $this->year;
+    }
+
+    /**
+     * @param int $discNumber
+     */
+    public function setDiscNumber($discNumber)
+    {
+        $this->_discNumber = $discNumber;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDiscNumber()
+    {
+        return $this->_discNumber;
     }
 
 
