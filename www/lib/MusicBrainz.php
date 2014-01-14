@@ -5,8 +5,18 @@
  * Date: 9/7/13
  * Time: 2:00 PM
  * File: MusicBrainz.php
+ *
  * Class for retrieving music info from a MusicBrainz replication server.  To configure your own
  * replication server, see http://nzedbetter.org/index.php?title=MusicBrainz
+ *
+ * It is STRONGLY recommended that you configure your own replication server if
+ * you plan to index music binaries and utilize the MusicBrainz integration.
+ *
+ * NOTE: All http requests to musicbrainz are in compliance with the MusicBrainz
+ * terms of service, provided that the code below has not been altered from the
+ * author's original work.  For the current release version of nZEDbetter, please visit
+ * https://github.com/KurzonDax/nZEDbetter
+ *
  */
 
 require_once(WWW_DIR . "lib/site.php");
@@ -19,6 +29,9 @@ require_once(WWW_DIR . "lib/MusicBrainz/mbRelease.php");
 require_once(WWW_DIR . "lib/MusicBrainz/mbTrack.php");
 require_once(WWW_DIR . "lib/namecleaning.php");
 
+/**
+ * Class MusicBrainz
+ */
 class MusicBrainz {
 
     const POST = 'post';
@@ -30,19 +43,64 @@ class MusicBrainz {
     const COVER_ART_BASE_URL = "http://coverartarchive.org/release/";
     const WRITE_LOG_FILES = true;
 
+    /**
+     * @var string
+     */
     private $_MBserver = '';
+    /**
+     * @var bool
+     */
     private $_throttleRequests = false;
+    /**
+     * @var string
+     */
     private $_applicationName = 'nZEDbetter';
+    /**
+     * @var string
+     */
     private $_applicationVersion = '';
+    /**
+     * @var null
+     */
     private $_email = null;
+    /**
+     * @var string
+     */
     private $_imageSavePath = '';
+    /**
+     * @var bool
+     */
     private $_isAmazonValid = false;
+    /**
+     * @var string
+     */
     private $_amazonPublicKey = '';
+    /**
+     * @var string
+     */
     private $_amazonPrivateKey = '';
+    /**
+     * @var string
+     */
     private $_amazonTag = '';
+    /**
+     * @var string
+     */
     private $_baseLogPath = '';
+    /**
+     * @var int
+     */
     private $_threads = 0;
 
+    /**
+     * @throws MBException      exception thrown if search server URL contains musicbrainz.org
+     *                          and no valid email address has been configured in site settings.
+     *
+     * NOTE: All requests to musicbrainz are in compliance with the MusicBrainz terms
+     * of service, provided that the code below has not been altered from the author's
+     * original work.  For the current release version of nZEDbetter, please visit
+     * https://github.com/KurzonDax/nZEDbetter
+     */
     function construct()
     {
         $s = new Sites();
@@ -83,6 +141,14 @@ class MusicBrainz {
 
     }
 
+    /**
+     * @param string $searchFunction
+     * @param string $field
+     * @param string $query
+     * @param int    $limit
+     *
+     * @return bool|SimpleXMLElement
+     */
     private function __makeSearchCall($searchFunction, $field = '' , $query = '', $limit=10)
     {
 
@@ -92,6 +158,12 @@ class MusicBrainz {
 
     }
 
+    /**
+     * @param string    $entity   string literal: artist, label, recording, release, release-group, work, area, url
+     * @param string    $mbid
+     *
+     * @return bool|SimpleXMLElement
+     */
     public function musicBrainzLookup($entity, $mbid)
     {
         // $entity must be one of the following:
@@ -125,6 +197,13 @@ class MusicBrainz {
 
     }
 
+    /**
+     * @param string $query
+     * @param string $field     defaults to blank
+     * @param int    $limit     defaults to 10, max number of results to return
+     *
+     * @return bool|SimpleXMLElement
+     */
     private function __searchArtist($query, $field='', $limit=10)
     {
         /*  FIELD       DESCRIPTION
@@ -154,6 +233,13 @@ class MusicBrainz {
 
     }
 
+    /**
+     * @param string $query
+     * @param string $field     defaults to 'title'
+     * @param int    $limit     defaults to 10, max number of results to return
+     *
+     * @return bool|SimpleXMLElement
+     */
     private function __searchCDstubs($query, $field='title',$limit=10)
     {
 
@@ -174,6 +260,13 @@ class MusicBrainz {
 
     }
 
+    /**
+     * @param string $query
+     * @param string $field     defaults to blank
+     * @param int    $limit     defaults to 10, max number of results to return
+     *
+     * @return bool|SimpleXMLElement
+     */
     private function __searchLabel($query, $field='',$limit=10)
     {
 
@@ -205,6 +298,15 @@ class MusicBrainz {
 
     }
 
+    /**
+     * @param string $query1
+     * @param string $field1    defaults to 'recording', first field to search in query
+     * @param string $query2
+     * @param string $field2    defaults to 'artist', second field to search to narrow results
+     * @param int    $limit     defaults to 30, max number of results to return
+     *
+     * @return bool|SimpleXMLElement
+     */
     private function __searchRecording($query1, $field1='recording', $query2='', $field2='artist',$limit=30)
     {
 
@@ -252,6 +354,13 @@ class MusicBrainz {
         }
     }
 
+    /**
+     * @param string $query
+     * @param string $field     defaults to 'releasegroup'
+     * @param int    $limit     defaults to 10, max number of results to return
+     *
+     * @return bool|SimpleXMLElement
+     */
     private function __searchReleaseGroup($query, $field='releasegroup',$limit=10)
     {
         /*
@@ -281,6 +390,15 @@ class MusicBrainz {
             return $this->__makeSearchCall('release-group', $field, $query, $limit);
     }
 
+    /**
+     * @param string $query1
+     * @param string $field1    defaults to 'release'
+     * @param string $query2
+     * @param string $field2    defaults to 'artistname', used to narrow results
+     * @param int    $limit     defaults to 10, max number of results to return
+     *
+     * @return bool|SimpleXMLElement
+     */
     private function __searchRelease($query1, $field1='release', $query2='', $field2='artistname',$limit=10)
     {
         /*
@@ -331,9 +449,10 @@ class MusicBrainz {
     }
 
     /**
-     * @param $query
-     * @param string $field
-     * @param int $limit
+     * @param string    $query
+     * @param string    $field      defaults to 'work'
+     * @param int       $limit      defaults to 10, max number of results to return
+     *
      * @return bool|mixed
      */
     private function __searchWork($query, $field='work',$limit=10)
@@ -362,11 +481,17 @@ class MusicBrainz {
 
     }
 
+    /**
+     * @param array  $musicRow     associative array containing ID, name, searchname
+     *
+     * @return bool
+     */
     public function processMusicRelease($musicRow)
     {
         $nameCleaning = new nameCleaning();
         $db = new DB();
 
+        $failureType = '';
         $n = "\n\033[01;37m";
 
         if (preg_match('/bootleg/i', $musicRow['name']) === 1)
@@ -420,10 +545,16 @@ class MusicBrainz {
                         echo "\033[01;31mERROR: Encountered an error adding/updating artist" . $n;
                 }
                 else
+                {
                     echo "\033[01;33mUnable to match release: " . $musicRow['searchname'] . $n;
+                    $failureType = 'release-release';
+                }
             }
             else
+            {
                 echo "\033[01;34mUnable to determine artist: " . $musicRow['searchname'] . $n;
+                $failureType = 'release-artist';
+            }
         }
         else
         {
@@ -469,10 +600,22 @@ class MusicBrainz {
                         echo "\033[01;31mERROR: Encountered an error updating artist" . $n;
                 }
                 else
+                {
                     echo "\033[01;33mUnable to match single: " . $isSingle['title'] . $n;
+                    $failureType = 'track-track';
+                }
             }
             else
+            {
                 echo "\033[01;33mUnable to match artist: " . $isSingle['artist'] . $n;
+                $failureType = 'track-artist';
+            }
+        }
+
+        if(MusicBrainz::WRITE_LOG_FILES)
+        {
+            $log = $musicRow['ID'] . ',"' . $musicRow['name'] . '","' . $musicRow['searchname'] . '"' . "\n";
+            file_put_contents($this->_baseLogPath . $failureType . '-noMatch.log', $log, FILE_APPEND);
         }
 
         return false;
@@ -880,6 +1023,14 @@ class MusicBrainz {
         return $foundRecording === true ? $return : false;
     }
 
+    /**
+     * @param string $text              string to normalize
+     * @param bool   $includeArticles   remove English language articles (a, an, the)
+     *
+     * @return string
+     *
+     * This function standardizes text strings to facilitate better matches
+     */
     private function __normalizeString($text, $includeArticles = false)
     {
         $text = strtolower($text);
@@ -894,6 +1045,12 @@ class MusicBrainz {
         return $text;
     }
 
+    /**
+     * @param string    $text   text to clean
+     * @param bool      $debug  true to output debug info, defaults to false
+     *
+     * @return string
+     */
     public function cleanQuery($text, $debug = false)
     {
         // Remove year
@@ -922,7 +1079,7 @@ class MusicBrainz {
 
     /**
      * @param string $text        text to use as base
-     * @param array  $searchArray Array to append results to
+     * @param array  $searchArray array to append results to
      *
      * @return array
      *
@@ -974,13 +1131,18 @@ class MusicBrainz {
         return $searchArray;
     }
 
+    /**
+     * @param mbArtist $artist
+     *
+     * @return bool
+     */
     public function updateArtist(mbArtist $artist)
     {
-
-        $db = new DB();
         if($artist->getMbID() == '' || is_null($artist->getMbID()))
             return false;
 
+        $this->__updateGenres('artist', $artist->getMbID(), $artist->getTags());
+        $db = new DB();
         $searchExisting = $db->queryOneRow("SELECT mbID FROM mbArtists WHERE mbID=" . $db->escapeString($artist->getMbID()));
         if(!$searchExisting)
         {
@@ -1010,12 +1172,17 @@ class MusicBrainz {
         }
     }
 
+    /**
+     * @param mbRelease $release
+     *
+     * @return bool
+     */
     public function updateAlbum(mbRelease $release)
     {
-
         if($release->getMbID() == '' || is_null($release->getMbID()))
             return false;
 
+        $this->__updateGenres('album', $release->getMbID(), $release->getTags());
         $db = new DB();
         $searchExisting = $db->queryOneRow("SELECT mbID FROM mbAlbums WHERE mbID=" . $db->escapeString($release->getMbID()));
         if(!$searchExisting)
@@ -1030,6 +1197,8 @@ class MusicBrainz {
                     ", " . $db->escapeString($release->getDescription()) . ", " . $release->getTracks() .
                     ", " . $db->escapeString(implode(", ", $release->getTags())) . ", " . $db->escapeString($release->getCover()) .
                     ", " . $release->getRating() . ", " . ", " . $db->escapeString($release->getAsin());
+
+
 
             if (MusicBrainz::WRITE_LOG_FILES)
                 file_put_contents($this->_baseLogPath . 'album-SQL.log', $sql . "\n----------------------------------------\n", FILE_APPEND);
@@ -1053,9 +1222,13 @@ class MusicBrainz {
 
             return $db->queryDirect($sql);
         }
-
     }
 
+    /**
+     * @param mbTrack $track
+     *
+     * @return bool
+     */
     public function updateTrack(mbTrack $track)
     {
         if($track->getMbID() == '' || is_null($track->getMbID()))
@@ -1088,9 +1261,37 @@ class MusicBrainz {
         }
     }
 
+    /* @param string    $type   string literal: 'album' or 'artist'
+     * @param string    $mbID   mbID of entity to update
+     * @param array     $genres array of tags to update
+     *
+     * @return bool             true for success, false for failure
+     */
+    private function __updateGenres($type, $mbID, $genres)
+    {
+        $validTypes = array('artist', 'album');
+        if(in_array($type, $validTypes) && !empty($genres) && !empty($mbID))
+        {
+            $db = new DB();
+            foreach($genres as $genre)
+            {
+                $genreID = $db->queryOneRow("SELECT ID FROM mbGenres WHERE name=" . $db->escapeString(trim($genre)));
+                if(!isset($genreID['ID']))
+                    $genreID['ID'] = $db->queryInsert("INSERT INTO mbGenres (name) VALUES (" . trim($genre) . ")");
+
+                $db->queryInsert("INSERT INTO mb" . ucwords($type) . "IDtoGenreID (" . strtolower($type) . "ID, genreID) VALUES (" .
+                    $db->escapeString($mbID) . ", " . $genreID['ID'] . ")");
+            }
+            return true;
+        }
+
+        return false;
+    }
+
     /* @param string    $releaseName
      *
-     * @return array|bool
+     * @return array|bool               array will contain artist and title at minimum
+     *                                  may also include release, track, and disc
      */
     public function isTrack($releaseName)
     {
@@ -1159,10 +1360,10 @@ class MusicBrainz {
     }
 
     /**
-     * @param array     $relArtist        array containing artist results from MB
-     * @param array     $query            Array containing values to compare against
-     * @param bool      $skipVariousCheck Defaults to false, skip check for Various Artists
-     * @param int|float $weight           Precalculated weight to add to percentmatch
+     * @param simpleXMLElement     $relArtist        simpleXMLElement containing a single artist result from MB
+     * @param array                $query            Array containing values to compare against
+     * @param bool                 $skipVariousCheck Defaults to false, skip check for Various Artists
+     * @param int|float            $weight           Precalculated weight to add to percentMatch
      *
      * @return mbArtist
      */
@@ -1294,7 +1495,20 @@ class MusicBrainz {
 
         return false;
     }
-    
+
+    /**
+     * @param $url
+     *
+     * @return bool|SimpleXMLElement
+     * @throws MBException              exception thrown if php-curl not loaded, or
+     *                                  if url contains musicbrainz.org and no valid
+     *                                  email address is configured in site settings.
+     *
+     * NOTE: All requests to musicbrainz are in compliance with the MusicBrainz terms
+     * of service, provided that the code below has not been altered from the author's
+     * original work.  For the current release version of nZEDbetter, please visit
+     * https://github.com/KurzonDax/nZEDbetter
+     */
     protected  function __getResponse($url)
     {
 
@@ -1316,7 +1530,7 @@ class MusicBrainz {
                     echo "The MusicBrainz integration will not function until this is corrected.\n\n";
                     throw new MBException("Invalid email address.  Halting MusicBrainz Processing.");
                 }
-                else //The following is REQUIRED if using musicbrainz.com for the server, per http://musicbrainz.org/doc/XML_Web_Service/Rate_Limiting
+                else //The following is REQUIRED if using musicbrainz.org for the server, per http://musicbrainz.org/doc/XML_Web_Service/Rate_Limiting
                     usleep($this->_threads * 9000);
             }
 
@@ -1341,6 +1555,9 @@ class MusicBrainz {
         }
     }
 
+    /**
+     * @param mbRelease $release    passed by reference, updated with path to saved cover art
+     */
     private function __getCoverArt(mbRelease &$release)
     {
         $releaseImage = new ReleaseImage();
@@ -1458,6 +1675,13 @@ class MusicBrainz {
         return $foundRelease === true ? $mbRelease : false;
     }
 
+    /**
+     * @param string     $mbID          mbID for release to lookup
+     * @param string     $mbArtistID    artist's mbID associated with release
+     * @param int|float  $percentMatch
+     *
+     * @return bool|mbRelease
+     */
     private function __getReleaseDetails ($mbID, $mbArtistID, $percentMatch = null)
     {
 
@@ -1511,6 +1735,14 @@ class MusicBrainz {
         return $mbRelease;
     }
 
+    /**
+     * @param string         $mbID           mbID of recording to lookup
+     * @param string         $mbArtistID     artist's mbID associated with recording
+     * @param string|null    $mbReleaseID    release's mbID associated with recording
+     * @param float|int|null $percentMatch
+     *
+     * @return bool|mbTrack
+     */
     private function __getRecordingDetails($mbID, $mbArtistID, $mbReleaseID=null, $percentMatch = null)
     {
         $recordingInfo = $this->musicBrainzLookup('recording', $mbID);
@@ -1568,6 +1800,12 @@ class MusicBrainz {
         return $mbRecording;
     }
 
+    /**
+     * @param string  $mbID             mbID of artist to lookup
+     * @param null    $percentMatch
+     *
+     * @return bool|mbArtist
+     */
     private function __getArtistDetails($mbID, $percentMatch = null)
     {
 
@@ -1607,4 +1845,7 @@ class MusicBrainz {
     }
 }
 
+/**
+ * Class MBException
+ */
 class MBException extends Exception{}

@@ -112,7 +112,6 @@ CREATE TABLE IF NOT EXISTS `mbAlbums` (
   KEY `ix_artistID` (`artistID`),
   KEY `ix_year` (`year`),
   KEY `ix_releaseGroupID` (`releaseGroupID`),
-  KEY `ix_genreID` (`genreID`),
   KEY `ix_rating` (`rating`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 CREATE TABLE IF NOT EXISTS `mbArtists` (
@@ -131,9 +130,32 @@ CREATE TABLE IF NOT EXISTS `mbArtists` (
   `updateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`mbID`),
   KEY `ix_type` (`type`),
-  KEY `ix_genreID` (`genreID`),
   KEY `ix_country` (`country`),
-  KEY `ix_rating` (`rating`)
+  KEY `ix_rating` (`rating`),
+  KEY `ix_gender` (`gender`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE IF NOT EXISTS `mbGenres` (
+  `ID` smallint(6) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `dateUpdated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `name` (`name`),
+  KEY `active` (`active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+CREATE TABLE IF NOT EXISTS `mbAlbumIDtoGenreID` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `albumID` varchar(40) NOT NULL,
+  `genreID` smallint(6) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ix_albumID_genreID` (`albumID`,`genreID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+CREATE TABLE IF NOT EXISTS `mbArtistIDtoGenreID` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `artistID` varchar(40) NOT NULL,
+  `genreID` smallint(6) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ix_artistID_genreID` (`artistID`,`genreID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 UPDATE `site` SET `VALUE` = '0.7' WHERE `setting` = 'NZEDBETTER_VERSION';
 UPDATE `site` SET `VALUE` = 'v0003' WHERE `setting` = 'sqlpatch';

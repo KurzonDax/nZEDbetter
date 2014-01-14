@@ -12,7 +12,7 @@ class mbTrack extends mb_base{
 
     private $_albumID = '';
     private $_artistID = '';
-    private $year = null;
+    private $_year = null;
     private $_trackNumber = null;
     private $_title = '';
     private $_length = 0;
@@ -107,7 +107,7 @@ class mbTrack extends mb_base{
     public function setYear($year)
     {
         if(is_integer($year) && preg_match('/(19|20)\d\d/', $year) === 1)
-            $this->year = $year;
+            $this->_year = $year;
     }
 
     /**
@@ -115,7 +115,7 @@ class mbTrack extends mb_base{
      */
     public function getYear()
     {
-        return $this->year;
+        return $this->_year;
     }
 
     /**
