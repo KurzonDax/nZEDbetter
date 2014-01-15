@@ -39,10 +39,16 @@ class MusicBrainz {
     const HEAD = 'head';
     const API_VERSION = '2';
     const API_SCHEME = "http://";
-    const DEBUG_MODE = false;
+    const SKIP_COVER_CREATION = false;
     const COVER_ART_BASE_URL = "http://coverartarchive.org/release/";
     const WRITE_LOG_FILES = true;
 
+    const DEBUG_NONE = 0;
+    const DEBUG_MIN = 1;
+    const DEBUG_MED = 3;
+    const DEBUG_MAX = 5;
+
+    const DEBUG_MODE = MusicBrainz::DEBUG_NONE;
     /**
      * @var string
      */
@@ -101,8 +107,11 @@ class MusicBrainz {
      * original work.  For the current release version of nZEDbetter, please visit
      * https://github.com/KurzonDax/nZEDbetter
      */
-    function construct()
+    public function __construct()
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\n";
+
         $s = new Sites();
         $site = $s->get();
         $this->_MBserver = (!empty($site->musicBrainzServer)) ? $site->musicBrainzServer : "musicbrainz.org";
@@ -136,7 +145,8 @@ class MusicBrainz {
         if(MusicBrainz::WRITE_LOG_FILES)
         {
             $this->_baseLogPath = WWW_DIR . "lib/logging/musicBrainz/";
-            mkdir($this->_baseLogPath, 0777, true);
+            if(!is_dir($this->_baseLogPath))
+                mkdir($this->_baseLogPath, 0777, true);
         }
 
     }
@@ -152,6 +162,8 @@ class MusicBrainz {
     private function __makeSearchCall($searchFunction, $field = '' , $query = '', $limit=10)
     {
 
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\nField: " . $field . "\nQuery: " . $query . "\n";
         $url = MusicBrainz::API_SCHEME . $this->_MBserver . '/ws/' . MusicBrainz::API_VERSION . '/' . $searchFunction . '?query=' . ($field=='' ? '' : $field . '%3A') . rawurlencode($query) . "&limit=" . $limit;
 
         return $this->__getResponse($url);
@@ -166,6 +178,8 @@ class MusicBrainz {
      */
     public function musicBrainzLookup($entity, $mbid)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\n";
         // $entity must be one of the following:
         // artist, label, recording, release, release-group, work, area, url
         if(is_null($entity) || empty($entity) || is_null($mbid) || empty($mbid))
@@ -182,7 +196,7 @@ class MusicBrainz {
                 $incParams = '?inc=ratings+tags';
                 break;
             case 'release':
-                $incParams = '?inc=ratings+tags+release-groups+media+release-rels';
+                $incParams = '?inc=ratings+tags+release-groups+mediums+release-rels';
                 break;
             case 'recording':
                 $incParams = '?inc=ratings+tags+artists+releases';
@@ -226,6 +240,8 @@ class MusicBrainz {
             type		artist type (“person”, “group”, "other" or “unknown”)
          *
          */
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "  Query: " . $query . "\n";
         if(empty($query) || is_null($query))
             return false;
         else
@@ -344,6 +360,8 @@ class MusicBrainz {
             type 			type of the release group, old type mapping for when we did not have separate primary and secondary types
          *
          */
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\nQuery1: " . $query1 . "\nQuery2: " . $query2 . "\n";
 
         if(empty($query1) || is_null($query1))
             return false;
@@ -438,6 +456,8 @@ class MusicBrainz {
          *
          *
          */
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\nQuery1: " . $query1 . "\nQuery2: " . $query2 . "\n";
 
         if(empty($query1) || is_null($query1))
             return false;
@@ -488,6 +508,9 @@ class MusicBrainz {
      */
     public function processMusicRelease($musicRow)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\n";
+
         $nameCleaning = new nameCleaning();
         $db = new DB();
 
@@ -517,6 +540,7 @@ class MusicBrainz {
 
         if (!$isSingle)
         {
+            echo "Looking up album: " . $musicRow['searchname'] . "\n";
             $artistResult = $this->findArtist($query, $artistSearchArray);
             if ($artistResult)
             {
@@ -529,9 +553,9 @@ class MusicBrainz {
                 $albumResult = $this->findRelease($query, $artistResult, $releaseSearchArr, (isset($year[0]) ? $year[0] : null));
                 if ($albumResult)
                 {
-                    if($this->updateArtist($artistResult))
+                    if($this->updateArtist($artistResult) !== false)
                     {
-                        if($this->updateAlbum($albumResult))
+                        if($this->updateAlbum($albumResult) !== false)
                         {
                             echo "\033[01;32mAdded/Updated Album: " . $albumResult->getTitle() . "  Artist: " . $artistResult->getName() . $n;
                             $db->queryDirect("UPDATE releases SET musicinfoID=99999999, mbAlbumID=" . $db->escapeString($albumResult->getMbID()) .
@@ -546,18 +570,19 @@ class MusicBrainz {
                 }
                 else
                 {
-                    echo "\033[01;33mUnable to match release: " . $musicRow['searchname'] . $n;
+                    echo "\033[01;33mUnable to match release: " . $musicRow['ID'] . "   " . $musicRow['searchname'] . $n;
                     $failureType = 'release-release';
                 }
             }
             else
             {
-                echo "\033[01;34mUnable to determine artist: " . $musicRow['searchname'] . $n;
+                echo "\033[01;34mUnable to determine artist: " . $musicRow['ID'] . "   " . $musicRow['searchname'] . $n;
                 $failureType = 'release-artist';
             }
         }
         else
         {
+            echo "Looking up single: " . $musicRow['searchname'] . "\n";
             $prefix = isset($isSingle['disc']) ? (string)$isSingle['disc'] . (string)$isSingle['track'] : $isSingle['track'];
             $query = preg_replace('/^' . $prefix . '/', '', $query);
 
@@ -570,9 +595,9 @@ class MusicBrainz {
                 $recordingResult = $this->findRecording($isSingle, $artistResult, false);
                 if ($recordingResult)
                 {
-                    if($this->updateArtist($artistResult))
+                    if($this->updateArtist($artistResult) !== false)
                     {
-                        if($this->updateTrack($recordingResult['recording']))
+                        if($this->updateTrack($recordingResult['recording']) !== false)
                         {
                             if($recordingResult['release'] !== false)
                             {
@@ -601,16 +626,37 @@ class MusicBrainz {
                 }
                 else
                 {
-                    echo "\033[01;33mUnable to match single: " . $isSingle['title'] . $n;
+                    echo "\033[01;33mUnable to match single: " . $musicRow['ID'] . "   " . $isSingle['title'] . $n;
                     $failureType = 'track-track';
                 }
             }
             else
             {
-                echo "\033[01;33mUnable to match artist: " . $isSingle['artist'] . $n;
+                echo "\033[01;33mUnable to match artist: " . $musicRow['ID'] . "   " . $isSingle['artist'] . $n;
                 $failureType = 'track-artist';
             }
         }
+
+        switch ($failureType)
+        {
+            case 'release-release':
+                $failureCode = '-1';
+                break;
+            case 'release-artist':
+                $failureCode = '-2';
+                break;
+            case 'track-track':
+                $failureCode = '-3';
+                break;
+            case 'track-artist':
+                $failureCode = '-4';
+                break;
+            default:
+                $failureType = 'process';
+                $failureCode = '-5';
+        }
+
+        $db->query("UPDATE releases SET musicinfoID=" . $failureCode . " WHERE ID=" . $musicRow['ID']);
 
         if(MusicBrainz::WRITE_LOG_FILES)
         {
@@ -629,6 +675,9 @@ class MusicBrainz {
      */
     public function findArtist($query, $searchArray)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "  Query: " . $query . "\n";
+
         $mbArtist = new mbArtist();
         $foundArtist = false;
 
@@ -642,7 +691,6 @@ class MusicBrainz {
             $searchArray[] = $this->__normalizeString($temp, true);
         }
 
-
         $wordCount = count(explode(' ', $query));
         if ($query == 'VA')
         {
@@ -655,16 +703,19 @@ class MusicBrainz {
 
         $results = $this->__searchArtist($query, '', 50);
 
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MAX)
+            print_r($results);
+
         $resultsAttr = isset($results->{'artist-list'}) ? $results->{'artist-list'}->attributes() : array();
         if (isset($resultsAttr['count']) && $resultsAttr['count'] == '0')
         {
-            if (MusicBrainz::DEBUG_MODE)
+            if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
                 echo "Artist name search returned no results\n";
             return false;
         }
         elseif (!isset($resultsAttr['count']))
         {
-            if(MusicBrainz::DEBUG_MODE)
+            if(MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MAX)
                 print_r($results);
             return false;
         }
@@ -683,10 +734,10 @@ class MusicBrainz {
                 // The following helps to prevent single-word artists from matching an artist
                 // with a similar full name (i.e Pink should not match Pink Floyd)
                 // Obviously only works if the query string is two words or less
-                if ($wordCount < 3 && count(explode(' ', $artistCheck['name'])) != $wordCount)
+                if ($wordCount < 3 && count(explode(' ', $artistCheck->getName())) != $wordCount)
                 {
-                    if (DEBUG_ECHO)
-                        echo "Matching artist name too short: " . $artistCheck['name'] . "\n";
+                    if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
+                        echo "Matching artist name too short: " . $artistCheck->getName() . "\n";
                     continue;
                 }
                 $mbArtist = $artistCheck->getMbID();
@@ -715,6 +766,8 @@ class MusicBrainz {
     {
         // enforce artist requirement
         // check all occurrences of $searchArray, fix $searchNameArr to use $searchArray
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "Query: " . $query . "\n";
 
         $query = $this->__normalizeString($query);
 
@@ -736,13 +789,13 @@ class MusicBrainz {
         }
         if (!isset($results->{'release-list'}->attributes()->count))
         {
-            if(MusicBrainz::DEBUG_MODE)
+            if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MAX)
                 print_r($results);
             return false;
         }
         if ($results->{'release-list'}->attributes()->count == '0')
         {
-            if (MusicBrainz::DEBUG_MODE)
+            if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
                 echo "Release name search returned no results\n";
 
             return false;
@@ -767,7 +820,7 @@ class MusicBrainz {
             }
             if (!$matchFound)
             {
-                if (MusicBrainz::DEBUG_MODE)
+                if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                     echo "Non-matching release: " . $results->{'release-list'}->release->title . "\n";
 
                 return false;
@@ -801,14 +854,14 @@ class MusicBrainz {
                 }
                 if (!$matchFound)
                 {
-                    if (MusicBrainz::DEBUG_MODE)
+                    if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                         echo "Non-matching release: " . $release->title . "\n";
                     continue;
                 }
                 else
                 {
                     similar_text($this->__normalizeString($release->title), $matchedSearchName, $tempMatch);
-                    if (MusicBrainz::DEBUG_MODE)
+                    if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                         echo "Checking release: " . $release->title . "\n";
                     if (!$artist && isset($release->{'artist-credit'}->{'name-credit'}))
                     {
@@ -830,7 +883,7 @@ class MusicBrainz {
                         }
                         if (!$mbArtist)
                         {
-                            if (MusicBrainz::DEBUG_MODE)
+                            if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                                 echo "No matching artist was found in the release.\n";
                             continue;
                         }
@@ -842,14 +895,14 @@ class MusicBrainz {
                     if ($this->__normalizeString($release->title, true) == $this->__normalizeString($mbArtist->getName(), true) &&
                         substr_count($query, $this->__normalizeString($mbArtist->getName(), true)) == 1)
                     {
-                        if (MusicBrainz::DEBUG_MODE)
+                        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                             echo "Artist name and release title are the same, but not looking for self-titled release\n";
                         continue;
                     }
                     elseif (stripos(trim(preg_replace('/' . $this->__normalizeString($mbArtist->getName(), true) . '/', '', $this->__normalizeString($matchedSearchName, true), 1)),
                             trim($this->__normalizeString($release->title, true))) === false)
                     {
-                        if (MusicBrainz::DEBUG_MODE)
+                        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                             echo "Title no longer matched after extracting artist's name.\n";
                         continue;
                     }
@@ -901,6 +954,12 @@ class MusicBrainz {
      */
     public function findRecording($query, mbArtist $artist,  $requireReleaseMatch = false)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+        {
+            echo "Starting " . __METHOD__ . "\n";
+            print_r($query);
+        }
+
         $foundRecording = false;
         $return = array();
         $matchedRecording = array();
@@ -920,17 +979,17 @@ class MusicBrainz {
 
         if (!isset($results->{'recording-list'}->attributes()->count))
         {
-            if(MusicBrainz::DEBUG_MODE)
+            if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MAX)
                 print_r($results);
             return false;
         }
         if ($results->{'recording-list'}->attributes()->count == '0')
         {
-            if (MusicBrainz::DEBUG_MODE)
+            if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                 echo "Recording search returned no results\n";
 
             return false;
-        } elseif (MusicBrainz::DEBUG_MODE)
+        } elseif (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
             echo "Recordings Found: " . $results->{'recording-list'}->attributes()->count . "\n";
 
         $normalizedTitleArr = array();
@@ -945,7 +1004,7 @@ class MusicBrainz {
 
             foreach ($normalizedTitleArr as $normalizedTitle)
             {
-                if (MusicBrainz::DEBUG_MODE)
+                if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                 {
                     echo "Checking Title: " . $normalizedTitle . "\n";
                     echo "Against Title:  " . $this->__normalizeString($recording->title) . "\n";
@@ -979,7 +1038,7 @@ class MusicBrainz {
                 }
                 if (!$releaseMatchFound && $requireReleaseMatch)
                 {
-                    if (MusicBrainz::DEBUG_MODE)
+                    if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                         echo "No matching release for matched title.\n";
                     continue;
                 }
@@ -1000,13 +1059,13 @@ class MusicBrainz {
             } // Title match found
             else
             {
-                if (MusicBrainz::DEBUG_MODE)
+                if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                     echo "Non-matching recording title: " . $recording->title . "\n";
             }
             $i++; // Increment the recording result counter
         } // Recording result loop
 
-        if(MusicBrainz::DEBUG_MODE)
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MAX)
         {
             ob_start();
             print_r($results);
@@ -1088,6 +1147,9 @@ class MusicBrainz {
      */
     private function __buildReleaseSearchArray($text, $searchArray)
     {
+        if(MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\n";
+
         $searchArray[] = $text;
         $searchArray[] = $this->__normalizeString($text);
         $searchArray[] = $this->__normalizeString($text, true);
@@ -1098,30 +1160,32 @@ class MusicBrainz {
             $searchArray[] = preg_replace('/\bVolume\b/i', ' ', $text);
         // Replace ordinal numbers with roman numerals
         preg_match('/\bVolume[ \-_\.](\d)\b/i', $text, $matches);
-        switch ($matches[1])
+        if(isset($matches[1]))
         {
-            case '1':
-                $searchArray[] = preg_replace('\bVolume[ \-_\.]1\b', ' Volume I ', $text);
-                $searchArray[] = preg_replace('\bVolume[ \-_\.]1\b', ' I ', $text);
-                break;
-            case '2':
-                $searchArray[] = preg_replace('\bVolume[ \-_\.]2\b', ' Volume II ', $text);
-                $searchArray[] = preg_replace('\bVolume[ \-_\.]2\b', ' II ', $text);
-                break;
-            case '3':
-                $searchArray[] = preg_replace('\bVolume[ \-_\.]3\b', ' Volume III ', $text);
-                $searchArray[] = preg_replace('\bVolume[ \-_\.]3\b', ' III ', $text);
-                break;
-            case '4':
-                $searchArray[] = preg_replace('\bVolume[ \-_\.]4\b', ' Volume IV ', $text);
-                $searchArray[] = preg_replace('\bVolume[ \-_\.]4\b', ' IV ', $text);
-                break;
-            case '5':
-                $searchArray[] = preg_replace('\bVolume[ \-_\.]5\b', ' Volume V ', $text);
-                $searchArray[] = preg_replace('\bVolume[ \-_\.]5\b', ' V ', $text);
-                break;
+            switch ($matches[1])
+            {
+                case '1':
+                    $searchArray[] = preg_replace('\bVolume[ \-_\.]1\b', ' Volume I ', $text);
+                    $searchArray[] = preg_replace('\bVolume[ \-_\.]1\b', ' I ', $text);
+                    break;
+                case '2':
+                    $searchArray[] = preg_replace('\bVolume[ \-_\.]2\b', ' Volume II ', $text);
+                    $searchArray[] = preg_replace('\bVolume[ \-_\.]2\b', ' II ', $text);
+                    break;
+                case '3':
+                    $searchArray[] = preg_replace('\bVolume[ \-_\.]3\b', ' Volume III ', $text);
+                    $searchArray[] = preg_replace('\bVolume[ \-_\.]3\b', ' III ', $text);
+                    break;
+                case '4':
+                    $searchArray[] = preg_replace('\bVolume[ \-_\.]4\b', ' Volume IV ', $text);
+                    $searchArray[] = preg_replace('\bVolume[ \-_\.]4\b', ' IV ', $text);
+                    break;
+                case '5':
+                    $searchArray[] = preg_replace('\bVolume[ \-_\.]5\b', ' Volume V ', $text);
+                    $searchArray[] = preg_replace('\bVolume[ \-_\.]5\b', ' V ', $text);
+                    break;
+            }
         }
-
         // Get rid of extra spaces in all values
         foreach ($searchArray as $key => $value)
         {
@@ -1138,6 +1202,9 @@ class MusicBrainz {
      */
     public function updateArtist(mbArtist $artist)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\n";
+
         if($artist->getMbID() == '' || is_null($artist->getMbID()))
             return false;
 
@@ -1146,7 +1213,7 @@ class MusicBrainz {
         $searchExisting = $db->queryOneRow("SELECT mbID FROM mbArtists WHERE mbID=" . $db->escapeString($artist->getMbID()));
         if(!$searchExisting)
         {
-            $sql = "INSERT INTO mbArtists (mbID, name, type, gender, disambiguation, description, genreID, country, rating, beginDate, endDate) VALUES (" .
+            $sql = "INSERT INTO mbArtists (mbID, name, type, gender, disambiguation, description, genres, country, rating, beginDate, endDate) VALUES (" .
                      $db->escapeString($artist->getMbID()) . ", " . $db->escapeString($artist->getName()) . ", " . $db->escapeString($artist->getType()) . ", " .
                      $db->escapeString($artist->getGender()) . ", " . $db->escapeString($artist->getDisambiguation()) . ", " .
                      $db->escapeString($artist->getDescription()) . ", " . $db->escapeString(implode(", ", $artist->getTags())) . ", " . $db->escapeString($artist->getCountry()) . ", " .
@@ -1179,16 +1246,23 @@ class MusicBrainz {
      */
     public function updateAlbum(mbRelease $release)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\n";
+
         if($release->getMbID() == '' || is_null($release->getMbID()))
             return false;
 
         $this->__updateGenres('album', $release->getMbID(), $release->getTags());
         $db = new DB();
+
+        $this->__getCoverArt($release);
+
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "updateAlbum: Returned from __getCoverArt\n";
+
         $searchExisting = $db->queryOneRow("SELECT mbID FROM mbAlbums WHERE mbID=" . $db->escapeString($release->getMbID()));
         if(!$searchExisting)
         {
-            $this->__getCoverArt($release);
-
             $sql = "INSERT INTO mbAlbums (mbID, artistID, title, year, status, country, releaseDate, releaseGroupID, description, tracks, genres, cover, rating, asin) VALUES " .
                     "(" . $db->escapeString($release->getMbID()) . ", " . $db->escapeString($release->getArtistID()) .
                     ", " . $db->escapeString($release->getTitle()) . ", " . $db->escapeString($release->getYear()) .
@@ -1196,7 +1270,7 @@ class MusicBrainz {
                     ", " . $db->escapeString($release->getReleaseDate()) . ", " . $db->escapeString($release->getReleaseGroupID()) .
                     ", " . $db->escapeString($release->getDescription()) . ", " . $release->getTracks() .
                     ", " . $db->escapeString(implode(", ", $release->getTags())) . ", " . $db->escapeString($release->getCover()) .
-                    ", " . $release->getRating() . ", " . ", " . $db->escapeString($release->getAsin());
+                    ", " . $release->getRating() . ", " . $db->escapeString($release->getAsin()) . ")";
 
 
 
@@ -1207,8 +1281,6 @@ class MusicBrainz {
         }
         else
         {
-            $this->__getCoverArt($release);
-
             $sql = "UPDATE mbAlbums SET artistID=" . $db->escapeString($release->getArtistID()) . ", title=" . $db->escapeString($release->getTitle()) .
                     ", year=" . $db->escapeString($release->getYear()) . ", releaseDate=" . $db->escapeString($release->getReleaseDate()) .
                     ", status=" . $db->escapeString($release->getStatus()) . ", country=" . $db->escapeString($release->getCountry()) .
@@ -1231,6 +1303,9 @@ class MusicBrainz {
      */
     public function updateTrack(mbTrack $track)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\n";
+
         if($track->getMbID() == '' || is_null($track->getMbID()))
             return false;
 
@@ -1269,6 +1344,12 @@ class MusicBrainz {
      */
     private function __updateGenres($type, $mbID, $genres)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+        {
+            echo "Starting " . __METHOD__ . "\n";
+            print_r($genres);
+        }
+
         $validTypes = array('artist', 'album');
         if(in_array($type, $validTypes) && !empty($genres) && !empty($mbID))
         {
@@ -1277,8 +1358,17 @@ class MusicBrainz {
             {
                 $genreID = $db->queryOneRow("SELECT ID FROM mbGenres WHERE name=" . $db->escapeString(trim($genre)));
                 if(!isset($genreID['ID']))
-                    $genreID['ID'] = $db->queryInsert("INSERT INTO mbGenres (name) VALUES (" . trim($genre) . ")");
+                {
+                    $sql = "INSERT INTO mbGenres (`name`) VALUES (" . $db->escapeString(trim($genre)) . ")";
+                    $genreID['ID'] = $db->queryInsert($sql);
+                    if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+                    {
+                        echo "__updateGenres: New genre added: " . $genreID['ID'] . "\n";
+                        echo "SQL: " . $sql . "\n";
+                        echo "SQL Error: " . $db->Error() . "\n";
+                    }
 
+                }
                 $db->queryInsert("INSERT INTO mb" . ucwords($type) . "IDtoGenreID (" . strtolower($type) . "ID, genreID) VALUES (" .
                     $db->escapeString($mbID) . ", " . $genreID['ID'] . ")");
             }
@@ -1290,11 +1380,14 @@ class MusicBrainz {
 
     /* @param string    $releaseName
      *
-     * @return array|bool               array will contain artist and title at minimum
+     * @return array|bool               array will contain artist and title at minimum,
      *                                  may also include release, track, and disc
      */
     public function isTrack($releaseName)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\n";
+
         if (empty($releaseName) || $releaseName == null)
             return false;
 
@@ -1369,8 +1462,13 @@ class MusicBrainz {
      */
     private function __checkArtistName($relArtist, $query, $skipVariousCheck = false, $weight = 0)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\n";
+        if(MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MAX)
+            print_r($relArtist);
+
         $queryText = '';
-        if (MusicBrainz::DEBUG_MODE)
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
             echo "Checking artist: " . $relArtist->name . "\n";
         $percentMatch = 0;
         $artistArr = array();
@@ -1403,17 +1501,17 @@ class MusicBrainz {
                 } 
                 else
                 {
-                    if (MusicBrainz::DEBUG_MODE)
+                    if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                         echo "Artist name not matched: " . $relArtist->name . " (weight = $weight)\n";
                     if (isset($relArtist->{'alias-list'}))
                     {
-                        if (MusicBrainz::DEBUG_MODE)
+                        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                             echo "Checking aliases...\n";
                         foreach ($relArtist->{'alias-list'}->alias as $alias)
                         {
                             if (is_array($alias))
                             {
-                                if (MusicBrainz::DEBUG_MODE)
+                                if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                                     echo "\nAlias is an array\n";
                                 foreach ($alias as $aliasName)
                                 {
@@ -1421,7 +1519,7 @@ class MusicBrainz {
                                         continue;
                                     if (preg_match('/\b' . $this->__normalizeString($aliasName) . '\b/i', $stringToMatch) === 0)
                                     {
-                                        if (MusicBrainz::DEBUG_MODE)
+                                        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                                             echo "Alias did not match: " . $aliasName . " (weight = $weight)\n";
                                         continue;
                                     } 
@@ -1441,13 +1539,13 @@ class MusicBrainz {
                                     continue;
                                 if (preg_match('/\b' . $this->__normalizeString($alias) . '\b/i', $stringToMatch) === 0)
                                 {
-                                    if (MusicBrainz::DEBUG_MODE)
+                                    if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                                         echo "Alias did not match: " . $alias . " (weight = $weight)\n";
                                     continue;
                                 } 
                                 else
                                 {
-                                    if (MusicBrainz::DEBUG_MODE)
+                                    if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                                         echo "Alias matched: " . $alias . " (weight = $weight)\n";
                                     $artistFound = $this->__normalizeString($alias);
                                     break;
@@ -1481,13 +1579,13 @@ class MusicBrainz {
 
             if ($artist->getPercentMatch() > 15)
             {
-                if(MusicBrainz::DEBUG_MODE)
+                if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                     echo "Artist name matched: " . $artist->getName() . " (percentMatch = " . $artist->getPercentMatch() . ")\n";
                 return $artist;
             }
             elseif ($artistFound && $artist->getPercentMatch() > 0 && $artist->getPercentMatch() <= 15)
             {
-                if(MusicBrainz::DEBUG_MODE)
+                if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                     echo "Artist percent match not acceptable: " . $artist->getPercentMatch() . "\n";
                 return false;
             }
@@ -1511,12 +1609,14 @@ class MusicBrainz {
      */
     protected  function __getResponse($url)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . " URL: " . $url . "\n";
 
         if (extension_loaded('curl'))
         {
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_USERAGENT, $this->_applicationName . "/" . $this->_applicationVersion . "( " . $this->_email . " )");
+            curl_setopt($ch, CURLOPT_USERAGENT, $this->_applicationName . "/" . $this->_applicationVersion . "  ( " . $this->_email . " )");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_TIMEOUT, 30);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
@@ -1539,8 +1639,12 @@ class MusicBrainz {
             {
                 curl_close($ch);
 
+                if(MusicBrainz::DEBUG_MODE > 0)
+                    echo "__getResponse: curl request failed.\n";
+
                 return false;
-            } else
+            }
+            else
             {
                 /* parse XML */
                 $parsed_xml = @simplexml_load_string($xml_response);
@@ -1560,31 +1664,64 @@ class MusicBrainz {
      */
     private function __getCoverArt(mbRelease &$release)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\n";
+
         $releaseImage = new ReleaseImage();
         if ($release->getCover() == true)
         {
             $imageName = "mb-" . $release->getMbID() . "-cover";
             $imageUrl = MusicBrainz::COVER_ART_BASE_URL . $release->getMbID() . "/front";
-            $imageSave = $releaseImage->saveImage($imageName, $imageUrl, $this->_imageSavePath);
-            $release->setCover(($imageSave ? $imageName . ".jpg" : 'NULL'));
+
+            if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+                echo "__getCoverArt: fetching cover from " . $imageUrl . "\n";
+
+            if(!MusicBrainz::SKIP_COVER_CREATION)
+            {
+                $imageSave = $releaseImage->saveImage($imageName, $imageUrl, $this->_imageSavePath);
+                $release->setCover(($imageSave ? $imageName . ".jpg" : 'NULL'));
+            }
+            else
+                $release->setCover($imageUrl);
         }
         elseif ($release->getAsin() != false && $this->_isAmazonValid)
         {
             // Get from Amazon if $release->asin != false and valid Amazon keys have been provided
             $amazon = new AmazonProductAPI($this->_amazonPublicKey, $this->_amazonPrivateKey, $this->_amazonTag);
+            if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+                echo "__getCoverArt: Attempting Amazon\n";
+
             try
             {
                 $amazonResults = $amazon->getItemByAsin($release->getAsin(), "com", "ItemAttributes,Images");
+
+                if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+                    echo "__getCoverArt: Amazon results received \n";
+                if(MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
+                    print_r($amazonResults);
+
                 if (isset($amazonResults->Items->Item->ImageSets->ImageSet->LargeImage->URL) && !empty($amazonResults->Items->Item->ImageSets->ImageSet->LargeImage->URL))
                 {
                     $imageUrl = $amazonResults->Items->Item->ImageSets->ImageSet->LargeImage->URL;
                     $imageName = "mb-" . $release->getMbID() . "-cover";
-                    $imageSave = $releaseImage->saveImage($imageName, $imageUrl, $this->_imageSavePath);
-                    $release->setCover(($imageSave ? $imageName . ".jpg" : 'NULL'));
+
+                    if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+                        echo "__getCoverArt: Saving cover art from Amazon\nURL: " . $imageUrl . "\nimageName: " . $imageName . "\nSave Path: " . $this->_imageSavePath . "\n";
+
+                    if(!MusicBrainz::SKIP_COVER_CREATION)
+                    {
+                        $imageSave = $releaseImage->saveImage($imageName, $imageUrl, $this->_imageSavePath, 400, 400);
+                        $release->setCover(($imageSave ? $imageName . ".jpg" : 'NULL'));
+                    }
+                    else
+                        $release->setCover($imageUrl);
+
                 }
             }
             catch (Exception $e)
             {
+                if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+                    echo "__getCoverArt: Amazon exception: " . $e . "\n";
                 $release->setCover('NULL');
             }
         }
@@ -1592,6 +1729,9 @@ class MusicBrainz {
         {
             $release->setCover('NULL');
         }
+
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Finishing __getCoverArt\n";
     }
 
     /**
@@ -1603,6 +1743,9 @@ class MusicBrainz {
      */
     private function __getRecordingRelease($query, $releaseList)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\n";
+
         $releaseMatchFound = false;
         $x = 0;
         $releasePercentMatch = $tempReleasePercentMatch = -1000;
@@ -1621,7 +1764,7 @@ class MusicBrainz {
 
         foreach ($releaseList->release as $release)
         {
-            if(MusicBrainz::DEBUG_MODE)
+            if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                 echo "Check release:    " . $release->title . "\n";
             foreach ($normalizedReleaseArr as $normalizedRelease)
             {
@@ -1640,7 +1783,7 @@ class MusicBrainz {
 
             if ($releaseMatchFound && isset($query['year']) && (isset($release->date) || isset($release->{'release-event-list'}->{'release-event'}->date)))
             {
-                if(MusicBrainz::DEBUG_MODE)
+                if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                     echo "Checking year of release: " . $query['year'] . "\n";
                 preg_match('/(19\d\d|20\d\d)/', (isset($release->date) ? $release->date : $release->{'release-event-list'}->{'release-event'}->date), $releaseYear);
                 if (isset($releaseYear[0]))
@@ -1654,7 +1797,7 @@ class MusicBrainz {
 
             if ($releaseMatchFound)
             {
-                if(MusicBrainz::DEBUG_MODE)
+                if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                     echo "Release match found: " . $release->title . "\n";
                 similar_text($query['title'], $release->title, $tempReleasePercentMatch);
                 $tempReleasePercentMatch += (((30 - $x) / 30) * 10); // matches weighted based on position in results list
@@ -1684,6 +1827,8 @@ class MusicBrainz {
      */
     private function __getReleaseDetails ($mbID, $mbArtistID, $percentMatch = null)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\n";
 
         $releaseInfo = $this->musicBrainzLookup('release', $mbID);
 
@@ -1713,17 +1858,21 @@ class MusicBrainz {
                 if(isset($releaseInfo->release->{'release-group'}->{'tag-list'}))
                 {
                     foreach($releaseInfo->release->{'release-group'}->{'tag-list'}->tag as $tag)
+                    {
+                        if(MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+                            echo "__getReleaseDetails: Adding tag: " . $tag->name . "\n";
                         $mbRelease->addTag($tag->name);
+                    }
                 }
                 if(isset($releaseInfo->release->{'release-group'}->rating))
-                    $mbRelease->setRating($releaseInfo->release->{'release-group'}->rating);
+                    $mbRelease->setRating((float)$releaseInfo->release->{'release-group'}->rating);
             }
             if(isset($releaseInfo->release->country))
                 $mbRelease->setCountry($releaseInfo->release->country);
             if(isset($releaseInfo->release->asin))
                 $mbRelease->setAsin($releaseInfo->release->asin);
             if(isset($releaseInfo->release->{'medium-list'}->medium->{'track-list'}->attributes()->count))
-                $mbRelease->setTracks($releaseInfo->release->{'medium-list'}->medium->{'track-list'}->attributes()->count);
+                $mbRelease->setTracks((int)$releaseInfo->release->{'medium-list'}->medium->{'track-list'}->attributes()->count);
             if(isset($releaseInfo->release->{'cover-art-archive'}->front))
                 $mbRelease->setCover($releaseInfo->release->{'cover-art-archive'}->front == 'true' ? true : false);
             if(!is_null($percentMatch))
@@ -1745,6 +1894,9 @@ class MusicBrainz {
      */
     private function __getRecordingDetails($mbID, $mbArtistID, $mbReleaseID=null, $percentMatch = null)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\n";
+
         $recordingInfo = $this->musicBrainzLookup('recording', $mbID);
 
         if($recordingInfo)
@@ -1808,6 +1960,8 @@ class MusicBrainz {
      */
     private function __getArtistDetails($mbID, $percentMatch = null)
     {
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "Starting " . __METHOD__ . "\n";
 
         $artistInfo = $this->musicBrainzLookup('artist', $mbID);
 
@@ -1822,10 +1976,10 @@ class MusicBrainz {
                 $mbArtist->setGender($artistInfo->artist->gender);
             if(isset($artistInfo->artist->country))
                 $mbArtist->setCountry($artistInfo->artist->country);
-            if(isset($artistInfo->artist->lifespan->begin))
-                $mbArtist->setBeginDate($artistInfo->artist->lifespan->begin);
-            if(isset($artistInfo->artist->lifespan->end))
-                $mbArtist->setEndDate($artistInfo->artist->lifespan->end);
+            if(isset($artistInfo->artist->{'life-span'}->begin))
+                $mbArtist->setBeginDate($artistInfo->artist->{'life-span'}->begin);
+            if(isset($artistInfo->artist->{'life-span'}->end))
+                $mbArtist->setEndDate($artistInfo->artist->{'life-span'}->end);
             if(isset($artistInfo->artist->{'tag-list'}))
             {
                 foreach($artistInfo->artist->{'tag-list'}->tag as $tag)

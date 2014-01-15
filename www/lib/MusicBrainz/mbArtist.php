@@ -116,7 +116,10 @@ class mbArtist extends mb_base {
      */
     public function getRating()
     {
-        return $this->_rating;
+        if(is_null($this->_rating))
+            return "NULL";
+        else
+            return $this->_rating;
     }
 
     /**

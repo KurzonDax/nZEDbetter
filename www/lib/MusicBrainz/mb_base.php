@@ -50,6 +50,8 @@ class mb_base {
         $yearTag = preg_match('/^(19|20)?\d\d[\' ]?s?$/i', $tag);
         if (!in_array($tag, $this->_tags) && count($this->_tags) < 6 && count($words) < 3 && $yearTag === 0)
             $this->_tags[] = $tag;
+        if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
+            echo "[mb_base::addTag] Tag result: " . $tag . "\n";
     }
 
     /**
