@@ -117,7 +117,10 @@ class mbRelease extends mb_base{
      */
     public function getDescription()
     {
-        return $this->_description;
+        if (is_null($this->_description))
+            return "NULL";
+        else
+            return $this->_description;
     }
 
     /**

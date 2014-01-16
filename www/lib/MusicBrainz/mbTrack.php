@@ -98,7 +98,10 @@ class mbTrack extends mb_base{
      */
     public function getTrackNumber()
     {
-        return $this->_trackNumber;
+        if (is_null($this->_trackNumber))
+            return "NULL";
+        else
+            return $this->_trackNumber;
     }
 
     /**
@@ -115,7 +118,10 @@ class mbTrack extends mb_base{
      */
     public function getYear()
     {
-        return $this->_year;
+        if(is_null($this->_year))
+            return "NULL";
+        else
+            return $this->_year;
     }
 
     /**
@@ -131,7 +137,10 @@ class mbTrack extends mb_base{
      */
     public function getDiscNumber()
     {
-        return $this->_discNumber;
+        if (is_null($this->_discNumber))
+            return "NULL";
+        else
+            return $this->_discNumber;
     }
 
 

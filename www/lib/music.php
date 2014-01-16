@@ -484,8 +484,8 @@ class Music
                 else
                 {
                     $mbResult = $musicBrainz->processMusicRelease($arr);
-                    if($mbResult === false)
-                        echo "\033[01;31mUnable to match release: " . $arr['searchname'] . "\n\033[01;37m";
+                    /*if($mbResult === false)
+                        echo "\033[01;31mUnable to match release: " . $arr['searchname'] . "\n\033[01;37m";*/
                 }
 			}
 		}

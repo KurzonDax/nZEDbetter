@@ -1316,7 +1316,7 @@ class MusicBrainz {
             $sql = "INSERT INTO mbTracks (mbID, albumID, artistID, year, trackNumber, discNumber, title, length) VALUES " .
                 "(" . $db->escapeString($track->getMbID()) . ", " . $db->escapeString($track->getAlbumID()) .
                 ", " . $db->escapeString($track->getArtistID()) . ", " . $track->getYear() . ", " . $track->getTrackNumber() .
-                ", " . $db->escapeString($track->getDiscNumber()) . ", " . $db->escapeString($track->getTitle()) . ", " . $track->getLength();
+                ", " . $db->escapeString($track->getDiscNumber()) . ", " . $db->escapeString($track->getTitle()) . ", " . $track->getLength() . ")";
 
             if (MusicBrainz::WRITE_LOG_FILES)
                 file_put_contents($this->_baseLogPath . 'track-SQL.log', $sql . "\n----------------------------------------\n", FILE_APPEND);

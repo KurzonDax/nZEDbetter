@@ -16,7 +16,7 @@ class mbArtist extends mb_base {
     private $_type = '';
     private $_description = '';
     private $_country = '';
-    private $_rating = 0.0;
+    private $_rating = null;
     private $_beginDate = '';
     private $_endDate = '';
     private $_gender = '';
