@@ -1,4 +1,5 @@
 ALTER TABLE parts DROP `ID`, DROP INDEX parthash, ADD PRIMARY KEY (`parthash`);
+ALTER TABLE binaries ADD KEY `ix_collectionID_partCheck` (`collectionID`,`partcheck`);
 ALTER TABLE `movieinfo` CHANGE `imdbID` `imdbID` INT ( 8 ) NOT NULL,
     ADD  `MPAArating` VARCHAR( 10 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL AFTER  `rating` ,
     ADD  `MPAAtext` VARCHAR( 200 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL AFTER  `MPAArating` ,

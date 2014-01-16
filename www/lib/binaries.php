@@ -415,7 +415,16 @@ class Binaries
                     // any identifier of the number of files, just total parts.  In all cases that I observed, there was
                     // only one binary associated with the 'release'.  Will monitor this for negative impacts
                     // specifically with NZB creation and accuracy.
-					$filecnt[2] = $filecnt[6] = "1";
+                    /*
+                     * Changing the value below to 1 is definitely causing issues with the same collection
+                     * being converted to a release multiple times.  Going to change this back to set
+                     * total files to zero.  Then will change the release creation logic to not touch
+                     * collections with a total file count of zero.  From there, going to add additional
+                     * logic to the purge thread to check these collections once an hour to see if they
+                     * have not been updated in 4 hours.  If they haven't, then we'll queue them to convert
+                     * to a release at that point.
+                     */
+					$filecnt[2] = $filecnt[6] = "0";
 					$nofiles = true;
 				}
 

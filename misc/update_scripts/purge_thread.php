@@ -49,8 +49,10 @@ if ($next_dead_check['next_dead_check'] != null && time() > $next_dead_check['ne
     $releases->removeIncompleteReleases(true);
 if ($next_dead_check['next_dead_check'] !=null && time() > $next_dead_check['next_dead_check'] && $dead_hours['dead_hours'] > 0)
 {
-    echo "\n\033[01;31m[".date("H:i:s")."] Beginning dead collection check...\n\033[00;37m";
+    echo "\n\033[01;31m[".date("H:i:s")."] Beginning stale collection check...\n\033[00;37m";
     $releases->checkDeadCollections($dead_hours['dead_hours']);
+    echo "\n\033[01;31m[" . date("H:i:s") . "] Beginning unknown files collection check...\n\033[00;37m";
+    $releases->checkZeroTotalFilesCollections();
     setNextDeadCheck(true);
 }
 

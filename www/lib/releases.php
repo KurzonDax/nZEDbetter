@@ -1440,7 +1440,10 @@ class Releases
         if($binaryrowcount>0 || $doFullCheck)
         {
             if($doFullCheck)
+            {
+                echo "Checking all collections for completeness...\n";
                 $collectionsresult=$db->queryDirect("SELECT ID, totalFiles FROM collections WHERE totalFiles!=0 AND filecheck IN (0, 1) ".$where);
+            }
             else
                 $collectionsresult=$db->queryDirect("SELECT ID, totalFiles FROM collections WHERE totalFiles!=0 AND filecheck=1 ".$where);
 
@@ -1459,10 +1462,9 @@ class Releases
                     $colsprocessed++;
                     if($echooutput)
                         $consoletools->overWrite("Collections processed: ".$consoletools->percentString($colsprocessed,$collectionstotal));
-                    $binaryrows=$db->queryDirect("SELECT ID FROM binaries WHERE collectionID=".$collectionrow["ID"]." AND partCheck=1");
-                    $binarycount=$db->getNumRows($binaryrows);
+                    $binaryrows=$db->queryOneRow("SELECT count(*) AS binCount FROM binaries WHERE collectionID=".$collectionrow["ID"]." AND partCheck=1");
 
-                    if($binarycount>=$collectionrow["totalFiles"])
+                    if($binaryrows['binCount'] >= $collectionrow["totalFiles"])
                     {
                         $db->query("UPDATE collections SET filecheck=25 WHERE ID=".$collectionrow["ID"]);
                         $colsupdated++;
@@ -1505,11 +1507,11 @@ class Releases
         $where = (!empty($groupID)) ? " AND groupID = " . $groupID : "";
 
         if ($echooutput)
-            echo $n."\033[1;33m[".date("H:i:s A")."] Stage 2 -> Validating binary counts of collections.\033[0m".$n;
+            echo $n."\033[1;33m[".date("H:i:s A")."] Stage 2 -> Validating binaries and queueing collections.\033[0m".$n;
         $stage2 = TIME();
 
-        Echo "\nSelecting completed collections...\n";
-        $collectionsresult=$db->queryDirect("SELECT ID, totalFiles FROM collections AS c WHERE c.filecheck = 2");
+        echo "\nChecking for unprocessed completed collections...\n";
+        $collectionsresult=$db->queryDirect("SELECT ID, totalFiles FROM collections AS c WHERE c.filecheck = 2 and totalFiles != 0");
         $collectioncount=$db->getNumRows($collectionsresult);
         $colsupdated=0;
         if($collectioncount)
@@ -1527,7 +1529,7 @@ class Releases
 
                 $collectionsize=$db->queryOneRow("SELECT COUNT(*) as binNumber FROM binaries AS b WHERE b.collectionID=".$collectionsrow["ID"]);
 
-                If($collectionsize['binNumber']>=$collectionsrow['totalFiles'])
+                if($collectionsize['binNumber']>=$collectionsrow['totalFiles'])
                 {
                     $db->query("UPDATE collections SET filecheck=25 WHERE ID=".$collectionsrow["ID"]);
                     $colsupdated++;
@@ -1551,7 +1553,7 @@ class Releases
             $db->Commit();
             $db->setAutoCommit(TRUE);
 
-            $db->query("UPDATE collections SET filecheck=3 WHERE filecheck=25 and filesize>0 LIMIT ".($this->stage5limit * 3));
+            $db->query("UPDATE collections SET filecheck=3 WHERE filecheck=25 and filesize>0 ORDER BY dateadded ASC LIMIT ".($this->stage5limit * 3));
             if($echooutput)
                 echo "Queueing up ".$db->getAffectedRows()." collections to be processed.\n";
             sleep(1);
@@ -1560,7 +1562,7 @@ class Releases
         {
             if ($echooutput)
                 echo "\nNo collections found to update at this time.\n";
-            $db->query("UPDATE collections SET filecheck=3 WHERE filecheck=25 and filesize>0 LIMIT ".($this->stage5limit * 3));
+            $db->query("UPDATE collections SET filecheck=3 WHERE filecheck=25 and filesize>0 ORDER BY dateadded ASC LIMIT ".($this->stage5limit * 3));
             $colsupdated = $db->getAffectedRows();
             if($echooutput && $colsupdated)
                 echo "Queueing up ".$colsupdated." old collections to be processed.\n";
@@ -2087,7 +2089,7 @@ class Releases
                 $binsDeleted += $db->getAffectedRows();
                 // Added following to help prevent enormous transactions from stalling the database
                 // at the end of the purge cycle.
-                if($colsDeleted % 100 == 0)
+                if($colsDeleted % 50 == 0)
                     $db->Commit();
 
             }
@@ -2508,6 +2510,12 @@ class Releases
 
     public function checkDeadCollections($maxAge = 6, $echooutput = true)
     {
+        if($maxAge === 0)
+        {
+            echo "\nStale collection checks have been disabled in tmux settings.\n";
+            return true;
+        }
+
         $db = new DB();
 
         $consoletools = new ConsoleTools();
@@ -2517,7 +2525,7 @@ class Releases
         if ($echooutput)
             echo $n."\033[1;33m[".date("H:i:s A")."] Checking For Stale Collections.\033[0m".$n;
         $stageStart = time();
-        if($maxAge<1)
+        if(is_null($maxAge) || empty($maxAge))
             $maxAge=6;
         $loopTime = microtime(true);
         $colsDeleted = 0;
@@ -2536,8 +2544,10 @@ class Releases
         //    $threadID -= 9999999999;
         if ($echooutput)
             echo "Using thread ID ".$threadID['thread_ID']." to mark collections.\n";
-        $db->query("UPDATE collections AS c LEFT JOIN groups AS g ON c.groupID = g.ID SET c.filecheck=".$threadID['thread_ID']." WHERE (c.oldestBinary > g.first_record_postdate + INTERVAL ".$maxAge." HOUR) AND (c.newestBinary < g.last_record_postdate - INTERVAL ".$maxAge." HOUR)");
-        $completeCols = $db->queryDirect("SELECT ID, groupID, totalFiles FROM collections WHERE filecheck=".$threadID['thread_ID']);
+        $db->query("UPDATE collections AS c LEFT JOIN groups AS g ON c.groupID = g.ID SET c.filecheck=" . $threadID['thread_ID'] .
+                    " WHERE (c.oldestBinary > g.first_record_postdate + INTERVAL " . $maxAge." HOUR) " .
+                    " AND (c.newestBinary < g.last_record_postdate - INTERVAL " . $maxAge . " HOUR) AND c.filecheck IN (0,1) AND totalFiles !=0");
+        $completeCols = $db->queryDirect("SELECT ID, groupID, totalFiles FROM collections WHERE filecheck=" . $threadID['thread_ID']);
         $colsTotal = $db->getNumRows($completeCols);
         if($colsTotal == 0 || $colsTotal == false)
         {
@@ -2567,6 +2577,8 @@ class Releases
                 $db->queryDirect("DELETE binaries FROM binaries WHERE collectionID=".$currentCol['ID']);
                 $binsDeleted += $db->getAffectedRows();
             }
+            if($colsDeleted % 50 == 0)
+                $db->Commit();
         }
         $db->Commit();
 
@@ -2596,6 +2608,39 @@ class Releases
         If ($echooutput)
             echo "\nStage completed in ".$consoletools->convertTime(time() - $stageStart).".\n";
         return true;
+    }
+
+    public function checkZeroTotalFilesCollections()
+    {
+        // Currently, this process checks to see if collections with totalFiles=0 have not been
+        // updated within a four hour window.  Future improvement may be to allow the window
+        // size to be adjusted.
+
+        $db = new DB();
+        echo "\nChecking collections with unknown total files\n";
+        $threadID = $db->queryOneRow("SELECT connection_ID() as thread_ID");
+        $db->query("UPDATE collections AS c LEFT JOIN groups AS g ON c.groupID = g.ID SET c.filecheck=" . $threadID['thread_ID'] .
+                                        " WHERE (c.oldestBinary > g.first_record_postdate + INTERVAL 4 HOUR) " .
+                                        " AND (c.newestBinary < g.last_record_postdate - INTERVAL 4 HOUR) AND c.filecheck IN (0,1) AND totalFiles=0");
+        $countUnknownFilesCols = $db->getAffectedRows();
+        if($countUnknownFilesCols)
+        {
+            $consoleTools = new ConsoleTools();
+            $unknownFilesResults = $db->queryDirect("SELECT ID FROM collections WHERE filecheck=" . $threadID['thread_ID']);
+            $processedCollections = 0;
+            while($unknownFilesRow = $db->fetchAssoc($unknownFilesResults))
+            {
+                $processedCollections ++;
+                $consoleTools->overWrite("Queueing collections for release: " . $consoleTools->percentString($processedCollections, $countUnknownFilesCols));
+                $binaryCount = $db->queryDirect("SELECT count(*) AS binCount FROM binaries WHERE collectionID=" . $unknownFilesRow['ID']);
+                if($db->getNumRows($binaryCount) > 0)
+                    $db->query("UPDATE collections SET filecheck=25, totalFiles=" . $binaryCount['binCount'] . " WHERE ID=" . $unknownFilesRow['ID']);
+            }
+            echo "\nQueued " . $processedCollections . " collections for release.\n";
+        }
+        else
+            echo "\nNo collections with unknown total files found.\n";
+
     }
 
     // This resets collections, useful when the namecleaning class's collectioncleaner function changes.
