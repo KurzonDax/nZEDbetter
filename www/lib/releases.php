@@ -2623,7 +2623,7 @@ class Releases
                                         " WHERE (c.oldestBinary > g.first_record_postdate + INTERVAL 4 HOUR) " .
                                         " AND (c.newestBinary < g.last_record_postdate - INTERVAL 4 HOUR) AND c.filecheck IN (0,1) AND totalFiles=0");
         $countUnknownFilesCols = $db->getAffectedRows();
-        if($countUnknownFilesCols)
+        if($countUnknownFilesCols > 0)
         {
             $consoleTools = new ConsoleTools();
             $unknownFilesResults = $db->queryDirect("SELECT ID FROM collections WHERE filecheck=" . $threadID['thread_ID']);
@@ -2632,7 +2632,7 @@ class Releases
             {
                 $processedCollections ++;
                 $consoleTools->overWrite("Queueing collections for release: " . $consoleTools->percentString($processedCollections, $countUnknownFilesCols));
-                $binaryCount = $db->queryDirect("SELECT count(*) AS binCount FROM binaries WHERE collectionID=" . $unknownFilesRow['ID']);
+                $binaryCount = $db->queryOneRow("SELECT count(*) AS binCount FROM binaries WHERE collectionID=" . $unknownFilesRow['ID']);
                 if($db->getNumRows($binaryCount) > 0)
                     $db->query("UPDATE collections SET filecheck=25, totalFiles=" . $binaryCount['binCount'] . " WHERE ID=" . $unknownFilesRow['ID']);
             }
