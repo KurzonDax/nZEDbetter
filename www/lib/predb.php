@@ -33,7 +33,7 @@ Class Predb
 
             $newprelist = $this->retrievePrelist();
 			$newzenet = $this->retrieveZenet();
-            $neworly = $this->retrieveOrlydb();
+            // $neworly = $this->retrieveOrlydb();
             $newpdme = $this->retrievePredbme();
             $newsrr = $this->retrieveSrr();
 			$newwomble = $this->retrieveWomble();
@@ -44,7 +44,7 @@ Class Predb
 		}
 		$matched = $this->matchPredb();
 		if ($matched > 0 && $this->echooutput)
-			echo "\nMatched ".$matched." predDB titles to release search names.\n";
+			echo "\nMatched ".$matched." predDB titles to release names.\n";
 		$nfos = $this->matchNfo();
 		if ($nfos > 0 && $this->echooutput)
 			echo "\nAdded ".$nfos." missing NFOs from preDB sources.\n";
@@ -68,7 +68,15 @@ Class Predb
             $size = preg_replace('/&nbsp;/', ' ', $pieces[1]->innertext);
             $categoryPrime = $pieces[2]->innertext;
             $a = $pieces[3]->find('a');
-            $nfo = isset($a[1]) ? "http://nzb.isasecret.com/" . $a[1]->href : '';
+            $nfo = '';
+            foreach($a as $link)
+            {
+                if(preg_match('/nfo/i', $link->href) === 1)
+                {
+                    $nfo = "nfo=" . $db->escapeString('http://www.newshost.co.za/' . $link->href) . ", ";
+                    //echo $nfo . "\n";
+                }
+            }
             $title = trim($pieces[5]->innertext);
 
             $oldname = $db->queryOneRow(sprintf("SELECT title, source, ID FROM predb WHERE title = %s", $db->escapeString($title)));
@@ -82,9 +90,10 @@ Class Predb
                 {
                     // $this->_insertPreDB($db, $title, $preDate, 'womble', $size, $categoryPrime, $nfo);
                     $updated ++;
-                    $db->query("UPDATE predb SET nfo = " . $db->escapeString($nfo) . ", size = " . $db->escapeString($size) .
-                        ", category = " . $categoryPrime . ", predate = " . $preDate . ", adddate = now(), source = 'womble' " .
+                    $db->query("UPDATE predb SET " . $nfo . " size = " . $db->escapeString($size) .
+                        ", category = " . $db->escapeString($categoryPrime) . ", adddate = NOW(), source = 'womble' " .
                         " where ID = " . $oldname['ID']);
+                    //echo "DB: " . $db->Error() . "\n";
                 }
             }
             else
@@ -312,10 +321,48 @@ Class Predb
 		$db = new DB();
 		$updated = 0;
 		if($this->echooutput)
-			echo "Matching up predb titles with release search names.\n";
+			echo "Matching up predb titles with release names.\n";
+        $releaseResults = $db->queryDirect("SELECT ID, name FROM releases WHERE relnamestatus != 6 AND preDbID IS NULL AND adddate > NOW() - INTERVAL 3 HOUR");
+        $totalReleases = $db->getNumRows($releaseResults);
 
+        if($totalReleases > 0)
+        {
+            $releasesProcessed = 0;
+            $consoleTools = new ConsoleTools();
+            while($releaseRow = $db->fetchAssoc($releaseResults))
+            {
+                $releasesProcessed ++;
+                $consoleTools->overWrite("Processing release " . $consoleTools->percentString($releasesProcessed, $totalReleases));
+                preg_match('/([A-Za-z0-9\.\(\)_\-]+-[A-Za-z0-9]+)[ \[\(\-]/i', $releaseRow['name'], $nameMatches);
+                if(isset($nameMatches[1]))
+                {
+                    //echo "\033[01;37mChecking " . $nameMatches[1] . "\n";
+                    file_put_contents(WWW_DIR . "lib/logging/preDb-Match.log", $releaseRow['ID'] . ', "' . $nameMatches[1] . '", "' . $releaseRow['name'] . '"' . "\n", FILE_APPEND);
+                    $preDbMatch = $db->queryOneRow("SELECT ID, nfo, title FROM predb WHERE title LIKE '%" . $nameMatches[1] . "%'");
+                    if(isset($preDbMatch['ID']))
+                    {
+                        //echo "Match found: " . $releaseRow['name'] . "\n";
+                        $nfo = '';
+                        if(isset($preDbMatch['nfo']) && $preDbMatch['nfo'] != 'NULL' & !is_null($preDbMatch['nfo']))
+                        {
+                            $nfoFile = $this->retrieveNfo($preDbMatch['nfo']);
+                            if($nfoFile !== false)
+                            {
+                                $db->queryInsert("INSERT INTO releasenfo (releaseID, nfo) VALUES (" . $releaseRow['ID'] . ", COMPRESS(" . $nfoFile . "))");
+                                $nfo = " nfostatus=1, ";
+                            }
+
+                        }
+                        $db->query("UPDATE releases SET " . $nfo . " preDbID=" . $preDbMatch['ID'] . ", searchname=" . $db->escapeString($preDbMatch['title']) . ", relnamestatus=6 WHERE ID=" . $releaseRow['ID']);
+                        $updated ++;
+                    }
+                }
+            }
+        }
+        echo "\n";
+        return $updated;
 		//do womble first
-		if($res = $db->queryDirect("SELECT p.ID, p.category, r.ID as releaseID from predb p inner join releases r on p.title = r.searchname where p.releaseID is null and p.source = 'womble'"))
+		/*if($res = $db->queryDirect("SELECT p.ID, p.category, r.ID as releaseID from predb p inner join releases r on p.title = r.searchname where p.releaseID is null and p.source = 'womble'"))
 		{
 			while ($row = mysqli_fetch_assoc($res))
 			{
@@ -359,9 +406,31 @@ Class Predb
 				$updated++;
 			}
 			return $updated;
-		}
+		}*/
 
 	}
+
+    public function retrieveNfo($url)
+    {
+        if (extension_loaded('curl'))
+        {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+
+
+            $nfo_response = curl_exec($ch);
+            curl_close($ch);
+            return $nfo_response !== false ? $nfo_response : false;
+        }
+        else
+            echo "Error - php-curl extension not loaded.\n";
+
+        return false;
+
+    }
 
 	// Look if the release is missing an nfo.
 	public function matchNfo()

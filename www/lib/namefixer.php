@@ -10,10 +10,10 @@ require_once(WWW_DIR."/lib/tmux.php");
  * 0 : New release, just inserted into the table.
  * 1 : Categorized release.
  * 2 : Fixed with namefixer.
- * 3 : Fixed with post proc (from mp3 tags or music.php) or predb.
+ * 3 : Fixed with post proc (from mp3 tags or music.php).
  * 4 : Fixed with misc_sorter.
  * 5 : Fixed with decrypt hashes.
- * 6 : Matched properly in namecleaning.php's releaseCleaner function. (No longer valid)
+ * 6 : Fixed with predb match (use to be Matched properly in namecleaning.php's releaseCleaner function.)
  * 10: Checked NFO but failed
  * 11: Checked filename but failed
  * 12: Have checked NFO and Filenames

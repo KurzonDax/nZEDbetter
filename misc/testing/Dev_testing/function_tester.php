@@ -19,8 +19,13 @@ require_once(WWW_DIR . "/lib/consoletools.php");
 // require_once(WWW_DIR."/lib/tmdb.php");
 require_once(WWW_DIR . "/lib/namecleaning.php");
 // require_once(WWW_DIR . "/lib/trakttv.php");
+require_once(WWW_DIR . "lib/predb.php");
 
-$consoletools = new ConsoleTools();
+$predb = new Predb();
+$predb->retrieveWomble();
+
+
+/*$consoletools = new ConsoleTools();
 $namecleaner = new nameCleaning();
 $stop = false;
 do
@@ -41,4 +46,4 @@ function checkCleanName()
     $textToClean = $consoletools->getUserInput("Enter text to clean: ");
     $cleanName = $namecleaner->bookCleaner($textToClean);
     // echo "\n".$db->escapeString($cleanName)."\n";
-}
+}*/
