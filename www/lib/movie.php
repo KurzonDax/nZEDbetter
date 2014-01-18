@@ -693,7 +693,7 @@ class Movie
                 if (!isset($imdbProps) && !isset($tmdbProps))
                 {
                     echo "\033[01;33mNo results found for ID: " . $arr['ID'] . "   " . $cleanName['name'] . "\033[01;37m\n";
-                    $db->query("UPDATE releases SET movieID = -4, tmdbID = -4, imdbID = -4  WHERE ID = " . $arr['ID']);
+                    $db->query("UPDATE releases SET movieID = -3, tmdbID = -3, imdbID = -3  WHERE ID = " . $arr['ID']);
                     $msg = $arr['ID'] . "," . $db->escapeString($arr['searchname']) . "," . $db->escapeString($cleanName['name']) . "\n";
                     file_put_contents(WWW_DIR."lib/logging/movie-no-match.log",$msg, FILE_APPEND);
                     continue;

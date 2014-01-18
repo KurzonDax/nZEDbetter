@@ -264,7 +264,7 @@ class nameCleaning
             return false;
         $text = str_replace(".", ' ', $text);
         // First group is case insensitive
-        $text = preg_replace('/^\d{1,2} \d{1,2} |^have fun|\d\dth |http lostmoviearchives com( movie)?( thumbs)?|walt disney|walt disney.s|director s cut|directors cut|TGS|E4S|RE UP |^RS |mp4a|unrated |repack |dubbed |subtitled |extended cut |x264 \w+$|x264 |englisch/i', '', $text);
+        $text = preg_replace('/^\d{1,2} \d{1,2} |^have fun|^description |alternate cut|cowboyup|\d\dth |http lostmoviearchives com( movie)?( thumbs)?|walt disney|walt disney.s|director s cut|directors cut|TGS|E4S|RE UP |^RS |mp4a|unrated |repack |dubbed |subtitled |extended cut |x264 \w+$|x264 |englisch/i', '', $text);
         $text = preg_replace('/\s\s+/', ' ', $text);
         $text = preg_replace('/MOViEONLY|Movie name|uncut|DVD(5|9)|F0RFUN|nospam@nzbworld me |www allyourbasearebelongtous pw |ANiPUNK(.+)?|Mayhem|AN0NYM0US(.+)?|EwDp|unrated|norbit|www drlecter tk | R\d|(\-)?ironclub/i', '', $text);
         $text = preg_replace('/\s\s+/', ' ', $text);
@@ -275,7 +275,7 @@ class nameCleaning
         $text = preg_replace('/\s\s+/', ' ', $text);
         $text = preg_replace('/^Title |\bll eu\b|KOREAN|CHINESE|EXTENDED|PePPeP|Bin Poster (\d+)?|TiTLE|TOWN MOVIE|RELEASE|TOWN |Release Name|FILL|AmA (DIVX|XviD)|AmA|AVC(HD)?|(H|h)264|iNT|COMPLETE|LIMITED/', '', $text);
         $text = preg_replace('/\s\s+/', ' ', $text);
-        $text = preg_replace('/\bb |\bo |ENJOY|MASTER|iOM|SAM|RETAIL|MADE|NZBGRABIT LOWERS TONE AGAIN PAY PER DOWNLOAD|ip$|U+ |mOViE|\bENG\b/', '', $text);
+        $text = preg_replace('/\bb |\bo |ENJOY|MASTER|iOM|SAM|RETAIL|MADE|NZBGRABIT LOWERS TONE AGAIN PAY PER DOWNLOAD|ip$|U+ |mOViE|\bENG\b|merlins portal net|dreams of usenet info|alt binaries|iP/', '', $text);
         $text = trim($text);
         if(preg_match("/^[A-Z0-9' ]+$/", $text) === 0)
             $text = preg_replace('/[A-Z]{4,12}/', '', $text);
