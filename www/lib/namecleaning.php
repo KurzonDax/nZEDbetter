@@ -262,6 +262,7 @@ class nameCleaning
         // Function for further cleaning up movie names before attempting to search for them on TMDb or IMDb
         if( $text == NULL || $text == '')
             return false;
+        $text = str_replace(".", ' ', $text);
         // First group is case insensitive
         $text = preg_replace('/^\d{1,2} \d{1,2} |^have fun|\d\dth |http lostmoviearchives com( movie)?( thumbs)?|walt disney|walt disney.s|director s cut|directors cut|TGS|E4S|RE UP |^RS |mp4a|unrated |repack |dubbed |subtitled |extended cut |x264 \w+$|x264 |englisch/i', '', $text);
         $text = preg_replace('/\s\s+/', ' ', $text);
@@ -288,7 +289,7 @@ class nameCleaning
     {
         if ($debug)
             echo "\nCleaning Search Name\n";
-
+        $text = str_replace(".", ' ', $text);
         $newname = preg_replace('/#altbin Full |My Rip\s+EAC|(^| )\d{1,2} \d{1,2} | \d{3,4} ?(kbps|cbr)|(\d{1,2} \d{1,2} )?(Bootleg|Boxset|Clean.+Version|Compiled by.+|\d{1,2}CDs?|Digipak|DIRFIX|DVBS|FLAC|(Ltd )?(Deluxe|Limited|Special).+Edition|Promo|PROOF|Reissue|Remastered|REPACK|RETAIL(.+UK)?|SACD|Sampler|\bSAT\b|Summer.+Mag|UK.+Import|Deluxe.+Version|VINYL|WEB)/i', ' ', $text);
         if($debug)
             echo "1 - " . $newname . "\n";
@@ -346,7 +347,7 @@ class nameCleaning
         $debug = false;
         $newname = '';
         // NDS stuff
-        $text = preg_replace('/\./', ' ', $text );
+        $text = str_replace(".", ' ', $text);
         if($categoryID==1010)
         {
             preg_match('/(.+NDS)[\- ].+/i', $text, $matches);
@@ -476,7 +477,7 @@ class nameCleaning
 
     public function bookCleaner($text)
     {
-
+        $text = str_replace(".", ' ', $text);
         $newname = preg_replace('/^\d{1,2} \d{1,2} |\d{1,2} \d{1,2} \d{2,4}|(19|20)\d\d|anybody got .+?[a-z]\? |[\.\-_ ](Novel|TIA)([\.\-_ ]|$)|( |\.)HQ(-|\.| )|[\(\)\.\-_ ]?(DOC|EPUB|LIT|MOBI|NFO|(si)?PDF|RTF|TXT)(?![a-z0-9])/i', '', $text);
         $newname = preg_replace('/compleet|DAGSTiDNiNGEN|DiRFiX|\+ extra|more ebooks|r?e ?Books?([\.\-_ ]English|ers)?|ePu(b|p)s?|html|mobi|^NEW[\.\-_ ]/i', '', $newname);
         $newname = preg_replace('/PDF([\.\-_ ]English)?|Please post more|Post description|Proper|Repack(fix)?|[\.\-_ ](Chinese|English|French|German|Italian|Retail|Scan|Swedish)/i', '', $newname);

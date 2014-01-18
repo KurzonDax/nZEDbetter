@@ -207,6 +207,15 @@ class Category
 		return $ret;
 	}
 
+    public function  getQualifiedName($categoryID)
+    {
+        if($this->isParent($categoryID))
+            return $this->getTitle($categoryID);
+        else
+            return $this->getParentTitle($categoryID) . "-" . $this->getTitle($categoryID);
+
+    }
+
 	public function getForSelect($blnIncludeNoneSelected = true)
 	{
 		$categories = $this->get();

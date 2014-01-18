@@ -1656,12 +1656,12 @@ class Releases
 		$retcount = 0;
 		$where = (!empty($groupID)) ? " AND groupID = " . $groupID : "";
 		$namecleaning = new nameCleaning();
-		// $predb = new  Predb();
+		$predb = new  Predb();
 
 		if ($echooutput)
 			echo $n."\033[1;33m[".date("H:i:s A")."] Stage 4 -> Create releases.\033[0m".$n;
 		$stage4 = TIME();
-        $releasesAdded = 0;
+        $releasesPreDBmatched = 0;
 		if($rescol = $db->queryDirect("SELECT * FROM collections WHERE filecheck = 4 " . $where . " LIMIT ".$this->stage5limit))
 		{
 			$totalStage4cols = $db->getNumRows($rescol);
@@ -1678,7 +1678,8 @@ class Releases
 				{
 					$relid = $db->getInsertID();
                     // TODO: Look at better ways to implement the predb search.
-					// $predb->matchPre($cleanRelName, $relid);
+					 if($predb->matchPre($cleanRelName, $relid))
+                         $releasesPreDBmatched ++;
 					// Update collections table to say we inserted the release.
 					$db->queryDirect(sprintf("UPDATE collections SET filecheck = 45, releaseID = %d WHERE ID = %d", $relid, $rowcol['ID']));
 					$retcount ++;
@@ -1697,6 +1698,7 @@ class Releases
 		$timing = $consoletools->convertTime(TIME() - $stage4);
 		if ($echooutput)
 			echo "\n".$retcount . " Releases added in " . $timing . ".";
+        echo "\n" . $releasesPreDBmatched . " releases matched to preDB\n";
 		return $retcount;
 	}
 
