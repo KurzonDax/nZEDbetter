@@ -2635,7 +2635,8 @@ class Releases
                 $processedCollections ++;
                 $consoleTools->overWrite("Queueing collections for release: " . $consoleTools->percentString($processedCollections, $countUnknownFilesCols));
                 $binaryCount = $db->queryOneRow("SELECT count(*) AS binCount FROM binaries WHERE collectionID=" . $unknownFilesRow['ID']);
-                if($db->getNumRows($binaryCount) > 0)
+                // echo "Collection ID: " . $unknownFilesRow['ID'] . "   " . $binaryCount['binCount'] . "\n";
+                if(isset($binaryCount['binCount']))
                     $db->query("UPDATE collections SET filecheck=25, totalFiles=" . $binaryCount['binCount'] . " WHERE ID=" . $unknownFilesRow['ID']);
             }
             echo "\nQueued " . $processedCollections . " collections for release.\n";
