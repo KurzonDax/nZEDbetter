@@ -43,9 +43,15 @@ Class Predb
 				$db->query(sprintf("UPDATE predb SET adddate = now() where ID = %d", $newestrel["ID"]));
 		}
 		$matched = $this->matchPredb();
-		if ($matched > 0 && $this->echooutput)
-			echo "\nMatched ".$matched." predDB titles to release names.\n";
-		// $nfos = $this->matchReleaseFiles();
+		$matched += $this->matchHashed();
+        $matched += $this->matchFileNames();
+        $matched += $this->matchHashedFileNames();
+        if ($matched > 0 && $this->echooutput)
+            echo "\n\n\033[01;32mMatched a total of " . $matched . " releases to preDB titles.\033[01;37m\n";
+        else
+            echo "\n\n\033[01;33mNo releases were matched to preDB titles.\033[01;37m\n";
+
+        // $nfos = $this->matchReleaseFiles();
 		// if ($nfos > 0 && $this->echooutput)
 		//      echo "\nAdded ".$nfos." missing NFOs from preDB sources.\n";
 		return $newnames;
@@ -363,7 +369,7 @@ Class Predb
             return false;
 
 		if($this->echooutput)
-			echo "\033[01;37mMatching up predb titles with release names.\n";
+			echo "\n\033[01;36mMatching up predb titles with release names.\033[01;37m\n";
         $releaseResults = $db->queryDirect("SELECT ID, name FROM releases WHERE relnamestatus != 6 AND preDbID IS NULL " . $intervalClause);
         $totalReleases = $db->getNumRows($releaseResults);
 
@@ -399,61 +405,207 @@ Class Predb
                     }
                 }
             }
-            echo "\nReleases names matched: " . $updated . "\n";
+            echo "\nRelease names matched: " . $updated . "\n";
         }
-        unset($releaseResults);
-        $releaseResults = $db->queryDirect("SELECT ID, name, groupID FROM releases WHERE relnamestatus !=6 AND preDbId IS NULL AND " .
-                                            "categoryID = 7020 AND name REGEXP '[a-fA-F0-9]{32}|[a-fA-F0-9]{40}' " . $intervalClause);
-        $totalReleases = $db->getNumRows($releaseResults);
-        if($totalReleases > 0)
-        {
-            if(!isset($consoleTools))
-                $consoleTools = new ConsoleTools();
-            $category = new Category();
-            $releasesProcessed = 0;
-            $updatedHashedReleases = 0;
-            $categoriesUpdated = array();
-            while($releaseRow = $db->fetchAssoc($releaseResults))
-            {
-                $releasesProcessed ++;
-                $consoleTools->overWrite("Processing hashed releases " . $consoleTools->percentString($releasesProcessed, $totalReleases));
-                if (preg_match("/[a-f0-9]{32}|[a-f0-9]{40}/i", $releaseRow["name"], $matches))
-                {
-                    $hash = $db->escapeString($matches[0]);
-                    $hashResults = $db->queryOneRow("SELECT ID, title, source FROM predb WHERE md5 =" . $hash . " OR md2=" . $hash . " OR md4=" . $hash . " OR sha1=" . $hash);
-                    if(isset($hashResults['ID']))
-                    {
-                        $releaseCategory = $category->determineCategory($hashResults['title'], $releaseRow['groupID']);
-                        if(array_key_exists($releaseCategory, $categoriesUpdated))
-                            $categoriesUpdated[$releaseCategory]['count'] ++;
-                        else
-                        {
-                            $categoriesUpdated[$releaseCategory] = array();
-                            $categoriesUpdated[$releaseCategory]['count'] = 1;
-                        }
-                        $db->query("UPDATE releases SET searchname=" . $db->escapeString($hashResults['title']) . ", categoryID=" . $releaseCategory .
-                                    ", preDbID=" . $hashResults['ID'] . ", relnamestatus = 6 WHERE ID=" . $releaseRow['ID']);
-                        $updated++;
-                        $updatedHashedReleases ++;
-                    }
-                }
-            }
-            echo "\nHashed releases matched: " . $updatedHashedReleases . "\n";
-            if($updatedHashedReleases > 0)
-            {
-                $mask = "%-30.30s %22.22s\n";
-                printf($mask, "Category", "Releases Added");
-                printf($mask, "====================", "=================");
-                foreach($categoriesUpdated as $cat => $catCount)
-                {
-                    printf($category->getQualifiedName($cat), $catCount['count']);
-                }
-            }
-        }
+        else
+            echo "No new releases to match.\n";
 
         return $updated;
 
 	}
+
+    public function matchHashed($interval = 3)
+    {
+        $db = new DB();
+        $updated = 0;
+
+        if ($interval < 1)
+            $intervalClause = ' ';
+        elseif (is_numeric($interval))
+            $intervalClause = " AND adddate > NOW() - INTERVAL " . $interval . " HOUR";
+        else
+            return false;
+        if ($this->echooutput)
+            echo "\n\033[01;36mMatching up predb titles with hashed releases.\033[01;37m\n";
+
+        $releaseResults = $db->queryDirect("SELECT ID, name, groupID FROM releases WHERE relnamestatus !=6 AND preDbId IS NULL AND " .
+                                            "categoryID = 7020 AND name REGEXP '[a-fA-F0-9]{40}|[a-fA-F0-9]{32}' " . $intervalClause);
+        $totalReleases = $db->getNumRows($releaseResults);
+        if ($totalReleases > 0)
+        {
+            if (!isset($consoleTools))
+                $consoleTools = new ConsoleTools();
+            $category = new Category();
+            $releasesProcessed = 0;
+            $categoriesUpdated = array();
+            while ($releaseRow = $db->fetchAssoc($releaseResults))
+            {
+                $releasesProcessed++;
+                $consoleTools->overWrite("Processing hashed releases " . $consoleTools->percentString($releasesProcessed, $totalReleases));
+                if (preg_match("/[a-f0-9]{40}|[a-f0-9]{32}/i", $releaseRow["name"], $matches))
+                {
+                    $hash = $db->escapeString($matches[0]);
+                    $hashResults = $db->queryOneRow("SELECT ID, title, source FROM predb WHERE md5 =" . $hash . " OR md2=" . $hash . " OR md4=" . $hash . " OR sha1=" . $hash);
+                    if (isset($hashResults['ID']))
+                    {
+                        $releaseCategory = $category->determineCategory($hashResults['title'], $releaseRow['groupID']);
+                        if (array_key_exists($releaseCategory, $categoriesUpdated))
+                            $categoriesUpdated[$releaseCategory] += 1;
+                        else
+                        {
+                            $categoriesUpdated[$releaseCategory] = 1;
+                        }
+                        $db->query("UPDATE releases SET searchname=" . $db->escapeString($hashResults['title']) . ", categoryID=" . $releaseCategory .
+                            ", preDbID=" . $hashResults['ID'] . ", relnamestatus = 6 WHERE ID=" . $releaseRow['ID']);
+                        $updated++;
+                    }
+                }
+            }
+            echo "\nHashed releases matched: " . $updated . "\n";
+            if ($updated > 0)
+            {
+                print_r($categoriesUpdated);
+                $mask = "%-30.30s %22.22s\n";
+                printf($mask, "Category", "Releases Added");
+                printf($mask, "====================", "=================");
+                foreach ($categoriesUpdated as $cat => $catCount)
+                {
+                    printf($category->getQualifiedName($cat), (string)number_format($catCount,0));
+                }
+            }
+        }
+        else
+            echo "No new releases to match.\n";
+
+        return $updated;
+    }
+
+    public function matchFileNames($interval=3)
+    {
+        $db = new DB();
+        $updated = 0;
+
+        if ($interval < 1)
+            $intervalClause = ' ';
+        elseif (is_numeric($interval))
+            $intervalClause = " AND rf.createdate > NOW() - INTERVAL " . $interval . " HOUR";
+        else
+            return false;
+
+        if ($this->echooutput)
+            echo "\n\033[01;36mMatching up predb titles with release file names.\n\033[01;37m";
+
+        $fileNameResults = $db->queryDirect("SELECT r.ID, r.searchname, r.groupID, rf.name FROM `releases` AS r LEFT JOIN `releasefiles` AS rf ON r.ID=rf.releaseID " .
+                                            "WHERE rf.name REGEXP '([a-fA-F0-9]{32}|[a-fA-F0-9]{40})[[...][.backslash.]]' AND rf.ID IS NOT NULL " .
+                                            "AND r.relnamestatus != -6 " . $intervalClause);
+        $totalFiles = $db->getNumRows($fileNameResults);
+        if ($totalFiles > 0)
+        {
+            if (!isset($consoleTools))
+                $consoleTools = new ConsoleTools();
+            $category = new Category();
+            $fileNamesProcessed = 0;
+            while($fileNameRow = $db->fetchAssoc($fileNameResults))
+            {
+                $fileNamesProcessed ++;
+                $consoleTools->overWrite("Processing file names " . $consoleTools->percentString($fileNamesProcessed, $totalFiles));
+                preg_match('/([a-fA-F0-9]{32}|[a-fA-F0-9]{40})[\.\\]/', $fileNameRow['name'], $nameMatches);
+                if(isset($nameMatches[1]))
+                {
+                    $preDbMatch = $db->queryOneRow("SELECT ID, nfo, title FROM predb WHERE releaseGroup = " . $db->escapeString($nameMatches[2]) . " AND title LIKE '%" . $nameMatches[1] . "%'");
+                    if (isset($preDbMatch['ID']))
+                    {
+                        //echo "Match found: " . $releaseRow['name'] . "\n";
+                        $nfo = '';
+                        if (isset($preDbMatch['nfo']) && $preDbMatch['nfo'] != 'NULL' & !is_null($preDbMatch['nfo']))
+                        {
+                            $nfoFile = $this->retrieveNfo($preDbMatch['nfo']);
+                            if ($nfoFile !== false)
+                            {
+                                $db->queryInsert("INSERT INTO releasenfo (releaseID, nfo) VALUES (" . $fileNameRow['ID'] . ", COMPRESS(" . $nfoFile . "))");
+                                $nfo = " nfostatus=1, ";
+                            }
+
+                        }
+                        $newCategory = $category->determineCategory($preDbMatch['title'], $fileNameRow['groupID']);
+                        $db->query("UPDATE releases SET " . $nfo . " preDbID=" . $preDbMatch['ID'] . ", searchname=" . $db->escapeString($preDbMatch['title']) .
+                                    ", relnamestatus=6, categoryID=" . $newCategory . " WHERE ID=" . $fileNameRow['ID']);
+                        $updated++;
+                    }
+                }
+            }
+            echo "\nRelease file names matched: " . $updated . "\n";
+        }
+        else
+            echo "No new file names to process.\n";
+
+        return $updated;
+    }
+
+    public function matchHashedFileNames($interval = 3)
+    {
+        $db = new DB();
+        $updated = 0;
+
+        if ($interval < 1)
+            $intervalClause = ' ';
+        elseif (is_numeric($interval))
+            $intervalClause = " AND rf.createdate > NOW() - INTERVAL " . $interval . " HOUR";
+        else
+            return false;
+
+        if ($this->echooutput)
+            echo "\n\033[01;36mMatching up predb titles with hashed file names.\033[01;37m\n";
+
+        $fileNameResults = $db->queryDirect("SELECT r.ID, r.searchname, r.groupID, rf.name FROM `releases` AS r LEFT JOIN `releasefiles` AS rf ON r.ID=rf.releaseID " .
+            "WHERE rf.name REGEXP '([a-fA-F0-9]{40}|[a-fA-F0-9]{32})[[...][.backslash.]]' AND rf.ID IS NOT NULL " .
+            "AND r.relnamestatus != -6 " . $intervalClause);
+        $totalFiles = $db->getNumRows($fileNameResults);
+        if ($totalFiles > 0)
+        {
+            if (!isset($consoleTools))
+                $consoleTools = new ConsoleTools();
+            $category = new Category();
+            $fileNamesProcessed = 0;
+            while ($fileNameRow = $db->fetchAssoc($fileNameResults))
+            {
+                $fileNamesProcessed++;
+                $consoleTools->overWrite("Processing file names " . $consoleTools->percentString($fileNamesProcessed, $totalFiles));
+                preg_match('/([a-fA-F0-9]{40}|[a-fA-F0-9]{32})[\.\\]/', $fileNameRow['name'], $nameMatches);
+                if (isset($nameMatches[1]))
+                {
+                    $hash = $db->escapeString($nameMatches[1]);
+                    $hashResults = $db->queryOneRow("SELECT ID, title, source, nfo FROM predb WHERE md5 =" . $hash . " OR md2=" . $hash . " OR md4=" . $hash . " OR sha1=" . $hash);
+                    if (isset($hashResults['ID']))
+                    {
+                        $nfo = '';
+                        if (isset($hashResults['nfo']) && $hashResults['nfo'] != 'NULL' & !is_null($hashResults['nfo']))
+                        {
+                            $nfoFile = $this->retrieveNfo($hashResults['nfo']);
+                            if ($nfoFile !== false)
+                            {
+                                $db->queryInsert("INSERT INTO releasenfo (releaseID, nfo) VALUES (" . $fileNameRow['ID'] . ", COMPRESS(" . $nfoFile . "))");
+                                $nfo = " nfostatus=1, ";
+                            }
+
+                        }
+                        $releaseCategory = $category->determineCategory($hashResults['title'], $fileNameRow['groupID']);
+
+                        $db->query("UPDATE releases SET " . $nfo . " searchname=" . $db->escapeString($hashResults['title']) . ", categoryID=" . $releaseCategory .
+                            ", preDbID=" . $hashResults['ID'] . ", relnamestatus = 6 WHERE ID=" . $fileNameRow['ID']);
+                        $updated++;
+                    }
+
+
+                }
+            }
+            echo "\nHashed file names matched: " . $updated . "\n";
+        } else
+            echo "No new file names to process.\n";
+
+        return $updated;
+    }
+
 
     public function retrieveNfo($url)
     {
