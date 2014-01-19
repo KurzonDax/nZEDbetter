@@ -1028,6 +1028,7 @@ class Releases
 		$sqlcount = "select count(releases.ID) as num from releases ".substr($sql, $wherepos,$orderpos-$wherepos);
 
 		$countres = $db->queryOneRow($sqlcount);
+        file_put_contents(WWW_DIR . "lib/logging/api.log", $sql . "\n--------------------------------------------\n", FILE_APPEND);
 		$res = $db->query($sql);
 		if (count($res) > 0)
 			$res[0]['_totalrows'] = $countres['num'];
