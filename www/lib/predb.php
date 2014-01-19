@@ -183,21 +183,28 @@ Class Predb
 		$db = new DB();
 		$newnames = 0;
         $skipped = 0;
-
-        $html = str_get_html($this->getWebPage("http://www.prelist.ws/"));
-        $releases = $html->find('span[class="nobreak"]');
+        $consoleTools = new ConsoleTools();
+        $html = str_get_html($this->getWebPage("http://www.prelist.ws/?do=list"));
+        $releases = $html->find('div[class="PreEntry Pred"]');
 
         foreach ($releases as $post) {
 
-            preg_match('/\[ (.+) UTC \]/', $post->innertext, $match);
-            $preDate = strtotime(trim($match[1]));
-            $e = $post->find('a');
-            $categoryPrime = $e[0]->innertext;
-            $title = trim($e[1]->innertext);
-            $e = $post->find('b');
-            preg_match('/\[ *([\d\.]+MB) *\]/', $e[0]->innertext, $match);
+            $data = $post->find('div[class=PreData]');
+
+            $e = $data[0]->find('div[class=PreName]');
+            $e2 = $e[0]->find('a');
+            $title = $e2[0]->innertext;
+            $e = $data[0]->find('div[class=Time]');
+            $preDate = strtotime($e[0]->innertext);
+            $e = $data[0]->find('div[class=Section]');
+            $e2 = $e[0]->find('a');
+            $categoryPrime = $e2[0]->innertext;
+            $e = $data[0]->find('div[class=FilesSize]');
+            preg_match('/([\d\.]+MB)/', $e[0]->innertext, $match);
             $size = isset($match[1]) ? $match[1] : 'NULL';
-            if ($categoryPrime != 'NUKED') {
+
+
+            if ($categoryPrime != 'NUKE') {
                 $oldname = $db->queryOneRow(sprintf("SELECT title FROM predb WHERE title = %s", $db->escapeString($title)));
                 if ($oldname["title"] == $title)
                 {
