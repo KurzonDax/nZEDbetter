@@ -29,6 +29,7 @@
                     <li><a id="groupMulti-toggleBackfill" class="pointer">Toggle Backfill</a></li>
                     <li class="divider"></li>
                     <li><a id="group-Delete" class="pointer">Delete Group(s)...</a></li>
+                    <li><a id="group-PruneOld" class="pointer">Prune Old Collections...</a></li>
                     <li><a id="group-Reset" class="pointer">Reset Group(s)...<span style="float: right; font-size: 15px; color: darkred;" class="clearfix"><i class="icon-exclamation-sign"></i></span></a></li>
                     <li><a id="group-Purge" class="pointer">Purge Group(s)...<span style="float: right; font-size: 15px; color: darkred;"><i class="icon-warning-sign" class="clearfix"></a></i></span></li>
                 </ul>
@@ -479,6 +480,33 @@
             </div>
         </div> <!-- modal content -->
     </div> <!-- modal dialog -->
+</div> <!-- modal main tag -->
+<div class="modal fade" id="modalPruneOldGroups">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h3>Purge Old Collections</h3>
+            </div>
+            <div class="modal-body">
+                <p class="warning-heading">Please confirm that you wish to prune old collections from the following groups.<br/>
+                    <span style="font-size: 13px; color: #333;">
+                        This process should typically be used only after a group has finished backfilling.  This will purge any collection
+                        (and associated binaries and parts) related to the group that are more than 24 hours old.  This will <strong>NOT</strong>
+                        affect releases.
+                    </span>
+                </p>
+                <p id="modalPruneOldGroupsList"></p>
+            </div>
+            <!-- modal-body Final Tag -->
+            <div class="modal-footer">
+                <a href="javascript:;" class="btn btn-tertiary" data-dismiss="modal">Close</a>
+                <button id="btnConfirmPruneOldGroups" class="btn btn-primary" data-dismiss="modal">Confirm Prune</button>
+            </div>
+        </div>
+        <!-- modal content -->
+    </div>
+    <!-- modal dialog -->
 </div> <!-- modal main tag -->
 <div class="modal fade" id="modalResetGroups">
     <div class="modal-dialog">

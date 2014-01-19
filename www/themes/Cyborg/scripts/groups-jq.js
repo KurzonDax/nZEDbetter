@@ -257,6 +257,14 @@ jQuery(function($){
             .modal("show");
     });
 
+    $("#group-PruneOld").click(function () {
+        $("#modalPruneOldGroupsList").html(getGroupList());
+        $("#modalPruneOldGroups").css('margin-left', function () {
+            return (-($(this).width() / 2)).toString() + "px"
+        })
+            .modal("show");
+    });
+
     $("#btnConfirmDeleteGroups").click(function(){
         if ($(".group_check:checked").length == 0) {
             alert("No groups selected to delete!");
@@ -386,6 +394,47 @@ jQuery(function($){
                 $("#group_list").prepend('<div id="dangerGroupsPurgeError" class="alert-danger alert-pagetop">'+
                     '<b><i class="icon-warning-sign"></i> ERROR!</b> The following error occurred while attempting to purge the groups:<br /> ' +
                     err + '<br />You should <a href="'+document.URL+'">refresh</a> the page and attempt the operation again.</div>');
+            }
+        });
+
+    });
+
+    $("#btnConfirmPruneOldGroups").click(function () {
+        if ($(".group_check:checked").length == 0) {
+            alert("No groups selected to purge!");
+            return;
+        }
+        $("#group_list").prepend('<div id="warningGroupsPruneOldStart" class="alert-warning alert-pagetop">' +
+            '<b><i class="icon-warning-sign"></i> Notice!</b> Group(s) are in the process of being pruned. Please <strong>DO NOT</strong> ' +
+            'refresh or leave this page until the process is complete. This may take some time to finish.</div>');
+        disableCheckedItems();
+        var action = 'pruneGroups';
+        var rand_no = Math.random();
+        groupIDs = getCheckedIDs();
+        $.ajax({
+            url     : WWW_TOP + '/admin/ajax-group-ops.php',
+            data    : 'action=' + action + '&rand=' + rand_no + '&' + groupIDs,
+            dataType: "html",
+            type    : "POST",
+            success : function (data) {
+                /*$.each($(".group_check:checked"), function () {
+                 $(this).prop('checked', false);
+                 });*/
+                $("#group_list").find("#warningGroupsPruneOldStart").remove();
+                setButtons();
+                $(document).scrollTop(0);
+                $("#group_list").prepend('<div id="successGroupsPruneEnd" class="alert-success alert-pagetop">' +
+                    '<b><i class="icon-ok-sign"></i> Alert!</b> Group(s) have been pruned successfully. It is strongly recommended that you <a href="' + document.URL + '">refresh</a> the page ' +
+                    'to reflect the changes.</div>');
+                displayNotification(data);
+            },
+            error   : function (xhr, err, e) {
+                $("#group_list").find("#warningGroupsPruneOldStart").remove();
+                setButtons();
+                $(document).scrollTop(0);
+                $("#group_list").prepend('<div id="dangerGroupsPurgeError" class="alert-danger alert-pagetop">' +
+                    '<b><i class="icon-warning-sign"></i> ERROR!</b> The following error occurred while attempting to prune the groups:<br /> ' +
+                    err + '<br />You should <a href="' + document.URL + '">refresh</a> the page and attempt the operation again.</div>');
             }
         });
 

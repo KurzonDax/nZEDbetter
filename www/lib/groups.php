@@ -426,6 +426,42 @@ class Groups
         return $db->Error();
     }
 
+    public function pruneOldCollections($groupID)
+    {
+        if (empty($groupID) || $groupID === 0 || $groupID == '')
+            return 'ERROR: (deleteGroupCollections) No group ID provided.';
+        if (!(is_array($groupID)))
+            $where = " groupID=" . $groupID;
+        else
+        {
+            $inClause = '(';
+            foreach ($groupID as $id)
+                $inClause .= $id . ",";
+            $where = " groupID IN " . substr($inClause, 0, -1) . ")";
+        }
+        $db = new DB();
+        $sql = "SELECT ID FROM collections WHERE " . $where . " AND newestBinary < NOW() - INTERVAL 24 HOUR";
+        $collections = $db->queryDirect($sql);
+        file_put_contents(WWW_DIR . 'lib/logging/pruneGroups.log', $sql . "\n----------------------------\n", FILE_APPEND);
+        if($db->getNumRows($collections) > 0)
+        {
+            $collectionsProcessed = 0;
+            while ($colRow = $db->fetchAssoc($collections))
+            {
+                $db->query("DELETE FROM binaries WHERE collectionID=" . $colRow['ID']);
+                $db->query("DELETE FROM parts WHERE collectionID=" . $colRow['ID']);
+                $collectionsProcessed ++;
+            }
+            $sql = "DELETE FROM collections WHERE " . $where . " AND newestBinary < NOW() - INTERVAL 24 HOUR";
+            file_put_contents(WWW_DIR . 'lib/logging/pruneGroups.log', $sql . "\n----------------------------\n", FILE_APPEND);
+            $db->query($sql);
+        }
+        else
+            return "No collections to purge.";
+
+        return $db->Error();
+    }
+
 	public function update($group)
 	{
 		$db = new DB();
@@ -607,12 +643,35 @@ class Groups
                 else
                     return 'ERROR: (deleteGroupCollections) '.$error;
                 break;
+            case 'pruneGroups':
+                $error = $this->pruneOldCollections($groupIDs);
+                if ($error === 0 || $error='' || empty($error))
+                {
+                    $sql = false;
+                    $temp = "SELECT oldBins.groupID, oldBins.oldestBinary FROM " .
+                        "(SELECT groupID, oldestBinary FROM collections ORDER BY oldestBinary) AS oldBins " .
+                        "WHERE groupID IN " . $inClause . ") GROUP BY groupID";
+                    $groupsPruned = $db->queryDirect($temp);
+
+                    if($db->getNumRows($groupsPruned) > 0)
+                    {
+                        while($prunedGroup = $db->fetchAssoc($groupsPruned))
+                        {
+                            $db->query("UPDATE groups SET first_record_postdate = " . $db->escapeString($prunedGroup['oldestBinary']) . " WHERE ID = " . $prunedGroup['groupID']);
+                        }
+                    }
+                    $msg = "Selected groups have been PRUNED.";
+                }
+                else
+                    return 'ERROR: (pruneOldCollections) ' . $error;
+                break;
             default:
                 return "ERROR IN multiGroupAction. Invalid action.";
         }
 
         file_put_contents(WWW_DIR."lib/logging/multiGroupAction.log",$sql."\n-------------------------------\n", FILE_APPEND);
-        $db->query($sql);
+        if($sql !== false)
+            $db->query($sql);
         return $msg;
     }
 
