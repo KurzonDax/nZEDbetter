@@ -34,11 +34,12 @@ Class Predb
             $newprelist = $this->retrievePrelist();
 			$newzenet = $this->retrieveZenet();
             // $neworly = $this->retrieveOrlydb();  //Orlydb seems to be down - 1/16/2014
+            $newUsenetCrawler = $this->retrieveUsenetCrawler();
             $newpdme = $this->retrievePredbme();
             $newsrr = $this->retrieveSrr();
 			$newwomble = $this->retrieveWomble();
             $newomgwtf = $this->retrieveOmgwtfnzbs();
-			$newnames = $newwomble+$newomgwtf+$newzenet+$newprelist+$newsrr+$newpdme;
+			$newnames = $newwomble+$newomgwtf+$newzenet+$newprelist+$newsrr+$newpdme+$newUsenetCrawler;
 			if ($newnames == 0)
 				$db->query(sprintf("UPDATE predb SET adddate = now() where ID = %d", $newestrel["ID"]));
 		}
@@ -56,6 +57,61 @@ Class Predb
 		//      echo "\nAdded ".$nfos." missing NFOs from preDB sources.\n";
 		return $newnames;
 	}
+
+    public function retrieveUsenetCrawler()
+    {
+        $db = new DB();
+        $newnames = 0;
+        $skipped = 0;
+        $html = str_get_html($this->getWebPage("http://www.usenet-crawler.com/predb?q=&c=&offset=0#results"));
+        $releases = $html->find('table[id="browsetable"]');
+        $rows = $releases[0]->find('tr');
+        $count = 0;
+        foreach ($rows as $post)
+        {
+            if ($count == 0)
+            {
+                //Skip the table header row
+                $count++;
+                continue;
+            }
+            $data = $post->find('td');
+            $preDate = strtotime($data[0]->innertext);
+
+            $e = $data[1]->find('a');
+            if (isset($e[0]))
+            {
+                $title = trim($e[0]->innertext);
+                $title = str_ireplace(array('<u>', '</u>'), '', $title);
+            } elseif (preg_match('/(.+)<\/br><sub>/', $data[1]))
+            {
+                // title is nuked, so skip
+                $skipped++;
+                continue;
+            } else
+                $title = trim($data[1]->innertext);
+            $e = $data[2]->find('a');
+            $categoryPrime = $e[0]->innertext;
+            preg_match('/([\d\.]+MB)/', $data[3]->innertext, $match);
+            $size = isset($match[1]) ? $match[1] : 'NULL';
+            if ($categoryPrime != 'NUKED')
+            {
+                $oldname = $db->queryOneRow(sprintf("SELECT title FROM predb WHERE title = %s", $db->escapeString($title)));
+                if ($oldname["title"] == $title)
+                {
+                    $skipped++;
+                    continue;
+                } else
+                {
+                    $this->_insertPreDB($db, $title, $preDate, 'usenet-crawler', $size, $categoryPrime);
+                    $newnames++;
+                }
+            }
+
+        }
+        echo "Usenet-Crawler: " . $newnames . " Added, " . $skipped . " Skipped\n";
+        return $newnames;
+    }
 
 	public function retrieveWomble()
 	{
