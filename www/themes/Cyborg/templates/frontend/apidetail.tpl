@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:newznab="http://www.newznab.com/DTD/2010/feeds/attributes/" encoding="utf-8">
 <channel>
 <atom:link href="{$serverroot}api" rel="self" type="application/rss+xml">
@@ -31,6 +32,7 @@
     <newznab:attr name="size" value="{$release.size}">
     <newznab:attr name="files" value="{$release.totalpart}">
     <newznab:attr name="poster" value="{$release.fromname|escape:html}">
+    <newznab:attr name="guid" value="{$release.guid}">
     {if $release.season != ""}  <newznab:attr name="season" value="{$release.season}">{/if}
     {if $release.episode != ""} <newznab:attr name="episode" value="{$release.episode}">{/if}
     {if $release.rageID != "-1" && $release.rageID != "-2"} <newznab:attr name="rageid" value="{$release.rageID}">{/if}

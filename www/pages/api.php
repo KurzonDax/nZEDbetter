@@ -98,6 +98,7 @@ if ($uid != "")
 
 $page->smarty->assign("uid",$uid);
 $page->smarty->assign("rsstoken",$apikey);
+$page->smarty->assign("requestedURI", htmlentities("http://" . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']) . $_SERVER['REQUEST_URI']));
 if (isset($_GET["extended"]) && $_GET["extended"] == "1")
 	$page->smarty->assign('extended','1');
 if (isset($_GET["del"]) && $_GET["del"] == "1")

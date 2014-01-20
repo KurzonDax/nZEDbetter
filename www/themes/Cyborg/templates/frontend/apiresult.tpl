@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:newznab="http://www.newznab.com/DTD/2010/feeds/attributes/" encoding="utf-8">
 <channel>
-<atom:link href="{$serverroot}api" rel="self" type="application/rss+xml" />
+<atom:link href="{$requestedURI}" rel="self" type="application/rss+xml" />
 <title>{$site->title|escape}</title>
 <description>{$site->title|escape} API Results</description>
 <link>{$serverroot}</link>
@@ -14,7 +15,6 @@
     <description>Visit {$site->title|escape} - {$site->strapline|escape}</description>
 </image>
 <newznab:response offset="{$offset}" total="{if $releases|@count > 0}{$releases[0]._totalrows}{else}0{/if}" />
-
 {foreach from=$releases item=release}
 <item>
     <title>{$release.searchname|escape:html}</title>
@@ -25,11 +25,11 @@
     <category>{$release.category_name|escape:html}</category>
     <description>{$release.searchname|escape:html}</description>
     <enclosure url="{$serverroot}getnzb/{$release.guid}.nzb&amp;i={$uid}&amp;r={$rsstoken}" length="{$release.size}" type="application/x-nzb" />
-
     {foreach from=$release.category_ids|parray:"," item=cat}
     <newznab:attr name="category" value="{$cat}" />
     {/foreach}
     <newznab:attr name="size" value="{$release.size}" />
+    <newznab:attr name="guid" value="{$release.guid}" />
     {if $extended=="1"}
     <newznab:attr name="files" value="{$release.totalpart}" />
     <newznab:attr name="poster" value="{$release.fromname|escape:html}" />
