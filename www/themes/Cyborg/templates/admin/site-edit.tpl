@@ -223,7 +223,15 @@
                         assigning them to HD TV.</div>
                 </td>
             </tr>
-
+            <tr>
+                <td><label for="forceWebDlInApiResults">Include WEB-DL in API Results:</label></td>
+                <td>
+                    {html_radios id="forceWebDlInApiResults" name='forceWebDlInApiResults' values=$yesno_ids output=$yesno_names selected=$fsite->forceWebDlInApiResults separator='<br />'}
+                    <div class="hint">Some API-enabled applications, such as <a href="http://sickbeard.com/" target="_blank">SickBeard</a>, will only request search results from the TV-HD and TV-SD categories.  By setting
+                        this option to Yes,  you will force the results from API search requests to include the TV-WEB DL category as well.
+                    </div>
+                </td>
+            </tr>
             <tr>
                 <td><label for="imdburl">IMDB.com:</label></td>
                 <td>

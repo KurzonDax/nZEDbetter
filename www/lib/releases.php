@@ -52,6 +52,7 @@ class Releases
 	    $this->lastFullCollectionCheck = ($this->site->lastFullCollectionCheck) ? $this->site->lastFullCollectionCheck : 0;
         $this->nextCrosspostCheck = ($this->site->nextCrosspostCheck == "0") ? 0 : $this->site->nextCrosspostCheck;
         $this->maxColsPurgePerLoop = (!empty($this->tmux->MAX_PURGE_PER_LOOP)) ? $this->tmux->MAX_PURGE_PER_LOOP : 1500;
+        $this->includeWebDlInApiResults = (!empty($this->site->forceWebDlInApiResults)) ? $this->site->forceWebDlInApiResults : 0;
     }
 
 	public function get()
@@ -1014,6 +1015,8 @@ class Releases
 					}
 				}
 			}
+            if($this->includeWebDlInApiResults == 1)
+                $catsrch .= " releases.categoryID = 5010 or ";
 			$catsrch.= "1=2 )";
 		}
 
