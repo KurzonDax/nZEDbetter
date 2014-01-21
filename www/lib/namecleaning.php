@@ -290,7 +290,7 @@ class nameCleaning
         if ($debug)
             echo "\nCleaning Search Name\n";
         $text = str_replace(".", ' ', $text);
-        $newname = preg_replace('/#altbin Full |My Rip\s+EAC|(^| )\d{1,2} \d{1,2} | \d{3,4} ?(kbps|cbr)|(\d{1,2} \d{1,2} )?(Bootleg|Boxset|Clean.+Version|Compiled by.+|\d{1,2}CDs?|Digipak|DIRFIX|DVBS|FLAC|(Ltd )?(Deluxe|Limited|Special).+Edition|Promo|PROOF|Reissue|Remastered|REPACK|RETAIL(.+UK)?|SACD|Sampler|\bSAT\b|Summer.+Mag|UK.+Import|Deluxe.+Version|VINYL|WEB)/i', ' ', $text);
+        $newname = preg_replace('/#altbin Full |My Rip\s+EAC|trtk|(^| )\d{1,2} \d{1,2} | \d{3,4} ?(kbps|cbr)|(\d{1,2} \d{1,2} )?(Bootleg|Boxset|Clean.+Version|Compiled by.+|\d{1,2}CDs?|Digipak|DIRFIX|DVBS|FLAC|(Ltd )?(Deluxe|Limited|Special).+Edition|Promo|PROOF|Reissue|Remastered|REPACK|RETAIL(.+UK)?|SACD|Sampler|\bSAT\b|Summer.+Mag|UK.+Import|Deluxe.+Version|VINYL|WEB)/i', ' ', $text);
         if($debug)
             echo "1 - " . $newname . "\n";
         $newname = preg_replace('/ ([a-z]+[0-9]+[a-z]+[0-9]+.+|[a-z]{2,}[0-9]{2,}?.+|3FM|B00[a-z0-9]+|BRC482012|H056|UXM1DW086|(4WCD|ATL|bigFM|CDP|DST|ERE|FIM|MBZZ|MSOne|MVRD|QEDCD|RNB|SBD|SFT|ZYX) \d.+)/i', ' ', $newname);
