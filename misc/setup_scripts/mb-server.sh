@@ -46,6 +46,10 @@ else
     wget http://ftp.musicbrainz.org/pub/musicbrainz/data/fullexport/$LATEST/mbdump.tar.bz2
 fi
 echo -e "\n${ylbold}If prompted, please enter your sudo password.${endColor}"
+echo -e "\n${grbold}Configuring Postgre Repository${endColor}\n"
+echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get update > /dev/null
 if [ -z `which mkpasswd | grep "mkpasswd"` ]
 then
     sudo apt-get install -y whois > /dev/null
@@ -53,8 +57,8 @@ fi
 sudo useradd musicbrainz -m -s /bin/bash -p `mkpasswd musicbrainz`
 sudo adduser musicbrainz sudo
 sudo chmod a+rw $mbdumps/*.tar.bz2
-echo -e "${ylbold}Installing Postgres 9.1"
-sudo apt-get install -y postgresql-9.1 postgresql-server-dev-9.1 postgresql-contrib-9.1 postgresql-plperl-9.1 > /dev/null
+echo -e "${ylbold}Installing Postgres 9.3"
+sudo apt-get install -y postgresql-9.3 postgresql-server-dev-9.3 postgresql-contrib-9.3 postgresql-plperl-9.3 > /dev/null
 echo -e "Installing git, memcached, redis, and build essentials"
 sudo apt-get install -y git-core memcached redis-server build-essential > /dev/null
 echo -e "Installing Perl dependencies"
@@ -84,13 +88,13 @@ echo -e "\n${ylbold}Configuring CPAN libraries. Please be patient."
 echo -e "This process will take quite a while to complete.${endColor}\n"
 cd /home/musicbrainz/musicbrainz-server
 sudo cpanm --installdeps --notest --force --quiet .
-sudo mv /etc/postgresql/9.1/main/pg_hba.conf /etc/postgresql/9.1/main/pg_hba.conf.backup
-echo "local  all  all                       trust" | sudo tee /etc/postgresql/9.1/main/pg_hba.conf > /dev/null
-echo "local  all  postgres                  peer" | sudo tee -a /etc/postgresql/9.1/main/pg_hba.conf > /dev/null
-echo "local  all  all                       peer" | sudo tee -a /etc/postgresql/9.1/main/pg_hba.conf > /dev/null
-echo "host   all  all       127.0.0.1/32    md5" | sudo tee -a /etc/postgresql/9.1/main/pg_hba.conf > /dev/null
+sudo mv /etc/postgresql/9.3/main/pg_hba.conf /etc/postgresql/9.3/main/pg_hba.conf.backup
+echo "local  all  all                       trust" | sudo tee /etc/postgresql/9.3/main/pg_hba.conf > /dev/null
+echo "local  all  postgres                  peer" | sudo tee -a /etc/postgresql/9.3/main/pg_hba.conf > /dev/null
+echo "local  all  all                       peer" | sudo tee -a /etc/postgresql/9.3/main/pg_hba.conf > /dev/null
+echo "host   all  all       127.0.0.1/32    md5" | sudo tee -a /etc/postgresql/9.3/main/pg_hba.conf > /dev/null
 echo -e "${ylbold}Restarting postgres database engine.${endColor}"
-sudo chown postgres:postgres /etc/postgresql/9.1/main/pg_hba.conf
+sudo chown postgres:postgres /etc/postgresql/9.3/main/pg_hba.conf
 sudo service postgresql stop > /dev/null
 sudo service postgresql start > /dev/null
 echo -e "${ylbold}Creating database and importing data."
@@ -111,7 +115,7 @@ cd ..
 sudo mv nginx.conf nginx.conf.default
 sudo ln -s /home/musicbrainz/musicbrainz-server/admin/nginx/mbserver-rewrites.conf . > /dev/null
 sudo ln -s /home/musicbrainz/musicbrainz-server/admin/nginx/nginx.conf . > /dev/null
-echo "server_name nzedbetter.musicbrainz.org;" | sudo tee /etc/nginx/site-name.conf > /dev/null
+echo "server_name nzedbetter.org;" | sudo tee /etc/nginx/site-name.conf > /dev/null
 echo "Restarting nginx${endColor}"
 sudo service nginx stop > /dev/null
 sudo service nginx start > /dev/null

@@ -164,7 +164,10 @@ class MusicBrainz {
 
         if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
             echo "Starting " . __METHOD__ . "\nField: " . $field . "\nQuery: " . $query . "\n";
-        $url = MusicBrainz::API_SCHEME . $this->_MBserver . '/ws/' . MusicBrainz::API_VERSION . '/' . $searchFunction . '?query=' . ($field=='' ? '' : $field . '%3A') . rawurlencode($query) . "&limit=" . $limit;
+        $url = MusicBrainz::API_SCHEME . $this->_MBserver . '/ws/' . MusicBrainz::API_VERSION . '/' . $searchFunction . '/?query=' . ($field=='' ? '' : $field . ':') . urlencode($query) . "&limit=" . $limit;
+
+        if(MusicBrainz::WRITE_LOG_FILES)
+            file_put_contents($this->_baseLogPath . "urls.log", $url . "\n", FILE_APPEND);
 
         return $this->__getResponse($url);
 
@@ -319,11 +322,13 @@ class MusicBrainz {
      * @param string $field1    defaults to 'recording', first field to search in query
      * @param string $query2
      * @param string $field2    defaults to 'artist', second field to search to narrow results
+     * @param string $query3
+     * @param string $field3    defaults to 'release' thrid field to search to narrow results
      * @param int    $limit     defaults to 30, max number of results to return
      *
      * @return bool|SimpleXMLElement
      */
-    private function __searchRecording($query1, $field1='recording', $query2='', $field2='artist',$limit=30)
+    private function __searchRecording($query1, $field1='recording', $query2='', $field2='artist', $query3='', $field3='release',  $limit=30)
     {
 
         /*
@@ -367,7 +372,10 @@ class MusicBrainz {
             return false;
         else
         {
-            $query=$query1.(($query2 != '') ? " AND ".$field2.":".$query2 : '');
+            // $query = $query1.(($query2 !== '') ? ' AND '.$field2.':'.$query2 : '');
+            $query = '"' . $query1 . '"';
+            $query .= ($query2 !== '' ? ' AND ' . $field2 . ':"' . $query2 . '"' : '');
+            $query .= ($query3 !== '' ? ' AND ' . $field3 . ':"' . $query3 . '"' : '');
             return $this->__makeSearchCall('recording', $field1, $query, $limit);
         }
     }
@@ -463,7 +471,9 @@ class MusicBrainz {
             return false;
         else
         {
-            $query=$query1.(($query2 != '') ? " AND ".$field2.":".$query2 : '');
+            // $query=$query1.(($query2 != '') ? " AND ".$field2.":".$query2 : '');
+            $query = '"' . $query1 . '"';
+            $query .= ($query2 !== '' ? ' AND ' . $field2 . ':"' . $query2 . '"' : '');
             return $this->__makeSearchCall('release', $field1, $query, $limit);
         }
     }
@@ -519,65 +529,88 @@ class MusicBrainz {
 
         if (preg_match('/bootleg/i', $musicRow['name']) === 1)
         {
-                echo "Skipping bootleg release: " . $musicRow['name'] . $n;
-                return true;
+            echo "\033[01;30mSkipping bootleg release: " . $musicRow['name'] . $n;
+            $db->query("UPDATE releases SET musicinfoID=-9 WHERE ID=" . $musicRow['ID']);
+            return true;
+        }
+        elseif (preg_match('/\.jpg|\.png/i' , $musicRow['name']) === 1)
+        {
+            echo "\033[01;30mSkipping non-music release: " . $musicRow['name'] . $n;
+            $db->query("UPDATE releases SET musicinfoID=-10 WHERE ID=" . $musicRow['ID']);
+
+            return true;
         }
 
         $cleanSearchName = $nameCleaning->musicCleaner($musicRow['searchname']);
         $query = $this->cleanQuery($cleanSearchName);
+        $year = false;
+        if (preg_match('/\(?(19|20)\d\d\)?(?!.+(19|20)\d\d)(?!kbps|x)/', $musicRow['searchname'], $yearMatch) === 0)
+            preg_match('/\(?(19|20)\d\d\)?(?!.+(19|20)\d\d)(?!kbps|x)/', $musicRow['name'], $yearMatch);
+        if(isset($yearMatch))
+        {
+            $year = 0;
+            foreach($yearMatch as $yearFound)
+                $year = $yearFound > $year ? $yearFound : $year;
 
-        if (preg_match('/\(?(19|20)\d\d\)?(?!.+(19|20)\d\d)(?!kbps|x)/', $musicRow['searchname'], $year) === 0)
-            preg_match('/\(?(19|20)\d\d\)?(?!.+(19|20)\d\d)(?!kbps|x)/', $musicRow['name'], $year);
-
-        $artistSearchArray[] = $musicRow['searchname'];
-        $artistSearchArray[] = $this->__normalizeString($musicRow['searchname']);
-        $artistSearchArray[] = $this->__normalizeString($musicRow['searchname'], true);
+            $year = $year == 0 ? false : $year;
+        }
         $artistSearchArray[] = $musicRow['name'];
         $artistSearchArray[] = $this->__normalizeString($musicRow['name']);
         $artistSearchArray[] = $this->__normalizeString($musicRow['name'], true);
+        $artistSearchArray[] = $musicRow['searchname'];
+        $artistSearchArray[] = $this->__normalizeString($musicRow['searchname']);
+        $artistSearchArray[] = $this->__normalizeString($musicRow['searchname'], true);
 
         $isSingle = $this->isTrack($musicRow['name']);
 
         if (!$isSingle)
         {
-            echo "Looking up album: " . $musicRow['searchname'] . "\n";
-            $artistResult = $this->findArtist($query, $artistSearchArray);
-            if ($artistResult)
+            $parsedRelease = $this->releaseParser($musicRow['name']);
+            if($parsedRelease !== false)
             {
-                $query = trim(preg_replace('/\b' . $artistResult->getMatchString() . '\b/i', '', $query));
-
-                $releaseSearchArr = array();
-                $releaseSearchArr = $this->__buildReleaseSearchArray($musicRow['searchname'], $releaseSearchArr);
-                $releaseSearchArr = $this->__buildReleaseSearchArray($musicRow['name'], $releaseSearchArr);
-
-                $albumResult = $this->findRelease($query, $artistResult, $releaseSearchArr, (isset($year[0]) ? $year[0] : null));
-                if ($albumResult)
+                echo "Looking up album: \033[01;36m" . $parsedRelease['title'] . "\033[01;37m   Artist: \033[01;36m" . $parsedRelease['artist'] . $n;
+                $artistResult = $this->findArtist($parsedRelease['artist'], $artistSearchArray);
+                if ($artistResult)
                 {
-                    if($this->updateArtist($artistResult) !== false)
+                    $releaseSearchArr = array();
+                    $releaseSearchArr = $this->__buildReleaseSearchArray($musicRow['name'], $releaseSearchArr);
+                    $releaseSearchArr = $this->__buildReleaseSearchArray($musicRow['searchname'], $releaseSearchArr);
+
+
+                    $albumResult = $this->findRelease($parsedRelease['title'], $artistResult, $releaseSearchArr, ($year !==false ? $year : null));
+                    if ($albumResult)
                     {
-                        if($this->updateAlbum($albumResult) !== false)
+                        if($this->updateArtist($artistResult) !== false)
                         {
-                            echo "\033[01;32mAdded/Updated Album: " . $albumResult->getTitle() . "  Artist: " . $artistResult->getName() . $n;
-                            $db->queryDirect("UPDATE releases SET musicinfoID=99999999, mbAlbumID=" . $db->escapeString($albumResult->getMbID()) .
-                                                ", mbTrackID=NULL WHERE ID=" . $musicRow['ID']);
-                            return true;
+                            if($this->updateAlbum($albumResult) !== false)
+                            {
+                                echo "\033[01;32mAdded/Updated Album: " . $albumResult->getTitle() . "  Artist: " . $artistResult->getName() . $n;
+                                $db->queryDirect("UPDATE releases SET musicinfoID=99999999, mbAlbumID=" . $db->escapeString($albumResult->getMbID()) .
+                                                    ", mbTrackID=NULL WHERE ID=" . $musicRow['ID']);
+                                return true;
+                            }
+                            else
+                                echo "\033[01;31mERROR: Encountered an error adding/updating album" . $n;
                         }
                         else
-                            echo "\033[01;31mERROR: Encountered an error adding/updating album" . $n;
+                            echo "\033[01;31mERROR: Encountered an error adding/updating artist" . $n;
                     }
                     else
-                        echo "\033[01;31mERROR: Encountered an error adding/updating artist" . $n;
+                    {
+                        echo "\033[01;33mUnable to match release: " . $musicRow['ID'] . "   " . $parsedRelease['title'] . $n;
+                        $failureType = 'release-release';
+                    }
                 }
                 else
                 {
-                    echo "\033[01;33mUnable to match release: " . $musicRow['ID'] . "   " . $musicRow['searchname'] . $n;
-                    $failureType = 'release-release';
+                    echo "\033[01;34mUnable to determine artist: " . $musicRow['ID'] . "   " . $parsedRelease['artist'] . $n;
+                    $failureType = 'release-artist';
                 }
             }
             else
             {
-                echo "\033[01;34mUnable to determine artist: " . $musicRow['ID'] . "   " . $musicRow['searchname'] . $n;
-                $failureType = 'release-artist';
+                echo "\033[01;31mUnable to parse release artist and title: " . $musicRow['name'] . $n;
+                $failureType = 'release-regex';
             }
         }
         else
@@ -586,14 +619,14 @@ class MusicBrainz {
                 (isset($isSingle['release']) ? "   Album: \033[01;36m" . $isSingle['release'] . "\033[01;37m\n" : "\n");
             $prefix = isset($isSingle['disc']) ? (string)$isSingle['disc'] . (string)$isSingle['track'] : $isSingle['track'];
             $query = preg_replace('/^' . $prefix . '/', '', $query);
-
+            $isSingle['releaseID'] = $musicRow['ID'];
             $artistResult = $this->findArtist((isset($isSingle['artist']) ? $isSingle['artist'] : $query), $artistSearchArray);
             if ($artistResult)
             {
-                if (isset($year[0]))
-                    $isSingle['year'] = $year[0];
+                if ($year !== false)
+                    $isSingle['year'] = $year;
 
-                $recordingResult = $this->findRecording($isSingle, $artistResult, false);
+                $recordingResult = $this->findRecording($isSingle, $artistResult, (isset($isSingle['release']) ? true : false));
                 if ($recordingResult)
                 {
                     if($this->updateArtist($artistResult) !== false)
@@ -652,17 +685,29 @@ class MusicBrainz {
             case 'track-artist':
                 $failureCode = '-4';
                 break;
+            case 'release-regex':
+                $failureCode = '-5';
+                break;
             default:
                 $failureType = 'process';
-                $failureCode = '-5';
+                $failureCode = '-6';
         }
 
         $db->query("UPDATE releases SET musicinfoID=" . $failureCode . " WHERE ID=" . $musicRow['ID']);
 
         if(MusicBrainz::WRITE_LOG_FILES)
         {
-            $log = $musicRow['ID'] . ',"' . $musicRow['name'] . '","' . $musicRow['searchname'] . '"' . "\n";
-            file_put_contents($this->_baseLogPath . $failureType . '-noMatch.log', $log, FILE_APPEND);
+            $log = $musicRow['ID'] . '|' . $musicRow['name'] . '|' . $musicRow['searchname'];
+            if($failureCode == '-1' || $failureCode == '-2')
+                $log .= '|' . $parsedRelease['title'] . '|' . $parsedRelease['artist'];
+            if($failureCode == '-3' || $failureCode == '-4')
+            {
+                $log .= $isSingle['title'] . '|' . $isSingle['artist'];
+                $log .= (isset($isSingle['release']) ? '|' . $isSingle['release'] : '');
+            }
+            $log .= (isset($year) && $year !== false ? '|' . $year : '');
+            $log .= "\n";
+            file_put_contents($this->_baseLogPath . $failureType . '-noMatch.csv', $log, FILE_APPEND);
         }
 
         return false;
@@ -974,7 +1019,7 @@ class MusicBrainz {
 
         if(is_array($query) && isset($query['title']) && isset($query['release']))
         {
-            $results = $this->__searchRecording($query['title'], 'recording', $query['release'], 'release');
+            $results = $this->__searchRecording($query['title'], 'recording', $artist->getMbID(), "arid",  $query['release'], 'release');
         }
         elseif (is_array($query) && isset($query['title']))
         {
@@ -983,7 +1028,7 @@ class MusicBrainz {
         else
             return false;
 
-        if (!isset($results->{'recording-list'}->attributes()->count))
+        if (!isset($results->{'recording-list'}) || !isset($results->{'recording-list'}->attributes()->count))
         {
             if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MAX)
                 print_r($results);
@@ -1046,6 +1091,11 @@ class MusicBrainz {
                 {
                     if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MED)
                         echo "No matching release for matched title.\n";
+                    if (MusicBrainz::WRITE_LOG_FILES)
+                    {
+                        $log = $query['releaseID'] . '|' . $recording->attributes()->id . '|' . $query['title'] . '|' . $query['release'] . '|' . $artist->getName() . "\n";
+                        file_put_contents($this->_baseLogPath . "recordingMatch-releaseNoMatch.csv", $log, FILE_APPEND);
+                    }
                     continue;
                 }
                 else
@@ -1397,43 +1447,55 @@ class MusicBrainz {
         if (empty($releaseName) || $releaseName == null)
             return false;
 
-        // Remove years and file/part counts
-        $releaseName = trim(preg_replace('/\(?\[?19\d\d\]?\)?|\(?\[?20\d\d\]?\)?|\(?\[?\d\d?\/\d\d?\]?\)?/', '', $releaseName));
-        // Perform some very basic cleaning on the release name before matching
-        $releaseName = trim(preg_replace('/by req:? |attn:? [\w\s_]+| 320 |\bEAC\b|\bmy rip\b/i', '', $releaseName));
-        // Normalize spacing
-        $releaseName = trim(preg_replace('/\s{2,}/', ' ', $releaseName));
-
-        // echo "Cleaned Single Release Name: " . $releaseName . "\n";
-
-        // If it's a blatantly obvious 'various artist' release, use the following pattern
-        if (substr($releaseName, 0, 2) == 'VA')
-            preg_match('/VA ?- ?(?P<release>[\w\s\' ]+?)- ?(19\d\d|20\d\d)? ?-?(?![\(\[ ](19\d\d|20\d\d))(?P<track> ?(?!\(|\[|19\d\d|20\d\d)[0-2][0-9]\d?\d?) ?- ?(?P<artist>[\w\s\'\.]+?) ?- ?(?P<title>[\(\)\w _\']+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac)/', $releaseName, $matches);
+        //Thunder-News.org has a specific format that won't match correctly against the other regex below
+        if(preg_match('/\(www.thunder-news.org\)/i', $releaseName) === 1)
+            preg_match('/>(?P<artist>\w[\w\s\'_\&\-]+?)-(?P<release>\w[\w\s\'_\(\)\d\&\.]+)-([A-Z]{2,}|\(|(19|20)\d\d).+< <.+" ?(?P<track>[0-9][0-9]\d?\d?)-[\w_\.]+-(?P<title>\w[\(\)\w_\'\&]+)(-\w+)?\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac|ape)/i', $releaseName, $matches);
         else
         {
-            // The 'track' group will not match tracks numbered above 19 to prevent matching a year
-            // Probably won't be much of an issue because track numbers that high are rare.
-            // The alternative is the regex would be much more strict in what would be identified as a track number.
-            // Below matches artist, release, track, title (Type 1)
-            preg_match('/(?:^|["\- ])(?P<artist>[\w\s\'_\&]++)[ \-]*?[ \-]*?(?P<release>\w[\w\s\'_\(\)\-\d\&]+)[ \-"]*?(?P<track> ?(?!\(|\[|19\d\d|20\d\d)[0-2][0-9]\d?\d?).+?(?!-)(?P<title>[\(\)\w _\'\&]+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac|ape)/i', $releaseName, $matches);
+            // Remove years and file/part counts
+            $releaseName = trim(preg_replace('/\[.+\]|\(?\[?19\d\d\]?\)?(-\d)?|\(?\[?20\d\d\]?\)?(-\d)?|\(?\[?\d{1,3}\/\d{1,3}\]?\)?|\[\d{1,2} of \d{1,2}\]/', '', $releaseName));
+            // Perform some very basic cleaning on the release name before matching
+            $releaseName = trim(preg_replace('/~|by req:? |as req(uested)?|attn:? [\w_]+| 320 |\bEAC\b|\bmy rip\b|[\(\{\[\*]?NMR(\d\d\d)?[\)\}\]\*]?|\d\dbit|\d\dKhz|CD\d|^\(.+\)|\[ThOrP\]|repost|\d{1,2}cd|^req \w+? /i', '', $releaseName));
+            // Normalize spacing
+            $releaseName = trim(preg_replace('/\s{2,}/', ' ', $releaseName));
+
+            // If it's a blatantly obvious 'various artist' release, use the following pattern
+            // Need to handle looking up the actual release for VA tracks better in findRecording
+            if (substr($releaseName, 0, 2) == 'VA')
+                preg_match('/VA ?- ?(?P<release>[\w\s\' ]+?)- ?(19\d\d|20\d\d)? ?-?(?![\(\[ ](19\d\d|20\d\d))(?P<track> ?(?!\(|\[|19\d\d|20\d\d)[0-2][0-9]\d?\d?) ?- ?(?P<artist>[\w\s\'\.]+?) ?- ?(?P<title>[\(\)\w _\']+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac)/i', $releaseName, $matches);
+
+            // artist (hyphenated only, i.e. Mary-Chapin Carpenter), release, track, title - This must be run first
+            if (!isset($matches[0]) || (!isset($matches['artist']) && !isset($matches['release']) && !isset($matches['track']) && !isset($matches['title'])))
+                preg_match('/(?:^| ?)(?P<artist>[\w\s]+-[\w\s]+) - (?P<release>\w[\w\s\'_\(\)\d\&]+)[ \-]+?(?P<track> ?[0-2][0-9]\d?\d?) - (?!-)(?P<title>[\(\)\w _\'\&\.]+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac|ape)/i', $releaseName, $matches);
+
+                // The 'track' group will not match tracks numbered above 19 to prevent matching a year
+                // Probably won't be much of an issue because track numbers that high are rare.
+                // The alternative is the regex would be much more strict in what would be identified as a track number.
+                // Below matches artist, release, track, title (Type 1)
+            if (!isset($matches[0]) || (!isset($matches['artist']) && !isset($matches['release']) && !isset($matches['track']) && !isset($matches['title'])))
+                preg_match('/(?:^|["\- ])(?P<artist>\w[\w\s\'_\&]++)(\s{3,}|[ \-"]+)(?P<release>\w[\w\s\'_\(\)\-\d\&\.]+)[ \-"]*?\(?(?P<track> ?[D0-2][0-9]\d?\d?).+?(?!-)(?P<title>[\(\)\w _\'\&\.]+)\.(?i:mp3|wav|ogg|wma|mpa|aac|m4a|flac|ape)/i', $releaseName, $matches);
+
+            // artist, release, track, title (Type 2)
+            if (!isset($matches[0]) || (!isset($matches['artist']) && !isset($matches['release']) && !isset($matches['track']) && !isset($matches['title'])) || preg_match('/^(D\d|[\d \-])$/', $matches['artist']) || preg_match('/^(D\d|[\d \-])$/', $matches['release']))
+                preg_match('/(?P<artist>[\w\s\&\'_\-]+?)(\d?"|\s{2,}).*?(?P<release>\w[\w\s\&\'_\-]+).+"(?P<track>(\d - )?(D\d)?\d\d) ?-?(?P<title>[\(\)\w _\'\&\.]+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac|ape)/i', $releaseName, $matches);
+
+            // artist, release, track, title (Type 3)
+            if (!isset($matches[0]) || (!isset($matches['artist']) && !isset($matches['release']) && !isset($matches['track']) && !isset($matches['title'])))
+                preg_match('/(?P<artist>\w[\w\s\&\'_\-]+?)-\s*(?P<release>\w[\w\s\&\'_\-\.]+) ?- ?(?P<track>\d\d) ?- ?(?P<title>[\w\s]+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac|ape)/i', $releaseName, $matches);
+
+            // artist, release, track, title (Type 4)
+            if (!isset($matches[0]) || (!isset($matches['artist']) && !isset($matches['release']) && !isset($matches['track']) && !isset($matches['title'])))
+                preg_match('/"\s*?(?P<release>\w[\w\s\&\'_\-]+)".+"(?P<track>\d\d) - (?P<artist>\w[\w\s\&\'_\-\.]+) ?- ?(?P<title>[\w\s\'\&_`]+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac|ape)/i', $releaseName, $matches);
+
+
+            // track, artist, title
+            if (!isset($matches[0]) || (!isset($matches['artist']) && !isset($matches['release']) && !isset($matches['track']) && !isset($matches['title'])))
+                preg_match('/["\- ](?P<track>(?!\(|\[|19\d\d|20\d\d)[0-2][0-9]\d?\d?)(?<!\(|\[|19\d\d|20\d\d)(?P<artist>( |-).+-) ?-? ?(?P<title>[\(\)\w \-_\']+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac)/i', $releaseName, $matches);
+
+            // artist, title (must be used last due to being very permissive)
+            if (!isset($matches[0]))
+                preg_match('/("|-)? ?"?(?P<artist> ?.+-)* ?-? ?(?P<title>[\(\)\w \-_\']+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac)/i', $releaseName, $matches);
         }
-
-        // artist, release, track, title (Type 2)
-        if (!isset($matches[0]) || (!isset($matches['artist']) && !isset($matches['release']) && !isset($matches['track']) && !isset($matches['title'])))
-            preg_match('/(?P<artist>[\w\s\&\'_\-]+)"\s*(?P<release>\w[\w\s\&\'_]+).+"(?P<track>\d\d)-(?P<title>[\w\s]+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac|ape)/im', $releaseName, $matches);
-
-        // artist, release, track, title (Type 3)
-        if (!isset($matches[0]) || (!isset($matches['artist']) && !isset($matches['release']) && !isset($matches['track']) && !isset($matches['title'])))
-            preg_match('/(?P<artist>\w[\w\s\&\'_\-]+?)-\s*(?P<release>\w[\w\s\&\'_\-\.]+) ?- ?(?P<track>\d\d) ?- ?(?P<title>[\w\s]+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac|ape)/im', $releaseName, $matches);
-
-        // track, artist, title
-        if (!isset($matches[0]) || (!isset($matches['artist']) && !isset($matches['release']) && !isset($matches['track']) && !isset($matches['title'])))
-            preg_match('/(?P<track>["\- ](?!\(|\[|19\d\d|20\d\d)[0-2][0-9]\d?\d?)(?<!\(|\[|19\d\d|20\d\d)(?P<artist>( |-).+-)* ?-? ?(?P<title>[\(\)\w \-_\']+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac|ape)/i', $releaseName, $matches);
-
-        // artist, title
-        if (!isset($matches[0]))
-            preg_match('/("|-) ?"?(?P<artist> ?.+-)* ?-? ?(?P<title>[\(\)\w \-_\']+)\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac|ape)/i', $releaseName, $matches);
-
         if (!isset($matches[0]))
             return false;
 
@@ -1441,8 +1503,11 @@ class MusicBrainz {
         {
             $matches['artist'] = trim(str_ireplace(array('-', '_', '"'), ' ', $matches['artist']));
             $matches['artist'] = trim(preg_replace('/\s{2,}/', ' ', $matches['artist']));
-            if (preg_match('/^\d+$/', $matches['artist']))
+            if (preg_match('/^\d+$/', $matches['artist']) === 1 || strlen($matches['artist']) < 2 || preg_match('/^\s+&/', $matches['artist']) === 1)
                 return false;
+
+            if(trim($matches['artist']) == 'VA')
+                $matches['artist'] = 'Various Artists';
         }
 
         if (isset($matches['release']))
@@ -1462,12 +1527,117 @@ class MusicBrainz {
 
         if (isset($matches['track']) && strlen($matches['track']) > 2)
         {
-            $matches['disc'] = strlen($matches['track']) > 3 ? substr($matches['track'], 0, 2) : substr($matches['track'], 0, 1);
-            $matches['track'] = strlen($matches['track']) > 3 ? substr($matches['track'], 2, 2) : substr($matches['track'], 1, 2);
+            if(strpos($matches['track'], '-') !== false)
+            {
+                $matches['disc'] = substr($matches['track'], 0, 2);
+                $matches['track'] = substr($matches['track'], 2, 2);
+            }
+            else
+            {
+                $matches['disc'] = strlen($matches['track']) > 3 ? substr($matches['track'], 0, 2) : substr($matches['track'], 0, 1);
+                $matches['track'] = strlen($matches['track']) > 3 ? substr($matches['track'], 2, 2) : substr($matches['track'], 1, 2);
+            }
+
+            $matches['disc'] = str_ireplace('d','', $matches['disc']);
         }
 
+        if (preg_match('/^\d+$/', $matches['artist']) === 1 || strlen($matches['artist']) < 2 || preg_match('/^\s+&/', $matches['artist']) === 1)
+            return false;
+
+        if (preg_match('/^\d+$/', $matches['title']) === 1 || strlen($matches['title']) < 2 || preg_match('/^\s+&/', $matches['title']) === 1)
+            return false;
+
+        // One last round of cleaning to get rid of trailing hyphens and spaces
+        if(isset($matches['artist']))
+            $matches = preg_replace('/^[\(\) \-]+|[\(\) \-]+$/', '', $matches);
 
         return (isset($matches['artist']) && isset($matches['title'])) ? $matches : false;
+    }
+
+    /**
+     * @param string    $releaseName    release name field from nZEDbetter database
+     *
+     * @return bool|array               array will contain title and artist fields
+     */
+    public function releaseParser($releaseName)
+    {
+        if(is_null($releaseName) || empty($releaseName))
+            return false;
+        // Don't waste time on tracks that didn't get caught by the isTrack function
+        if(preg_match('/\.(?:mp3|wav|ogg|wma|mpa|aac|m4a|flac|ape)/i', $releaseName) === 1)
+            return false;
+
+        if (preg_match('/\^trtk\d{5}/', $releaseName) === 1) // trtk releases have a specific format that will not match with the normal regex parsers
+            preg_match('/"(?P<artist>[\w\s\&\'_]+)-(?P<title>[\w\s\&\'_\.!,\-]+)([\.\(\+])/', $releaseName, $matches);
+        if (preg_match('/\^trtk\d{5}/', $releaseName) === 1 && !isset($matches[0])) // trtk releases without an artist have a specific format that will not match with the normal regex parsers
+        {
+            preg_match('/"(?P<title>[\w\s\&\'_\.!,\-]+)([\.\(])/', $releaseName, $matches);
+            $matches['artist'] = 'Various Artists';
+        }
+        elseif (preg_match('/\[(a\.b\.flac(EFNet)?|altbinEFNet)\]/', $releaseName) === 1) // a.b.flacEFNet releases have a specific format that will not match with the normal regex parsers
+            preg_match('/\[ (?P<artist>[\w\s\&\'_\.]+)-(?P<title>[\w\s\&\'_\.\(\),!\-]+?)((-(\d|[A-Z]{2,}|\())|(_\()).+ \]/', $releaseName, $matches);
+        elseif (preg_match('/\[ TOWN \]/', $releaseName) === 1)  // TOWN releases have a specific format that will not match with the normal regex parsers
+            preg_match('/"(?P<artist>[\w\s\&\'_]+)-(?P<title>[\w\s\&\'_\.\(\),!\-]+?)-[A-Z]{2,}.+\./', $releaseName, $matches);
+        elseif (preg_match('/\(www.thunder-news.org\)/i', $releaseName) === 1) // Thunder-News has a specific format that will not match, or match incorrectly with the normal regex parsers below
+            preg_match('/>(?P<artist>\w[\w\s\'_\&\-]+?)-(?P<release>\w[\w\s\'_\(\)\d\&\.]+)-([A-Z]{2,}|\(|(19|20)\d\d).+< <.+\.(?i:par|nfo|sfv|rar|r\d\d?|vol|nzb|m3u|cue|flac)/', $releaseName, $matches);
+        elseif (preg_match('/\[ [a-f0-9]{32} \]/', $releaseName) === 1)  // Weird releases that begin with [ 32 char hash ]
+            preg_match('/"\d\d-(?P<artist>[\w\s\&\'_\.\-]+?)-(?P<title>[\w\s\&\'_\.\(\),!]+?)-((20|19)\d\d|web|\(|(?i:fri|sat|sun|mon|tue|wed|thu)|[0-2][0-9]).+\./i', $releaseName, $matches);
+        elseif (preg_match('/^time life/i', $releaseName) === 1) // Time-Life compilations
+        {
+            preg_match('/^Time Life ?-? ?(?P<title>[\w\s\&\'_\.\(\),!]+)/i', $releaseName, $matches);
+            $matches['artist'] = 'Various Artists';
+        }
+        else  // General parsers that work with most other release names
+        {
+            // Remove parts and years
+            $releaseName = preg_replace('/(\(.+?\))|(?<!-)\(?\[?19\d\d\]?\)?(-\d(?!\d\d\d))?(?!-)|(?<!-)\(?\[?20\d\d\]?\)?(-\d(?!\d\d\d))?(?!-)|\(?\[?\d{1,3}\/\d{1,3}\]?\)?|\[\d{1,2} of \d{1,2}\]|\[|\]|^(?!VA)[A-Z ]{2,}|.NMR.|.nmr./', '', $releaseName);
+
+            // Release parser 1
+            preg_match('/--(?P<artist>[\w\s\&\'_]+?)-(?P<title>[\w\s\&\'_\.\-!,]+)-/i', $releaseName, $matches);
+
+            // Release parser 2
+            if((!isset($matches['artist']) || !isset($matches['title'])) || strlen($matches['artist']) < 2 || strlen($matches['title']) < 2)
+                preg_match('/"(?P<artist>[\w\s\&\'_]+?)-(?P<title>[\w\s\&\'_\.\(\)!,]+?)(\(|\.(?i:par|nfo|sfv|rar|r\d\d?|vol|nzb|m3u|cue|flac))/i', $releaseName, $matches);
+
+            // Release parser 3
+            if ((!isset($matches['artist']) || !isset($matches['title'])) || strlen($matches['artist']) < 2 || strlen($matches['title']) < 2 || preg_match('/^[A \d]+$/', $matches['artist']) === 1 || preg_match('/^[A \d]+$/', $matches['title']) === 1)
+                preg_match('/(?P<artist>[\w\s\&\'_]+?)[ \-\"]+?(?P<title>[\w\s\&\'_\.\(\),!]+)\.(?i:par|nfo|sfv|rar|r\d\d?|vol|nzb|m3u|cue|flac)/i', $releaseName, $matches);
+
+            // Release parser 4
+            if ((!isset($matches['artist']) || !isset($matches['title'])) || strlen($matches['artist']) < 2 || strlen($matches['title']) < 2 || preg_match('/^[A \d]+$/', $matches['artist']) === 1 || preg_match('/^[A \d]+$/', $matches['title']) === 1)
+                preg_match('/^"?-?(?P<artist>[\w\s\&\'_\-]+?) - (?P<title>[\w\s\&\'_\.\(\),!]+?)[\-\(";]/', $releaseName, $matches);
+
+            // Release parser 5
+            if ((!isset($matches['artist']) || !isset($matches['title'])) || strlen($matches['artist']) < 2 || strlen($matches['title']) < 2 || preg_match('/^[A \d]+$/', $matches['artist']) === 1 || preg_match('/^[A \d]+$/', $matches['title']) === 1)
+                preg_match('/^"?-?(?P<artist>[\w\s\&\'_]+?)-(?P<title>[\w\s\&\'_\.\(\),!]+?)[\-\(";]/', $releaseName, $matches);
+
+            // Release parser 6
+            if ((!isset($matches['artist']) || !isset($matches['title'])) || strlen($matches['artist']) < 2 || strlen($matches['title']) < 2 || preg_match('/^[A \d]+$/', $matches['artist']) === 1 || preg_match('/^[A \d]+$/', $matches['title']) === 1)
+                preg_match('/^"?(?P<artist>[\w\s\&\'_]+?)-.+"(?P<title>[\w\s\&\'_\.\(\),!]+?)(?i:([\-\("]|\.(par|nfo|sfv|rar|r\d\d?|vol|nzb|m3u|cue|flac)))/', $releaseName, $matches);
+
+        }
+
+        if (!isset($matches['title']) || !isset($matches['artist']))
+            return false;
+        // Get rid of leading or trailing spaces/hyphens/parenthesis
+        $matches = preg_replace('/^[\(\) \-]+|[\(\) \-]+$/', '', $matches);
+
+        $matches['artist'] = trim(str_ireplace(array('-', '_', '"'), ' ', $matches['artist']));
+        $matches['title'] = trim(str_ireplace(array('-', '_', '"'), ' ', $matches['title']));
+
+        // Replace multiple spaces with a single space
+        $matches= preg_replace('/\s{2,}/', ' ', $matches);
+
+        if (preg_match('/^\d+$/', $matches['artist']) === 1 || strlen($matches['artist']) < 2 || preg_match('/^\s+&/', $matches['artist']) === 1)
+            return false;
+
+        if (preg_match('/^\d+$/', $matches['title']) === 1 || strlen($matches['title']) < 2 || preg_match('/^\s+&/', $matches['title']) === 1)
+            return false;
+
+        if (trim($matches['artist']) == 'VA' || trim($matches['artist']) == 'Various' || trim($matches['artist']) == 'va' || trim($matches['artist']) == 'various')
+            $matches['artist'] = 'Various Artists';
+
+        return $matches;
     }
 
     /**
@@ -1649,9 +1819,9 @@ class MusicBrainz {
                     throw new MBException("Invalid email address.  Halting MusicBrainz Processing.");
                 }
                 else //The following is REQUIRED if using musicbrainz.org for the server, per http://musicbrainz.org/doc/XML_Web_Service/Rate_Limiting
-                    usleep($this->_threads * 9000);
+                    sleep($this->_threads * 1);
             }
-
+            // sleep(2);   // Added this in as a step to alleviate an error MusicBrainz seems to generate when it is being flooded
             $xml_response = curl_exec($ch);
             if ($xml_response === false)
             {
@@ -1684,7 +1854,7 @@ class MusicBrainz {
     {
         if (MusicBrainz::DEBUG_MODE >= MusicBrainz::DEBUG_MIN)
             echo "Starting " . __METHOD__ . "\n";
-
+        sleep(2);  //Prevent overloading rate limiters
         $releaseImage = new ReleaseImage();
         if ($release->getCover() == true)
         {

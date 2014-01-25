@@ -89,7 +89,7 @@ class mbTrack extends mb_base{
      */
     public function setTrackNumber($trackNumber)
     {
-        if(is_integer($trackNumber))
+        //if(is_integer((int)$trackNumber))
             $this->_trackNumber = $trackNumber;
     }
 
